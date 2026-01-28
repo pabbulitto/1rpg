@@ -2,7 +2,7 @@
   "rusty_sword": {
     "name": "Ржавый меч",
     "type": "weapon",
-    "slot": "right_hand",
+    "slot": "hand",
     "stats": {"attack": 3},
     "price": 15,
     "stackable": false
@@ -10,7 +10,7 @@
   "iron_sword": {
     "name": "Железный меч",
     "type": "weapon",
-    "slot": "right_hand",
+    "slot": "hand",
     "stats": {"attack": 8},
     "price": 50,
     "stackable": false
@@ -18,7 +18,7 @@
   "steel_blade": {
     "name": "Стальной клинок",
     "type": "weapon",
-    "slot": "right_hand",
+    "slot": "hand",
     "stats": {"attack": 12},
     "price": 120,
     "stackable": false
@@ -26,15 +26,31 @@
   "dragon_tooth_sword": {
     "name": "Драконий зуб",
     "type": "weapon",
-    "slot": "right_hand",
+    "slot": "hand",
     "stats": {"attack": 20},
     "price": 500,
+    "stackable": false
+  },
+  "thief_dagger": {
+    "name": "Кинжал разбойника",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {"attack": 10},
+    "price": 35,
+    "stackable": false
+  },
+  "short_sword": {
+    "name": "Короткий меч",
+    "type": "weapon",
+    "slot": "hand",
+    "stats": {"attack": 7},
+    "price": 40,
     "stackable": false
   },
   "hunter_bow": {
     "name": "Лук охотника",
     "type": "weapon",
-    "slot": "right_hand",
+    "slot": "two_handed",
     "stats": {"attack": 6},
     "price": 60,
     "stackable": false
@@ -42,23 +58,23 @@
   "mage_staff": {
     "name": "Посох мага",
     "type": "weapon",
-    "slot": "right_hand",
+    "slot": "two_handed",
     "stats": {"attack": 4, "health": 20},
     "price": 80,
     "stackable": false
   },
-  "woodcutter_axe": {
-    "name": "Топор дровосека",
+  "great_axe": {
+    "name": "Большой топор",
     "type": "weapon",
-    "slot": "right_hand",
-    "stats": {"attack": 10},
-    "price": 70,
+    "slot": "two_handed",
+    "stats": {"attack": 15},
+    "price": 150,
     "stackable": false
   },
   "wooden_shield": {
     "name": "Деревянный щит",
     "type": "armor",
-    "slot": "left_hand",
+    "slot": "hand",
     "stats": {"defense": 6, "health": 8},
     "price": 40,
     "stackable": false
@@ -66,7 +82,7 @@
   "iron_shield": {
     "name": "Железный щит",
     "type": "armor",
-    "slot": "left_hand",
+    "slot": "hand",
     "stats": {"defense": 10, "health": 15},
     "price": 100,
     "stackable": false
@@ -74,9 +90,33 @@
   "dragon_shield": {
     "name": "Щит дракона",
     "type": "armor",
-    "slot": "left_hand",
+    "slot": "hand",
     "stats": {"defense": 15, "health": 25},
     "price": 300,
+    "stackable": false
+  },
+  "leather_helmet": {
+    "name": "Кожаный шлем",
+    "type": "armor",
+    "slot": "head",
+    "stats": {"defense": 3, "health": 5},
+    "price": 30,
+    "stackable": false
+  },
+  "iron_helmet": {
+    "name": "Железный шлем",
+    "type": "armor",
+    "slot": "head",
+    "stats": {"defense": 6, "health": 10},
+    "price": 75,
+    "stackable": false
+  },
+  "mage_hat": {
+    "name": "Шляпа мага",
+    "type": "armor",
+    "slot": "head",
+    "stats": {"defense": 2, "health": 8},
+    "price": 50,
     "stackable": false
   },
   "leather_jacket": {
@@ -93,6 +133,142 @@
     "slot": "body",
     "stats": {"defense": 8},
     "price": 150,
+    "stackable": false
+  },
+  "steel_breastplate": {
+    "name": "Стальной нагрудник",
+    "type": "armor",
+    "slot": "body",
+    "stats": {"defense": 12},
+    "price": 250,
+    "stackable": false
+  },
+  "dragon_scales": {
+    "name": "Драконья чешуя",
+    "type": "armor",
+    "slot": "body",
+    "stats": {"defense": 20, "health": 30},
+    "price": 800,
+    "stackable": false
+  },
+  "leather_bracers": {
+    "name": "Кожаные наручи",
+    "type": "armor",
+    "slot": "arms",
+    "stats": {"defense": 2},
+    "price": 25,
+    "stackable": false
+  },
+  "iron_bracers": {
+    "name": "Железные наручи",
+    "type": "armor",
+    "slot": "arms",
+    "stats": {"defense": 4},
+    "price": 60,
+    "stackable": false
+  },
+  "leather_gloves": {
+    "name": "Кожаные перчатки",
+    "type": "armor",
+    "slot": "hands",
+    "stats": {"defense": 1, "attack": 1},
+    "price": 20,
+    "stackable": false
+  },
+  "iron_gauntlets": {
+    "name": "Железные перчатки",
+    "type": "armor",
+    "slot": "hands",
+    "stats": {"defense": 3},
+    "price": 50,
+    "stackable": false
+  },
+  "leather_belt": {
+    "name": "Кожаный пояс",
+    "type": "armor",
+    "slot": "belt",
+    "stats": {"health": 5},
+    "price": 15,
+    "stackable": false
+  },
+  "chain_belt": {
+    "name": "Цепной пояс",
+    "type": "armor",
+    "slot": "belt",
+    "stats": {"defense": 2, "health": 10},
+    "price": 40,
+    "stackable": false
+  },
+  "leather_pants": {
+    "name": "Кожаные штаны",
+    "type": "armor",
+    "slot": "legs",
+    "stats": {"defense": 2},
+    "price": 30,
+    "stackable": false
+  },
+  "chain_leggings": {
+    "name": "Кольчужные поножи",
+    "type": "armor",
+    "slot": "legs",
+    "stats": {"defense": 5},
+    "price": 80,
+    "stackable": false
+  },
+  "leather_boots": {
+    "name": "Кожаные ботинки",
+    "type": "armor",
+    "slot": "feet",
+    "stats": {"defense": 2},
+    "price": 25,
+    "stackable": false
+  },
+  "iron_boots": {
+    "name": "Железные сапоги",
+    "type": "armor",
+    "slot": "feet",
+    "stats": {"defense": 4},
+    "price": 65,
+    "stackable": false
+  },
+  "bronze_amulet": {
+    "name": "Бронзовый амулет",
+    "type": "accessory",
+    "slot": "neck",
+    "stats": {"health": 10},
+    "price": 50,
+    "stackable": false
+  },
+  "silver_amulet": {
+    "name": "Серебряный амулет",
+    "type": "accessory",
+    "slot": "neck",
+    "stats": {"health": 20, "defense": 2},
+    "price": 120,
+    "stackable": false
+  },
+  "traveler_cloak": {
+    "name": "Плащ путешественника",
+    "type": "armor",
+    "slot": "neck",
+    "stats": {"defense": 3},
+    "price": 70,
+    "stackable": false
+  },
+  "bronze_ring": {
+    "name": "Бронзовое кольцо",
+    "type": "accessory",
+    "slot": "ring",
+    "stats": {"attack": 1},
+    "price": 40,
+    "stackable": false
+  },
+  "silver_ring": {
+    "name": "Серебряное кольцо",
+    "type": "accessory",
+    "slot": "ring",
+    "stats": {"attack": 2, "defense": 1},
+    "price": 100,
     "stackable": false
   },
   "wolf_fang": {
@@ -140,22 +316,6 @@
     "stackable": true,
     "maxStack": 10
   },
-  "rusty_axe": {
-    "name": "Ржавый топор",
-    "type": "weapon",
-    "slot": "right_hand",
-    "stats": {"attack": 8},
-    "price": 25,
-    "stackable": false
-  },
-  "thief_dagger": {
-    "name": "Кинжал разбойника",
-    "type": "weapon",
-    "slot": "right_hand",
-    "stats": {"attack": 10},
-    "price": 35,
-    "stackable": false
-  },
   "stolen_gold": {
     "name": "Украденное золото",
     "type": "currency",
@@ -174,48 +334,6 @@
     "stackable": true,
     "maxStack": 10
   },
-  "leather_helmet": {
-    "name": "Кожаный шлем",
-    "type": "armor",
-    "slot": "head",
-    "stats": {"defense": 3, "health": 5},
-    "price": 30,
-    "stackable": false
-  },
-  "iron_helmet": {
-    "name": "Железный шлем",
-    "type": "armor",
-    "slot": "head",
-    "stats": {"defense": 6, "health": 10},
-    "price": 75,
-    "stackable": false
-  },
-  "mage_hat": {
-    "name": "Шляпа мага",
-    "type": "armor", 
-    "slot": "head",
-    "stats": {"defense": 2, "health": 8},
-    "price": 50,
-    "stackable": false
-  },
-
-  "steel_breastplate": {
-    "name": "Стальной нагрудник",
-    "type": "armor",
-    "slot": "body",
-    "stats": {"defense": 12},
-    "price": 250,
-    "stackable": false
-  },
-  "dragon_scales": {
-    "name": "Драконья чешуя",
-    "type": "armor",
-    "slot": "body",
-    "stats": {"defense": 20, "health": 30},
-    "price": 800,
-    "stackable": false
-  },
-  
   "health_potion": {
     "name": "Зелье здоровья",
     "type": "consumable",
