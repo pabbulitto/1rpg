@@ -2,7 +2,6 @@
   "village": {
     "name": "Тихая деревня",
     "startRoom": "village_square",
-    "minPlayerLevel": 1,
     "theme": "village",
     "unlockedByDefault": true,
     "depthRange": [0, 0]
@@ -10,7 +9,6 @@
   "forest": {
     "name": "Зачарованный Лес",
     "startRoom": "forest_entrance",
-    "minPlayerLevel": 2,
     "theme": "forest",
     "unlockedByDefault": true,
     "depthRange": [0, 1]
@@ -18,7 +16,6 @@
   "dungeon": {
     "name": "Подземелье Кровавого Копья",
     "startRoom": "entrance",
-    "minPlayerLevel": 5,
     "theme": "dungeon",
     "unlockedByDefault": false,
     "depthRange": [1, 5]
@@ -26,7 +23,6 @@
   "castle": {
     "name": "Заброшенный Замок",
     "startRoom": "castle_gate",
-    "minPlayerLevel": 8,
     "theme": "castle",
     "unlockedByDefault": false,
     "depthRange": [0, 3]
@@ -34,7 +30,6 @@
   "road_dungeon": {
     "name": "Дорога к подземелью",
     "startRoom": "village_entrance",
-    "minPlayerLevel": 3,
     "theme": "road",
     "unlockedByDefault": false,
     "depthRange": [0, 0]
@@ -42,7 +37,6 @@
   "road_castle": {
     "name": "Дорога к старому замку",
     "startRoom": "village_entrance",
-    "minPlayerLevel": 6,
     "theme": "road",
     "unlockedByDefault": false,
     "depthRange": [0, 0]
