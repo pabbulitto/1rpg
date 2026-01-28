@@ -108,7 +108,7 @@ class UIManager {
       const roomInfo = this.game.zoneManager.getCurrentRoomInfo();
       this.updateRoomInfo(roomInfo);
       this.updateDirections();
-      this.updateMinimap();
+      this.updateMinimap(); // НОВОЕ: обновляем миникарту
     }
   }
   
@@ -165,6 +165,7 @@ class UIManager {
       if (valueElement) valueElement.textContent = value;
     }
   }
+  
   updateRoomInfo(roomInfo) {
     if (!roomInfo) return;
   
@@ -219,14 +220,217 @@ class UIManager {
     });
   }
   
+  // НОВЫЙ МЕТОД: Обновить миникарту с сеткой 7x7
   updateMinimap() {
-    const position = this.game.zoneManager.getCurrentPosition();
-    const roomInfo = this.game.zoneManager.getCurrentRoomInfo();
+    if (!this.elements.minimap || !this.game.zoneManager) return;
     
-    const mapText = `Зона: ${position.zoneName}\nКомната: ${position.room}\nГлубина: ${roomInfo?.depth || 0}`;
-    if (this.elements.minimap) {
-      this.elements.minimap.textContent = mapText;
+    const minimapManager = this.game.zoneManager.getMinimapManager();
+    if (!minimapManager) {
+      this.elements.minimap.innerHTML = '<div class="minimap-error">Миникарта не загружена</div>';
+      return;
     }
+    
+    const minimapData = minimapManager.getMinimapData();
+    if (!minimapData || !minimapData.grid) {
+      this.elements.minimap.innerHTML = '<div class="minimap-error">Нет данных для миникарты</div>';
+      return;
+    }
+    
+    // Создаем сетку 7x7
+    let html = `<div class="minimap-header">${minimapData.zoneName}</div>`;
+    html += '<div class="minimap-grid">';
+    
+    for (let y = 0; y < minimapData.dimensions.height; y++) {
+      for (let x = 0; x < minimapData.dimensions.width; x++) {
+        const cell = minimapData.grid[y][x];
+        const cellClasses = this.getMinimapCellClasses(cell);
+        const cellContent = this.getMinimapCellContent(cell);
+        
+        html += `
+          <div class="minimap-cell ${cellClasses}" 
+               title="${cell.roomId ? cell.name : 'Неизвестно'}"
+               data-x="${x}" data-y="${y}">
+            ${cellContent}
+          </div>
+        `;
+      }
+    }
+    
+    html += '</div>';
+    
+    // Добавляем информацию о координатах
+    const playerCoords = minimapManager.getPlayerCoordinates();
+    if (playerCoords) {
+      html += `
+        <div class="minimap-coordinates">
+          X=${playerCoords.x}, Y=${playerCoords.y}
+          ${playerCoords.level !== 0 ? `, Уровень ${playerCoords.level}` : ''}
+        </div>
+      `;
+    }
+    
+    this.elements.minimap.innerHTML = html;
+  }
+  
+  // НОВЫЙ МЕТОД: Получить CSS классы для клетки миникарты
+  getMinimapCellClasses(cell) {
+    const classes = ['minimap-cell'];
+    
+    if (cell.roomId) {
+      if (cell.visited) {
+        classes.push('visited');
+      } else {
+        classes.push('unvisited');
+      }
+      
+      if (cell.isPlayer) {
+        classes.push('player');
+      }
+      
+      // Маппинг special -> CSS класс для стилизации
+      if (cell.special) {
+        const special = cell.special.toLowerCase();
+        
+        if (special.includes('shop') || special.includes('market') || 
+            special.includes('blacksmith') || special.includes('healer')) {
+          classes.push('cell-shop');
+        } else if (special.includes('forest') || special.includes('wood') || 
+                   special.includes('grove') || special.includes('glade')) {
+          classes.push('cell-forest');
+        } else if (special.includes('road') || special.includes('path') || 
+                   special.includes('bridge')) {
+          classes.push('cell-road');
+        } else if (special.includes('town') || special.includes('village') || 
+                   special.includes('square') || special.includes('central')) {
+          classes.push('cell-town');
+        } else if (special.includes('water') || special.includes('river') || 
+                   special.includes('swamp') || special.includes('marsh')) {
+          classes.push('cell-water');
+        } else if (special.includes('cave') || special.includes('dungeon') || 
+                   special.includes('tunnel') || special.includes('underground')) {
+          classes.push('cell-cave');
+        } else if (special.includes('boss') || special.includes('throne') || 
+                   special.includes('arena')) {
+          classes.push('cell-boss');
+        } else {
+          classes.push('cell-default');
+        }
+      } else {
+        classes.push('cell-default');
+      }
+    } else {
+      classes.push('empty');
+    }
+    
+    return classes.join(' ');
+  }
+  
+  // НОВЫЙ МЕТОД: Получить содержимое для клетки миникарты
+  getMinimapCellContent(cell) {
+    if (!cell.roomId) {
+      return '';
+    }
+    
+    if (cell.isPlayer) {
+      return '<i class="fas fa-user"></i>';
+    }
+    
+    if (cell.visited) {
+      // Для посещенных комнат показываем иконку в зависимости от special
+      if (cell.special) {
+        const special = cell.special.toLowerCase();
+        
+        if (special.includes('shop')) {
+          return '<i class="fas fa-store"></i>';
+        } else if (special.includes('blacksmith')) {
+          return '<i class="fas fa-hammer"></i>';
+        } else if (special.includes('healer')) {
+          return '<i class="fas fa-heart"></i>';
+        } else if (special.includes('forest')) {
+          return '<i class="fas fa-tree"></i>';
+        } else if (special.includes('water')) {
+          return '<i class="fas fa-water"></i>';
+        } else if (special.includes('cave') || special.includes('dungeon')) {
+          return '<i class="fas fa-mountain"></i>';
+        } else if (special.includes('boss')) {
+          return '<i class="fas fa-skull"></i>';
+        } else if (special.includes('town') || special.includes('village')) {
+          return '<i class="fas fa-home"></i>';
+        }
+      }
+      return '<i class="fas fa-map-marker-alt"></i>';
+    }
+    
+    // Для непосещенных комнат
+    return '<i class="fas fa-question"></i>';
+  }
+  
+  // ОБНОВЛЕНО: Добавить вызов updateMinimap()
+  showExplorationUI() {
+    if (this.elements.battleUI) this.elements.battleUI.style.display = 'none';
+    if (this.elements.exploreBtn) this.elements.exploreBtn.style.display = 'flex';
+    if (this.elements.searchEnemiesBtn) this.elements.searchEnemiesBtn.style.display = 'flex';
+    this.updateAll();
+    this.updateMinimap(); // НОВОЕ: обновляем миникарту
+  }
+  
+  // Остальные методы без изменений...
+  // ... (updateInventory, addToLog, showBattleUI и другие методы остаются как были)
+  
+  showBattleUI(battleStart) {
+    if (this.elements.battleUI) this.elements.battleUI.style.display = 'block';
+    if (this.elements.exploreBtn) this.elements.exploreBtn.style.display = 'none';
+    if (this.elements.searchEnemiesBtn) this.elements.searchEnemiesBtn.style.display = 'none';
+    
+    if (battleStart.enemy && this.elements.enemyName && this.elements.enemyHealth) {
+      this.elements.enemyName.textContent = battleStart.enemy.name;
+      this.elements.enemyHealth.textContent = `${battleStart.enemy.health}/${battleStart.enemy.maxHealth}`;
+    }
+    
+    if (battleStart.log) {
+      battleStart.log.forEach(msg => this.addToLog(msg, 'battle'));
+    }
+  }
+  
+  updateBattleStats(playerStats, enemyInfo) {
+    this.updatePlayerStats(playerStats);
+    
+    if (enemyInfo && this.elements.enemyName && this.elements.enemyHealth) {
+      this.elements.enemyName.textContent = enemyInfo.name;
+      this.elements.enemyHealth.textContent = `${enemyInfo.health}/${enemyInfo.maxHealth}`;
+    }
+  }
+  
+  showVictoryScreen(result) {
+    this.addToLog("=".repeat(40), 'victory');
+    if (result.log) {
+      result.log.forEach(msg => this.addToLog(msg, 'victory'));
+    }
+    this.addToLog("=".repeat(40), 'victory');
+  }
+  
+  addToLog(message, type = 'info') {
+    if (!this.elements.logContent) return;
+    
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry log-${type}`;
+    logEntry.textContent = `> ${message}`;
+    
+    this.elements.logContent.appendChild(logEntry);
+    this.elements.logContent.scrollTop = this.elements.logContent.scrollHeight;
+    
+    const entries = this.elements.logContent.querySelectorAll('.log-entry');
+    if (entries.length > 50) {
+      entries[0].remove();
+    }
+  }
+  
+  updateBattleLog(messages) {
+    if (!messages || !Array.isArray(messages)) return;
+    
+    messages.forEach(msg => {
+      this.addToLog(msg, 'battle');
+    });
   }
   
   updateInventory(inventoryInfo) {
@@ -335,69 +539,6 @@ class UIManager {
     return parts.length > 0 ? parts.join(', ') : 'Нет бонусов';
   }
   
-  addToLog(message, type = 'info') {
-    if (!this.elements.logContent) return;
-    
-    const logEntry = document.createElement('div');
-    logEntry.className = `log-entry log-${type}`;
-    logEntry.textContent = `> ${message}`;
-    
-    this.elements.logContent.appendChild(logEntry);
-    this.elements.logContent.scrollTop = this.elements.logContent.scrollHeight;
-    
-    const entries = this.elements.logContent.querySelectorAll('.log-entry');
-    if (entries.length > 50) {
-      entries[0].remove();
-    }
-  }
-  
-  updateBattleLog(messages) {
-    if (!messages || !Array.isArray(messages)) return;
-    
-    messages.forEach(msg => {
-      this.addToLog(msg, 'battle');
-    });
-  }
-  
-  showBattleUI(battleStart) {
-    if (this.elements.battleUI) this.elements.battleUI.style.display = 'block';
-    if (this.elements.exploreBtn) this.elements.exploreBtn.style.display = 'none';
-    if (this.elements.searchEnemiesBtn) this.elements.searchEnemiesBtn.style.display = 'none';
-    
-    if (battleStart.enemy && this.elements.enemyName && this.elements.enemyHealth) {
-      this.elements.enemyName.textContent = battleStart.enemy.name;
-      this.elements.enemyHealth.textContent = `${battleStart.enemy.health}/${battleStart.enemy.maxHealth}`;
-    }
-    
-    if (battleStart.log) {
-      battleStart.log.forEach(msg => this.addToLog(msg, 'battle'));
-    }
-  }
-  
-  updateBattleStats(playerStats, enemyInfo) {
-    this.updatePlayerStats(playerStats);
-    
-    if (enemyInfo && this.elements.enemyName && this.elements.enemyHealth) {
-      this.elements.enemyName.textContent = enemyInfo.name;
-      this.elements.enemyHealth.textContent = `${enemyInfo.health}/${enemyInfo.maxHealth}`;
-    }
-  }
-  
-  showVictoryScreen(result) {
-    this.addToLog("=".repeat(40), 'victory');
-    if (result.log) {
-      result.log.forEach(msg => this.addToLog(msg, 'victory'));
-    }
-    this.addToLog("=".repeat(40), 'victory');
-  }
-  
-  showExplorationUI() {
-    if (this.elements.battleUI) this.elements.battleUI.style.display = 'none';
-    if (this.elements.exploreBtn) this.elements.exploreBtn.style.display = 'flex';
-    if (this.elements.searchEnemiesBtn) this.elements.searchEnemiesBtn.style.display = 'flex';
-    this.updateAll();
-  }
-  
   showShop(shopInfo) {
     if (!shopInfo) {
       this.addToLog("Информация о магазине не загружена", "error");
@@ -426,7 +567,6 @@ class UIManager {
             <h3>Товары магазина:</h3>
     `;
 
-    // Секция покупки
     if (!shopInfo.items || shopInfo.items.length == 0) {
       shopHTML += '<p>В магазине нет товаров</p>';
     } else {
@@ -523,13 +663,11 @@ class UIManager {
     if (!modal) return;
 
     modal.addEventListener('click', (e) => {
-      // Закрытие магазина
       if (e.target.id === 'close-shop-btn' || e.target.closest('#close-shop-btn')) {
         modal.remove();
         return;
       }
 
-      // Переключение вкладок
       if (e.target.classList.contains('shop-tab-btn') || e.target.closest('.shop-tab-btn')) {
         const tabBtn = e.target.classList.contains('shop-tab-btn') ? e.target : e.target.closest('.shop-tab-btn');
         const tab = tabBtn.dataset.tab;
@@ -550,7 +688,6 @@ class UIManager {
         return;
       }
 
-      // Покупка предметов
       if (e.target.classList.contains('buy-btn')) {
         const itemId = e.target.dataset.itemId;
         this.game.buyItemFromShop(itemId);
@@ -560,7 +697,6 @@ class UIManager {
           goldElement.textContent = this.game.player.getStats().gold;
         }
 
-        // Обновляем состояние кнопок покупки
         modal.querySelectorAll('.shop-item').forEach(itemEl => {
           const itemPrice = parseInt(itemEl.querySelector('.item-price').textContent) || 0;
           const canAfford = this.game.player.getStats().gold >= itemPrice;
@@ -570,7 +706,6 @@ class UIManager {
           button.textContent = canAfford ? 'Купить' : 'Недостаточно золота';
         });
         
-        // Обновляем вкладку продажи
         const sellTab = modal.querySelector('#shop-sell-tab .sell-items');
         if (sellTab) {
           sellTab.innerHTML = `<h3>Ваши предметы для продажи:</h3>${this.renderSellableItems()}`;
@@ -578,7 +713,6 @@ class UIManager {
         return;
       }
 
-      // Продажа предметов
       if (e.target.classList.contains('btn-sell')) {
         const itemIndex = parseInt(e.target.dataset.itemIndex);
         if (!isNaN(itemIndex)) {
@@ -589,13 +723,11 @@ class UIManager {
             goldElement.textContent = this.game.player.getStats().gold;
           }
 
-          // Обновляем список предметов для продажи
           const sellTab = modal.querySelector('#shop-sell-tab .sell-items');
           if (sellTab) {
             sellTab.innerHTML = `<h3>Ваши предметы для продажи:</h3>${this.renderSellableItems()}`;
           }
           
-          // Обновляем кнопки покупки
           modal.querySelectorAll('.shop-item').forEach(itemEl => {
             const itemPrice = parseInt(itemEl.querySelector('.item-price').textContent) || 0;
             const canAfford = this.game.player.getStats().gold >= itemPrice;
@@ -609,7 +741,6 @@ class UIManager {
       }
     });
 
-    // Инициализация значений при открытии магазина
     const goldElement = modal.querySelector('.shop-gold .gold-text');
     if (goldElement) {
       goldElement.textContent = this.game.player.getStats().gold;
@@ -651,5 +782,4 @@ class UIManager {
   }
 }
 
-export { UIManager };  
-     
+export { UIManager };            
