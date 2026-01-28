@@ -258,16 +258,6 @@ class UIManager {
     
     html += '</div>';
     
-    const playerCoords = minimapManager.getPlayerCoordinates();
-    if (playerCoords) {
-      html += `
-        <div class="minimap-coordinates">
-          X=${playerCoords.x}, Y=${playerCoords.y}
-          ${playerCoords.level !== 0 ? `, Уровень ${playerCoords.level}` : ''}
-        </div>
-      `;
-    }
-    
     this.elements.minimap.innerHTML = html;
   }
   
@@ -783,6 +773,7 @@ class UIManager {
 }
 
 export { UIManager };
+
 
 
 
