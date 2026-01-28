@@ -90,33 +90,153 @@ class InventorySystem {
       return { success: false, message: "Этот предмет нельзя надеть" };
     }
     
-    let targetSlot = item.slot;
     const equipment = this.gameState.getEquipment();
+    const statManager = this.gameState.getStatManager();
     
+    // === ОБРАБОТКА ДВУРУЧНОГО ОРУЖИЯ (НОВАЯ ЛОГИКА) ===
+    if (item.slot === "two_handed") {
+      const rightHandItem = equipment.right_hand;
+      const leftHandItem = equipment.left_hand;
+      
+      // Проверяем, можно ли освободить левую руку
+      if (leftHandItem && leftHandItem.slot === "two_handed") {
+        return { success: false, message: "Уже экипировано двуручное оружие" };
+      }
+      
+      // Снимаем предметы с обеих рук
+      if (rightHandItem) {
+        const unequipResult = this.unequipItem("right_hand", player);
+        if (!unequipResult.success && !unequipResult.isEmpty) {
+          return { success: false, message: "Не удалось освободить правую руку" };
+        }
+      }
+      
+      if (leftHandItem) {
+        const unequipResult = this.unequipItem("left_hand", player);
+        if (!unequipResult.success && !unequipResult.isEmpty) {
+          return { success: false, message: "Не удалось освободить левую руку" };
+        }
+      }
+      
+      // Надеваем двуручник в правую руку
+      const removedItem = this.removeItem(itemIndex);
+      if (!removedItem) {
+        return { success: false, message: "Не удалось удалить предмет из инвентаря" };
+      }
+      
+      const equipped = player.equipItem(removedItem, "right_hand");
+      if (!equipped) {
+        this.addItem(removedItem);
+        return { success: false, message: "Не удалось надеть двуручное оружие" };
+      }
+      
+      // Добавляем модификатор
+      if (removedItem.stats && Object.keys(removedItem.stats).length > 0) {
+        statManager.addModifier("equipment_right_hand", removedItem.stats);
+      }
+      
+      return { success: true, message: `Вы надели ${removedItem.name} (двуручное)` };
+    }
+    
+    // === СТАРАЯ ЛОГИКА ДЛЯ РУК (С ДОПОЛНЕНИЕМ) ===
+    if (item.slot === "hand") {
+      // ПРОВЕРКА: левая рука не заблокирована двуручником
+      const rightHandItem = equipment.right_hand;
+      if (rightHandItem && rightHandItem.slot === "two_handed") {
+        return { success: false, message: "Левая рука занята двуручным оружием" };
+      }
+      
+      // Ищем свободную руку
+      let targetSlot = null;
+      if (!equipment.right_hand) {
+        targetSlot = "right_hand";
+      } else if (!equipment.left_hand) {
+        targetSlot = "left_hand";
+      } else {
+        return { success: false, message: "Обе руки заняты" };
+      }
+      
+      return this.equipToSlot(itemIndex, targetSlot, player, item);
+    }
+    
+    // === ОБРАБОТКА КОЛЕЦ (старая логика) ===
     if (item.slot === "ring") {
-      if (!equipment.ring1) targetSlot = "ring1";
-      else if (!equipment.ring2) targetSlot = "ring2";
-      else return { success: false, message: "Оба слота колец заняты" };
+      if (!equipment.ring1) {
+        return this.equipToSlot(itemIndex, "ring1", player, item);
+      } else if (!equipment.ring2) {
+        return this.equipToSlot(itemIndex, "ring2", player, item);
+      } else {
+        return { success: false, message: "Оба слота колец заняты" };
+      }
     }
     
-    else if (item.slot === "neck") {
-      if (!equipment.neck1) targetSlot = "neck1";
-      else if (!equipment.neck2) targetSlot = "neck2";
-      else return { success: false, message: "Оба слота амулетов заняты" };
+    // === ОБРАБОТКА АМУЛЕТОВ (старая логика) ===
+    if (item.slot === "neck") {
+      if (!equipment.neck1) {
+        return this.equipToSlot(itemIndex, "neck1", player, item);
+      } else if (!equipment.neck2) {
+        return this.equipToSlot(itemIndex, "neck2", player, item);
+      } else {
+        return { success: false, message: "Оба слота амулетов заняты" };
+      }
     }
     
-    else if (item.slot === "hand") {
-      if (!equipment.right_hand) targetSlot = "right_hand";
-      else if (!equipment.left_hand) targetSlot = "left_hand";
-      else return { success: false, message: "Оба слота рук заняты" };
+    // === ОБРАБОТКА ПРЯМЫХ СЛОТОВ (НОВАЯ ЛОГИКА) ===
+    const directSlots = ["head", "body", "arms", "hands", "belt", "legs", "feet"];
+    if (directSlots.includes(item.slot)) {
+      return this.equipToSlot(itemIndex, item.slot, player, item);
     }
+    
+    // === РЕЗЕРВНЫЙ ВАРИАНТ (старая логика) ===
+    let targetSlot = item.slot;
+    
+    if (equipment[targetSlot]) {
+      const oldItem = equipment[targetSlot];
+      const equipped = player.equipItem(item, targetSlot);
+      
+      if (equipped) {
+        statManager.removeModifier(`equipment_${targetSlot}`);
+        
+        if (item.stats && Object.keys(item.stats).length > 0) {
+          statManager.addModifier(`equipment_${targetSlot}`, item.stats);
+        }
+        
+        this.addItem(oldItem);
+        return { 
+          success: true, 
+          message: `Вы надели ${item.name} (сняли ${oldItem.name})` 
+        };
+      } else {
+        player.equipItem(oldItem, targetSlot);
+        this.addItem(item);
+        return { success: false, message: "Не удалось надеть предмет" };
+      }
+    }
+    
+    const equipped = player.equipItem(item, targetSlot);
+    
+    if (!equipped) {
+      this.addItem(item);
+      return { success: false, message: "Не удалось надеть предмет" };
+    }
+    
+    if (item.stats && Object.keys(item.stats).length > 0) {
+      statManager.addModifier(`equipment_${targetSlot}`, item.stats);
+    }
+    
+    return { success: true, message: `Вы надели ${item.name}` };
+  }
+  
+  // === ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ НАДЕВАНИЯ В КОНКРЕТНЫЙ СЛОТ ===
+  equipToSlot(itemIndex, targetSlot, player, item) {
+    const equipment = this.gameState.getEquipment();
+    const statManager = this.gameState.getStatManager();
     
     const removedItem = this.removeItem(itemIndex);
     if (!removedItem) {
       return { success: false, message: "Не удалось удалить предмет из инвентаря" };
     }
     
-    const statManager = this.gameState.getStatManager();
     const equipmentSource = `equipment_${targetSlot}`;
     
     if (equipment[targetSlot]) {
@@ -124,7 +244,7 @@ class InventorySystem {
       const equipped = player.equipItem(removedItem, targetSlot);
       
       if (equipped) {
-        statManager.removeModifier(`equipment_${targetSlot}`);
+        statManager.removeModifier(equipmentSource);
         
         if (removedItem.stats && Object.keys(removedItem.stats).length > 0) {
           statManager.addModifier(equipmentSource, removedItem.stats);
@@ -136,8 +256,8 @@ class InventorySystem {
           message: `Вы надели ${removedItem.name} (сняли ${oldItem.name})` 
         };
       } else {
-        player.equipItem(oldItem, targetSlot); 
-        this.addItem(removedItem); 
+        player.equipItem(oldItem, targetSlot);
+        this.addItem(removedItem);
         return { success: false, message: "Не удалось надеть предмет" };
       }
     }
@@ -148,6 +268,7 @@ class InventorySystem {
       this.addItem(removedItem);
       return { success: false, message: "Не удалось надеть предмет" };
     }
+    
     if (removedItem.stats && Object.keys(removedItem.stats).length > 0) {
       statManager.addModifier(equipmentSource, removedItem.stats);
     }
@@ -165,24 +286,34 @@ class InventorySystem {
       isEmpty: true 
     };
     
-    // Очищаем слот
+    // === ОСОБАЯ ЛОГИКА ДЛЯ ДВУРУЧНИКА ===
+    if (item.slot === "two_handed" && slot === "right_hand") {
+      // При снятии двуручника освобождаем только правую руку
+      // Левая рука и так была "заблокирована"
+      this.gameState.updateEquipment("right_hand", null);
+      
+      const statManager = this.gameState.getStatManager();
+      statManager.removeModifier(`equipment_right_hand`);
+      
+      this.addItem(item);
+      return { success: true, message: `Вы сняли ${item.name} (двуручное)` };
+    }
+    
+    // === СТАНДАРТНАЯ ЛОГИКА ===
     this.gameState.updateEquipment(slot, null);
     
-    // Удаляем модификатор
     const statManager = this.gameState.getStatManager();
     statManager.removeModifier(`equipment_${slot}`);
     
-    // Возвращаем предмет в инвентарь
     this.addItem(item);
-    
     return { success: true, message: `Вы сняли ${item.name}` };
   }
+  
   getInventoryInfo() {
     const items = this.gameState.getInventoryItems();
     const equipment = this.gameState.getEquipment();
     const statManager = this.gameState.getStatManager();
     
-    // Получаем финальные характеристики из StatManager
     const finalStats = statManager.getFinalStats();
     const bonuses = {
       attack: finalStats.attack - (statManager.getBaseStats().attack || 0),
