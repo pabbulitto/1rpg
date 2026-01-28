@@ -285,6 +285,13 @@ class UIManager {
         classes.push('player');
       }
       
+      if (cell.directions) {
+        if (!cell.directions.north) classes.push('no-north');
+        if (!cell.directions.south) classes.push('no-south');
+        if (!cell.directions.east) classes.push('no-east');
+        if (!cell.directions.west) classes.push('no-west');
+      }
+      
       if (cell.special) {
         const special = cell.special.toLowerCase();
         
@@ -292,22 +299,22 @@ class UIManager {
             special.includes('blacksmith') || special.includes('healer')) {
           classes.push('cell-shop');
         } else if (special.includes('forest') || special.includes('wood') || 
-                   special.includes('grove') || special.includes('glade')) {
+                  special.includes('grove') || special.includes('glade')) {
           classes.push('cell-forest');
         } else if (special.includes('road') || special.includes('path') || 
-                   special.includes('bridge')) {
+                  special.includes('bridge')) {
           classes.push('cell-road');
         } else if (special.includes('town') || special.includes('village') || 
-                   special.includes('square') || special.includes('central')) {
+                  special.includes('square') || special.includes('central')) {
           classes.push('cell-town');
         } else if (special.includes('water') || special.includes('river') || 
-                   special.includes('swamp') || special.includes('marsh')) {
+                  special.includes('swamp') || special.includes('marsh')) {
           classes.push('cell-water');
         } else if (special.includes('cave') || special.includes('dungeon') || 
-                   special.includes('tunnel') || special.includes('underground')) {
+                  special.includes('tunnel') || special.includes('underground')) {
           classes.push('cell-cave');
         } else if (special.includes('boss') || special.includes('throne') || 
-                   special.includes('arena')) {
+                  special.includes('arena')) {
           classes.push('cell-boss');
         } else {
           classes.push('cell-default');
@@ -772,3 +779,4 @@ class UIManager {
 }
 
 export { UIManager };
+
