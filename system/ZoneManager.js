@@ -1,8 +1,13 @@
+import { MinimapManager } from './MinimapManager.js';
+
 class ZoneManager {
   constructor(gameState) {
     this.gameState = gameState;
     this.loadedZones = new Map();
     this.zonesData = null;
+    
+    // Инициализируем MinimapManager
+    this.minimapManager = new MinimapManager(gameState, this);
   }
   
   async init() {
@@ -18,6 +23,9 @@ class ZoneManager {
       }
       
       await this.loadZone(position.zone);
+      
+      // Инициализируем миникарту для начальной зоны
+      this.minimapManager.initForZone(position.zone);
       
       console.log('ZoneManager инициализирован');
       return true;
@@ -105,6 +113,9 @@ class ZoneManager {
     const oldRoom = position.room;
     this.gameState.updatePosition(position.zone, targetRoom);
     
+    // Обновляем миникарту при перемещении внутри зоны
+    this.minimapManager.onPlayerMoved();
+    
     return {
       success: true,
       message: `Вы перешли в ${zoneData[targetRoom].name}`,
@@ -129,6 +140,9 @@ class ZoneManager {
       const oldRoom = position.room;
       
       this.gameState.updatePosition(targetZone, targetRoom);
+      
+      // Обновляем миникарту при смене зоны
+      this.minimapManager.switchZone(targetZone);
       
       return {
         success: true,
@@ -178,6 +192,29 @@ class ZoneManager {
     return this.zonesData?.[zoneId] || null;
   }
   
+  // Добавляем геттер для MinimapManager
+  getMinimapManager() {
+    return this.minimapManager;
+  }
+  
+  // Новый метод: получить данные миникарты для UI
+  getMinimapData() {
+    return this.minimapManager ? this.minimapManager.getMinimapData() : null;
+  }
+  
+  // Новый метод: получить текстовое представление миникарты
+  getMinimapText() {
+    return this.minimapManager ? this.minimapManager.getTextRepresentation() : 'Миникарта не доступна';
+  }
+  
+  // Новый метод: получить координаты текущей комнаты
+  getCurrentRoomCoordinates() {
+    const roomInfo = this.getCurrentRoomInfo();
+    if (roomInfo && roomInfo.coordinates) {
+      return roomInfo.coordinates;
+    }
+    return null;
+  }
 }
 
 export { ZoneManager };
