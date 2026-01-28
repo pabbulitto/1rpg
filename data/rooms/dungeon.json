@@ -12,7 +12,8 @@
     },
     "isShop": false,
     "special": "entrance",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 0, "level": 1}
   },
   "main_hall": {
     "name": "Главный зал",
@@ -30,7 +31,8 @@
     },
     "isShop": false,
     "special": "central",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 1, "level": 1}
   },
   "armory": {
     "name": "Оружейная",
@@ -45,7 +47,8 @@
     },
     "isShop": false,
     "special": "loot",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 1, "y": 1, "level": 1}
   },
   "prison": {
     "name": "Тюремные камеры",
@@ -59,7 +62,8 @@
     },
     "isShop": false,
     "special": "prison",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": -1, "y": 1, "level": 1}
   },
   "temple": {
     "name": "Заброшенный храм",
@@ -74,7 +78,8 @@
     },
     "isShop": false,
     "special": "boss",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 2, "level": 1}
   },
   "treasury": {
     "name": "Сокровищница",
@@ -85,7 +90,8 @@
     },
     "isShop": false,
     "special": "treasure",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 1, "y": 2, "level": 1}
   },
   "library": {
     "name": "Забытая библиотека",
@@ -99,7 +105,8 @@
     },
     "isShop": false,
     "special": "knowledge",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 1, "y": 0, "level": 1}
   },
   "forge": {
     "name": "Кузница",
@@ -114,7 +121,8 @@
     },
     "isShop": false,
     "special": "craft",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 2, "y": 0, "level": 1}
   },
   "shop": {
     "name": "Подпольный магазин",
@@ -125,7 +133,8 @@
     },
     "isShop": true,
     "special": "shop",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 2, "y": 1, "level": 1}
   },
   "exit_up": {
     "name": "Выход на поверхность",
@@ -134,7 +143,8 @@
     "directions": {},
     "isShop": false,
     "special": "exit_up",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": -1, "y": 0, "level": 1}
   },
   "exit_down": {
     "name": "Спуск в глубины",
@@ -147,6 +157,7 @@
     },
     "isShop": false,
     "special": "exit_down",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 3, "level": 1}
   }
 }
