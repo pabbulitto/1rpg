@@ -78,6 +78,7 @@
     "isShop": false,
     "special": "dungeon_entrance",
     "depth": 0,
-    "coordinates": {"x": 1, "y": -3, "level": 0} 
+    "coordinates": {"x": 1, "y": -1, "level": 0}
   }
 }
+
