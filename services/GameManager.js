@@ -1,5 +1,3 @@
-import { Enemy } from '../core/Enemy.js';
-
 class GameManager {
     constructor(game) {
         this.game = game;
@@ -121,5 +119,6 @@ class GameManager {
         }
     }
 }
+
 
 export { GameManager };
