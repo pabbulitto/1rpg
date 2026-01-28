@@ -54,7 +54,6 @@ class MinimapManager {
       return null;
     }
     
-    // Получаем координаты текущей комнаты
     const currentRoom = this.currentZoneData[currentRoomId];
     if (!currentRoom.coordinates) {
       console.warn(`MinimapManager: комната ${currentRoomId} не имеет координат`);
@@ -65,7 +64,6 @@ class MinimapManager {
     const playerY = currentRoom.coordinates.y;
     const playerLevel = currentRoom.coordinates.level || 0;
     
-    // Создаем пустую сетку 7x7
     const grid = Array(this.gridSize).fill().map(() => 
       Array(this.gridSize).fill().map(() => ({
         roomId: null,
@@ -78,7 +76,6 @@ class MinimapManager {
       }))
     );
     
-    // Проходим по всем комнатам зоны
     Object.entries(this.currentZoneData).forEach(([roomId, roomData]) => {
       if (!roomData.coordinates) return;
       
@@ -86,14 +83,11 @@ class MinimapManager {
       const roomY = roomData.coordinates.y;
       const roomLevel = roomData.coordinates.level || 0;
       
-      // Фильтруем по уровню (если указан)
       if (playerLevel !== roomLevel) return;
       
-      // Вычисляем позицию на сетке
       const gridX = roomX - playerX + this.centerIndex;
-      const gridY = roomY - playerY + this.centerIndex;
+      const gridY = playerY - roomY + this.centerIndex; // ← ИНВЕРСИЯ!
       
-      // Проверяем, попадает ли комната в видимую область
       if (gridX >= 0 && gridX < this.gridSize && gridY >= 0 && gridY < this.gridSize) {
         const visited = position.visitedRooms.has(`${this.currentZoneId}:${roomId}`);
         const isPlayer = roomId === currentRoomId;
