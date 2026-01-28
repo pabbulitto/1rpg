@@ -552,7 +552,7 @@ class UIManager {
         <div class="shop-tabs">
 
          <button class="shop-tab-btn active"data-tab="buy">
-            <i class="fas fa-shopping-cart"></i> Купить
+            <i class="fas fa-coins"></i> Купить
           </button>
           <button class="shop-tab-btn" data-tab="sell"> 
             <i class="fas fa-coins"></i> Продать
@@ -779,4 +779,5 @@ class UIManager {
 }
 
 export { UIManager };
+
 
