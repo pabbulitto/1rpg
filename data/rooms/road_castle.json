@@ -12,7 +12,8 @@
     },
     "isShop": false,
     "special": "entrance",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
   },
   "winding_path": {
     "name": "Извилистая тропа",
@@ -28,7 +29,8 @@
     },
     "isShop": false,
     "special": "path",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 1, "level": 0}
   },
   "ruined_shrine": {
     "name": "Разрушенная часовня",
@@ -42,7 +44,8 @@
     },
     "isShop": false,
     "special": "shrine",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": -1, "y": 1, "level": 0}
   },
   "drawbridge": {
     "name": "Перед подъемным мостом",
@@ -57,7 +60,8 @@
     },
     "isShop": false,
     "special": "drawbridge",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 2, "level": 0}
   },
   "castle_gates": {
     "name": "Перед вратами замка",
@@ -72,6 +76,7 @@
     },
     "isShop": false,
     "special": "castle_entrance",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 2, "level": 0}
   }
 }
