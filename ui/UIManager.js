@@ -25,7 +25,6 @@ class UIManager {
     this.elements.expBar = document.getElementById('exp-bar');
     
     this.elements.roomName = document.getElementById('room-name');
-    this.elements.roomDesc = document.getElementById('room-description');
     this.elements.roomDescriptionBox = document.getElementById('room-description-box');
     
     this.elements.logContent = document.getElementById('log-content');
@@ -59,21 +58,22 @@ class UIManager {
   }
   
   bindEvents() {
-    this.elements.exploreBtn.addEventListener('click', () => this.game.explore());
-    this.elements.restBtn.addEventListener('click', () => this.game.rest());
-    this.elements.shopBtn.addEventListener('click', () => this.game.openShop());
-    this.elements.searchEnemiesBtn.addEventListener('click', () => this.game.searchForEnemies());
+    // ИСПРАВЛЕНО: вызываем методы через gameManager и battleService
+    this.elements.exploreBtn.addEventListener('click', () => this.game.gameManager.explore());
+    this.elements.restBtn.addEventListener('click', () => this.game.gameManager.rest());
+    this.elements.shopBtn.addEventListener('click', () => this.game.gameManager.openShop());
+    this.elements.searchEnemiesBtn.addEventListener('click', () => this.game.gameManager.searchForEnemies());
     
-    this.elements.northBtn.addEventListener('click', () => this.game.move('north'));
-    this.elements.southBtn.addEventListener('click', () => this.game.move('south'));
-    this.elements.eastBtn.addEventListener('click', () => this.game.move('east'));
-    this.elements.westBtn.addEventListener('click', () => this.game.move('west'));
-    this.elements.upBtn.addEventListener('click', () => this.game.move('up'));
-    this.elements.downBtn.addEventListener('click', () => this.game.move('down'));
+    this.elements.northBtn.addEventListener('click', () => this.game.gameManager.move('north'));
+    this.elements.southBtn.addEventListener('click', () => this.game.gameManager.move('south'));
+    this.elements.eastBtn.addEventListener('click', () => this.game.gameManager.move('east'));
+    this.elements.westBtn.addEventListener('click', () => this.game.gameManager.move('west'));
+    this.elements.upBtn.addEventListener('click', () => this.game.gameManager.move('up'));
+    this.elements.downBtn.addEventListener('click', () => this.game.gameManager.move('down'));
     
-    this.elements.attackBtn.addEventListener('click', () => this.game.playerAttack());
-    this.elements.potionBtn.addEventListener('click', () => this.game.useDefenseAction());
-    this.elements.escapeBtn.addEventListener('click', () => this.game.tryEscape());
+    this.elements.attackBtn.addEventListener('click', () => this.game.battleService.playerAttack());
+    this.elements.potionBtn.addEventListener('click', () => this.game.battleService.useDefenseAction());
+    this.elements.escapeBtn.addEventListener('click', () => this.game.battleService.tryEscape());
   }
   
   setupTabs() {
@@ -104,10 +104,6 @@ class UIManager {
       const stats = this.game.player.getStats();
       this.updateStatsTab(stats);
     }
-    
-    // НОВОЕ: Можно добавить для других вкладок позже
-    // if (tabName === 'skills') { ... }
-    // if (tabName === 'spells') { ... }
   }
   
   updateAll() {
@@ -139,7 +135,6 @@ class UIManager {
       this.elements.playerDefense.textContent = stats.defense;
     }
     
-    // Прогресс-бары
     const healthPercent = (stats.health / stats.maxHealth) * 100;
     this.elements.healthBar.style.width = `${healthPercent}%`;
     
@@ -154,7 +149,6 @@ class UIManager {
     const expPercent = (stats.exp / stats.expToNext) * 100;
     this.elements.expBar.style.width = `${expPercent}%`;
     
-    // НОВОЕ: Обновление вкладки характеристик
     this.updateStatsTab(stats);
   }
 
@@ -164,7 +158,6 @@ class UIManager {
     
     let html = `
       <div class="stats-grid">
-        <!-- БЛОК А: АТРИБУТЫ -->
         <div class="stats-block">
           <h3><i class="fas fa-dumbbell"></i> Атрибуты</h3>
           <div class="stat-row"><span class="stat-label">Сила:</span><span class="stat-value">${stats.strength || 10}</span></div>
@@ -175,7 +168,6 @@ class UIManager {
           <div class="stat-row"><span class="stat-label">Обаяние:</span><span class="stat-value">${stats.charisma || 10}</span></div>
         </div>
         
-        <!-- БЛОК Б: БОЕВЫЕ -->
         <div class="stats-block">
           <h3><i class="fas fa-fist-raised"></i> Боевые</h3>
           <div class="stat-row"><span class="stat-label">Атака:</span><span class="stat-value">${stats.attack || 15}</span></div>
@@ -188,7 +180,6 @@ class UIManager {
           <div class="stat-row"><span class="stat-label">Блок (90% урона):</span><span class="stat-value">${stats.blockChance || 0}%</span></div>
         </div>
         
-        <!-- БЛОК В: РЕСУРСЫ -->
         <div class="stats-block">
           <h3><i class="fas fa-heartbeat"></i> Ресурсы</h3>
           <div class="stat-row"><span class="stat-label">Здоровье:</span><span class="stat-value">${stats.health || 100}/${stats.maxHealth || 100}</span></div>
@@ -199,7 +190,6 @@ class UIManager {
           <div class="stat-row"><span class="stat-label">Восст. вынос.:</span><span class="stat-value">+${stats.staminaRegen || 0}/ход</span></div>
         </div>
         
-        <!-- БЛОК Г: СОПРОТИВЛЕНИЯ -->
         <div class="stats-block">
           <h3><i class="fas fa-shield-alt"></i> Сопротивления</h3>
           <div class="stat-row"><span class="stat-label">Огонь:</span><span class="stat-value">${stats.fireResistance || 0}%</span></div>
@@ -212,7 +202,6 @@ class UIManager {
         </div>
       </div>
       
-      <!-- АФФЕКТЫ (условия) -->
       <div class="conditions-block">
         <h3><i class="fas fa-skull-crossbones"></i> Состояния</h3>
         <div class="conditions-grid">
@@ -236,26 +225,6 @@ class UIManager {
     `;
     
     container.innerHTML = html;
-  }
-  
-  updateStatElement(id, label, value) {
-    let container = document.getElementById('stats-content');
-    if (!container) return;
-    
-    let element = document.getElementById(`stat-${id}`);
-    if (!element) {
-      element = document.createElement('div');
-      element.id = `stat-${id}`;
-      element.className = 'stat-row';
-      element.innerHTML = `
-        <span class="stat-label">${label}:</span>
-        <span class="stat-value" id="stat-value-${id}">${value}</span>
-      `;
-      container.appendChild(element);
-    } else {
-      const valueElement = document.getElementById(`stat-value-${id}`);
-      if (valueElement) valueElement.textContent = value;
-    }
   }
   
   updateRoomInfo(roomInfo) {
@@ -427,7 +396,7 @@ class UIManager {
         const special = cell.special.toLowerCase();
         
         if (special.includes('shop') || special.includes('market')) {
-          return '<i class="fas fa-coins"></i>'; // СТОПКА МОНЕТ для магазина
+          return '<i class="fas fa-coins"></i>';
         } else if (special.includes('blacksmith')) {
           return '<i class="fas fa-hammer"></i>';
         } else if (special.includes('healer')) {
@@ -634,9 +603,8 @@ class UIManager {
         </div>
         
         <div class="shop-tabs">
-
-         <button class="shop-tab-btn active"data-tab="buy">
-            <i class="fas fa-shopping-cart"></i> Купить
+          <button class="shop-tab-btn active" data-tab="buy">
+            <i class="fas fa-coins"></i> Купить
           </button>
           <button class="shop-tab-btn" data-tab="sell"> 
             <i class="fas fa-coins"></i> Продать
@@ -770,7 +738,7 @@ class UIManager {
 
       if (e.target.classList.contains('buy-btn')) {
         const itemId = e.target.dataset.itemId;
-        this.game.buyItemFromShop(itemId);
+        this.game.gameManager.buyItemFromShop(itemId);
 
         const goldElement = modal.querySelector('.shop-gold .gold-text');
         if (goldElement) {
@@ -796,7 +764,7 @@ class UIManager {
       if (e.target.classList.contains('btn-sell')) {
         const itemIndex = parseInt(e.target.dataset.itemIndex);
         if (!isNaN(itemIndex)) {
-          this.game.sellItemToShop(itemIndex);
+          this.game.gameManager.sellItemToShop(itemIndex);
           
           const goldElement = modal.querySelector('.shop-gold .gold-text');
           if (goldElement) {
@@ -836,7 +804,7 @@ class UIManager {
       if (e.target.classList.contains('use-btn')) {
         const index = parseInt(e.target.dataset.index);
         if (!isNaN(index)) {
-          this.game.useInventoryItem(index);
+          this.game.inventorySystem.useItem(index, this.game.player);
         }
         return;
       }
@@ -844,7 +812,7 @@ class UIManager {
       if (e.target.classList.contains('equip-btn')) {
         const index = parseInt(e.target.dataset.index);
         if (!isNaN(index)) {
-          this.game.equipInventoryItem(index);
+          this.game.inventorySystem.equipItem(index, this.game.player);
         }
         return;
       }
@@ -854,7 +822,7 @@ class UIManager {
         const slot = btn.dataset.slot;
         console.log('Кнопка "Снять" нажата, слот:', slot);
         if (slot) {
-          this.game.unequipItem(slot);
+          this.game.inventorySystem.unequipItem(slot, this.game.player);
         }
         return;
       }
