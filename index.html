@@ -22,7 +22,9 @@
 
     <div class="tabs">
       <button class="tab-button active" data-tab="game"><i class="fas fa-gamepad"></i> Игра</button>
+      <button class="tab-button" data-tab="character"><i class="fas fa-user"></i> Персонаж</button>
       <button class="tab-button" data-tab="stats"><i class="fas fa-chart-bar"></i> Характеристики</button>
+      <button class="tab-button" data-tab="abilities"><i class="fas fa-magic"></i> Способности</button>
       <button class="tab-button" data-tab="inventory"><i class="fas fa-backpack"></i> Инвентарь</button>
       <button class="tab-button" data-tab="equipment"><i class="fas fa-tshirt"></i> Экипировка</button>
     </div>
@@ -71,11 +73,56 @@
           </div>
         </div>
 
-        <!-- ВКЛАДКИ -->
+        <!-- СУЩЕСТВУЮЩИЕ ВКЛАДКИ -->
         <div id="stats-tab" class="tab-content card">
-          <h2><i class="fas fa-chart-bar"></i> Характеристики</h2>
+          <h2 id="stats-title"><i class="fas fa-chart-bar"></i> Характеристики</h2>
           <div id="stats-content"></div>
+          <!-- НОВОЕ: Блок золота и опыта -->
+          <div class="stats-footer">
+            <div class="money-row">
+              <span class="money-label">Золото:</span>
+              <span id="gold-on-hand" class="money-value">50</span>
+              <span class="money-separator">|</span>
+              <span class="money-label">В банке:</span>
+              <span id="gold-in-bank" class="money-value">0</span>
+            </div>
+            <div class="exp-row">
+              <span class="exp-label">Всего опыта:</span>
+              <span id="total-exp" class="exp-value">0</span>
+              <span class="exp-separator">|</span>
+              <span class="exp-label">До уровня:</span>
+              <span id="exp-to-next" class="exp-value">50</span>
+            </div>
+          </div>
         </div>
+        
+        <div id="abilities-tab" class="tab-content card">
+          <h2><i class="fas fa-magic"></i> Способности</h2>
+          <div class="abilities-container">
+            <!-- 3 колонки -->
+            <div class="abilities-column">
+              <h3><i class="fas fa-skull-crossbones"></i> Аффекты</h3>
+              <div id="affects-list" class="abilities-list">
+                <div class="empty-message">Нет активных эффектов</div>
+              </div>
+            </div>
+            
+            <div class="abilities-column">
+              <h3><i class="fas fa-tools"></i> Умения</h3>
+              <div id="skills-list" class="abilities-list">
+                <div class="empty-message">Умения не изучены</div>
+              </div>
+            </div>
+            
+            <div class="abilities-column">
+              <h3><i class="fas fa-hat-wizard"></i> Заклинания</h3>
+              <div id="spells-list" class="abilities-list">
+                <div class="empty-message>Заклинания неизвестны</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div id="inventory-tab" class="tab-content card">
           <h2><i class="fas fa-backpack"></i> Инвентарь</h2>
           <div id="inventory-content"></div>
@@ -84,47 +131,56 @@
           <h2><i class="fas fa-tshirt"></i> Экипировка</h2>
           <div id="equipment-content"></div>
         </div>
+        <div id="character-tab" class="tab-content card">
+          <h2><i class="fas fa-user"></i> Персонаж</h2>
+          <div id="character-content">
+            <p>Информация о персонаже появится позже</p>
+          </div>
+        </div>
       </div>
 
       <!-- ПРАВАЯ ПАНЕЛЬ -->
-    <div class="right-panel">
-      <div class="right-top-row">
-        <div class="card character-card">
-          <h2><i class="fas fa-user"></i> Персонаж</h2>
-          <div class="character-info">
-            <div class="stat-row"><span class="stat-label">Имя:</span><span id="player-name" class="stat-value">Герой</span></div>
-            <div class="stat-row"><span class="stat-label">Уровень:</span><span id="player-level" class="stat-value">1</span></div>
-            <div class="stat-row"><span class="stat-label">Здоровье:</span><span id="player-health" class="stat-value">100/100</span></div>
-            <div class="health-bar"><div id="health-bar" class="health-fill"></div></div>
-            <div class="stat-row"><span class="stat-label">Опыт:</span><span id="player-exp" class="stat-value">0/50</span></div>
-            <div class="exp-bar"><div id="exp-bar" class="exp-fill"></div></div>
-            <div class="stat-row"><span class="stat-label">Золото:</span><span id="player-gold" class="stat-value gold-text">50 <i class="fas fa-coins gold-icon"></i></span></div>
-            <div class="stat-row"><span class="stat-label">Атака:</span><span id="player-attack" class="stat-value">15</span>
-            <span style="margin: 0 10px;">|</span><span class="stat-label">Защита:</span><span id="player-defense" class="stat-value">5</span>
+      <div class="right-panel">
+        <div class="right-top-row">
+          <div class="card character-card">
+            <h2><i class="fas fa-user"></i> Персонаж</h2>
+            <div class="character-info">
+              <div class="stat-row"><span class="stat-label">Имя:</span><span id="player-name" class="stat-value">Герой</span></div>
+              <div class="stat-row"><span class="stat-label">Уровень:</span><span id="player-level" class="stat-value">1</span></div>
+              <div class="stat-row"><span class="stat-label">Здоровье:</span><span id="player-health" class="stat-value">100/100</span></div>
+              <div class="health-bar"><div id="health-bar" class="health-fill"></div></div>
+              <div class="stat-row"><span class="stat-label">Опыт:</span><span id="player-exp" class="stat-value">0/50</span></div>
+              <div class="exp-bar"><div id="exp-bar" class="exp-fill"></div></div>
+              <div class="stat-row"><span class="stat-label">Золото:</span><span id="player-gold" class="stat-value gold-text">50 <i class="fas fa-coins gold-icon"></i></span></div>
+              <div class="stat-row"><span class="stat-label">Атака:</span><span id="player-attack" class="stat-value">15</span>
+              <span style="margin: 0 10px;">|</span><span class="stat-label">Защита:</span><span id="player-defense" class="stat-value">5</span>
+              </div>
+            </div>
+            <button id="rest-btn" class="btn btn-secondary"><i class="fas fa-bed"></i> Отдохнуть</button>
+          </div>
+          
+          <div id="battle-ui" class="card battle-card">
+            <h2><i class="fas fa-fist-raised"></i> Бой</h2>
+            <div class="enemy-info">
+              <h3 id="enemy-name">-</h3>
+              <div class="enemy-health">Здоровье: <span id="enemy-health">-/-</span></div>
+            </div>
+            <div class="battle-actions">
+              <button id="attack-btn" class="btn btn-danger"><i class="fas fa-swords"></i> Атаковать</button>
+              <button id="potion-btn" class="btn btn-secondary"><i class="fas fa-shield-alt"></i> Защита</button>
+              <button id="escape-btn" class="btn btn-warning"><i class="fas fa-running"></i> Бежать</button>
             </div>
           </div>
-          <button id="rest-btn" class="btn btn-secondary"><i class="fas fa-bed"></i> Отдохнуть</button>
         </div>
         
-        <div id="battle-ui" class="card battle-card">
-          <h2><i class="fas fa-fist-raised"></i> Бой</h2>
-          <div class="enemy-info">
-            <h3 id="enemy-name">-</h3>
-            <div class="enemy-health">Здоровье: <span id="enemy-health">-/-</span></div>
-          </div>
-          <div class="battle-actions">
-            <button id="attack-btn" class="btn btn-danger"><i class="fas fa-swords"></i> Атаковать</button>
-            <button id="potion-btn" class="btn btn-secondary"><i class="fas fa-shield-alt"></i> Защита</button>
-            <button id="escape-btn" class="btn btn-warning"><i class="fas fa-running"></i> Бежать</button>
-          </div>
+        <div class="card belt-card">
+          <h2><i class="fas fa-belt"></i> Пояс</h2>
+          <div id="belt-slots"></div>
         </div>
       </div>
-      
-      <div class="card belt-card">
-        <h2><i class="fas fa-belt"></i> Пояс</h2>
-        <div id="belt-slots"></div>
-      </div>
     </div>
+  </div>
+  
   <script type="module" src="main.js"></script>
 </body>
 </html>
