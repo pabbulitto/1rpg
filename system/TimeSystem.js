@@ -182,7 +182,7 @@ class TimeSystem {
         // Отправляем через глобальную шину или напрямую в UI
         if (window.game?.uiManager) {
             window.game.uiManager.addToLog(
-                `[Время: ${this.formatTime()}] ${eventType}`,
+                `[Время: ${this.formatTime(hour)}] ${eventType}`,
                 'time'
             );
         }
@@ -262,5 +262,6 @@ class TimeSystem {
         }
     }
 }
+
 
 export { TimeSystem };
