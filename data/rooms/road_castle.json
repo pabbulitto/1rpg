@@ -71,7 +71,7 @@
       {"type": "Страж-скелет", "level": 8}
     ],
     "directions": {
-      "north": "drawbridge",
+      "west": "drawbridge",
       "east": "castle:castle_gate"
     },
     "isShop": false,
