@@ -71,6 +71,7 @@ class Game {
     this.uiManager.updateRoomInfo(roomInfo);
     
     this.uiManager.addToLog(`📍 Вы в ${roomInfo.name}`);
+    this.uiManager.updateMinimap();
   }
   
   async move(direction) {
@@ -100,6 +101,7 @@ class Game {
     
     if (!enemyData) {
       this.uiManager.addToLog("В этой комнате нет врагов");
+      this.uiManager.updateMinimap();
       return;
     }
     
@@ -151,6 +153,7 @@ class Game {
       this.gameState.updateBattle(null, false);
       this.uiManager.showExplorationUI();
       this.uiManager.updatePlayerStats(this.player.getStats());
+      this.uiManager.updateMinimap();
     }, 2000);
   }
   
@@ -204,6 +207,7 @@ class Game {
     if (result.success) {
       this.gameState.updateBattle(null, false);
       this.uiManager.showExplorationUI();
+      this.uiManager.updateMinimap();
     } else if (result.playerDead) {
       this.endBattleDefeat();
     }
@@ -273,6 +277,7 @@ class Game {
     }
     
     this.uiManager.showShop(this.shopSystem.getShopInfo());
+    this.uiManager.updateMinimap();
   }
     
   equipInventoryItem(index) {
@@ -317,6 +322,7 @@ class Game {
     const invInfo = this.inventorySystem.getInventoryInfo();
     this.uiManager.updateInventory(invInfo);
   }
+  
   useInventoryItem(index) {
     const result = this.inventorySystem.useItem(index, this.player);
     if (result.success) {
@@ -369,5 +375,4 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('save-btn').addEventListener('click', () => {
     gameInstance.saveGame();
   });
-
 });
