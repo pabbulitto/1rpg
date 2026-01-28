@@ -85,6 +85,7 @@ class MinimapManager {
       
       if (playerLevel !== roomLevel) return;
       
+      // ИСПРАВЛЕННАЯ СТРОКА: инвертирован Y
       const gridX = roomX - playerX + this.centerIndex;
       const gridY = playerY - roomY + this.centerIndex; // ← ИНВЕРСИЯ!
       
@@ -108,7 +109,7 @@ class MinimapManager {
     this.currentGrid = grid;
     return grid;
   }
-  
+    
   /**
    * Получить данные для отрисовки миникарты
    * @returns {Object} данные миникарты
