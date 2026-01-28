@@ -104,11 +104,13 @@ class UIManager {
   updateAll() {
     this.updatePlayerStats(this.game.player.getStats());
     
-    if (this.game.zoneManager) {
+    if (this.game.zoneManager && this.game.isInitialized) {
       const roomInfo = this.game.zoneManager.getCurrentRoomInfo();
-      this.updateRoomInfo(roomInfo);
-      this.updateDirections();
-      this.updateMinimap(); // НОВОЕ: обновляем миникарту
+      if (roomInfo) {
+        this.updateRoomInfo(roomInfo);
+        this.updateDirections();
+        this.updateMinimap();
+      }
     }
   }
   
@@ -220,7 +222,6 @@ class UIManager {
     });
   }
   
-  // НОВЫЙ МЕТОД: Обновить миникарту с сеткой 7x7
   updateMinimap() {
     if (!this.elements.minimap || !this.game.zoneManager) return;
     
@@ -236,7 +237,6 @@ class UIManager {
       return;
     }
     
-    // Создаем сетку 7x7
     let html = `<div class="minimap-header">${minimapData.zoneName}</div>`;
     html += '<div class="minimap-grid">';
     
@@ -258,7 +258,6 @@ class UIManager {
     
     html += '</div>';
     
-    // Добавляем информацию о координатах
     const playerCoords = minimapManager.getPlayerCoordinates();
     if (playerCoords) {
       html += `
@@ -272,7 +271,6 @@ class UIManager {
     this.elements.minimap.innerHTML = html;
   }
   
-  // НОВЫЙ МЕТОД: Получить CSS классы для клетки миникарты
   getMinimapCellClasses(cell) {
     const classes = ['minimap-cell'];
     
@@ -287,7 +285,6 @@ class UIManager {
         classes.push('player');
       }
       
-      // Маппинг special -> CSS класс для стилизации
       if (cell.special) {
         const special = cell.special.toLowerCase();
         
@@ -325,7 +322,6 @@ class UIManager {
     return classes.join(' ');
   }
   
-  // НОВЫЙ МЕТОД: Получить содержимое для клетки миникарты
   getMinimapCellContent(cell) {
     if (!cell.roomId) {
       return '';
@@ -336,7 +332,6 @@ class UIManager {
     }
     
     if (cell.visited) {
-      // Для посещенных комнат показываем иконку в зависимости от special
       if (cell.special) {
         const special = cell.special.toLowerCase();
         
@@ -361,21 +356,32 @@ class UIManager {
       return '<i class="fas fa-map-marker-alt"></i>';
     }
     
-    // Для непосещенных комнат
     return '<i class="fas fa-question"></i>';
   }
   
-  // ОБНОВЛЕНО: Добавить вызов updateMinimap()
-  showExplorationUI() {
-    if (this.elements.battleUI) this.elements.battleUI.style.display = 'none';
-    if (this.elements.exploreBtn) this.elements.exploreBtn.style.display = 'flex';
-    if (this.elements.searchEnemiesBtn) this.elements.searchEnemiesBtn.style.display = 'flex';
-    this.updateAll();
-    this.updateMinimap(); // НОВОЕ: обновляем миникарту
+  addToLog(message, type = 'info') {
+    if (!this.elements.logContent) return;
+    
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry log-${type}`;
+    logEntry.textContent = `> ${message}`;
+    
+    this.elements.logContent.appendChild(logEntry);
+    this.elements.logContent.scrollTop = this.elements.logContent.scrollHeight;
+    
+    const entries = this.elements.logContent.querySelectorAll('.log-entry');
+    if (entries.length > 50) {
+      entries[0].remove();
+    }
   }
   
-  // Остальные методы без изменений...
-  // ... (updateInventory, addToLog, showBattleUI и другие методы остаются как были)
+  updateBattleLog(messages) {
+    if (!messages || !Array.isArray(messages)) return;
+    
+    messages.forEach(msg => {
+      this.addToLog(msg, 'battle');
+    });
+  }
   
   showBattleUI(battleStart) {
     if (this.elements.battleUI) this.elements.battleUI.style.display = 'block';
@@ -409,28 +415,11 @@ class UIManager {
     this.addToLog("=".repeat(40), 'victory');
   }
   
-  addToLog(message, type = 'info') {
-    if (!this.elements.logContent) return;
-    
-    const logEntry = document.createElement('div');
-    logEntry.className = `log-entry log-${type}`;
-    logEntry.textContent = `> ${message}`;
-    
-    this.elements.logContent.appendChild(logEntry);
-    this.elements.logContent.scrollTop = this.elements.logContent.scrollHeight;
-    
-    const entries = this.elements.logContent.querySelectorAll('.log-entry');
-    if (entries.length > 50) {
-      entries[0].remove();
-    }
-  }
-  
-  updateBattleLog(messages) {
-    if (!messages || !Array.isArray(messages)) return;
-    
-    messages.forEach(msg => {
-      this.addToLog(msg, 'battle');
-    });
+  showExplorationUI() {
+    if (this.elements.battleUI) this.elements.battleUI.style.display = 'none';
+    if (this.elements.exploreBtn) this.elements.exploreBtn.style.display = 'flex';
+    if (this.elements.searchEnemiesBtn) this.elements.searchEnemiesBtn.style.display = 'flex';
+    this.updateAll();
   }
   
   updateInventory(inventoryInfo) {
@@ -554,6 +543,7 @@ class UIManager {
         </div>
         
         <div class="shop-tabs">
+
          <button class="shop-tab-btn active"data-tab="buy">
             <i class="fas fa-shopping-cart"></i> Купить
           </button>
@@ -561,7 +551,6 @@ class UIManager {
             <i class="fas fa-coins"></i> Продать
           </button>
         </div>
-        
         <div class="shop-tab-content active" id="shop-buy-tab">
           <div class="shop-items">
             <h3>Товары магазина:</h3>
@@ -782,4 +771,4 @@ class UIManager {
   }
 }
 
-export { UIManager };            
+export { UIManager };
