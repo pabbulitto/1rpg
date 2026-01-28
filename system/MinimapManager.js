@@ -85,9 +85,8 @@ class MinimapManager {
       
       if (playerLevel !== roomLevel) return;
       
-      // ИСПРАВЛЕННАЯ СТРОКА: инвертирован Y
       const gridX = roomX - playerX + this.centerIndex;
-      const gridY = playerY - roomY + this.centerIndex; // ← ИНВЕРСИЯ!
+      const gridY = roomY - playerY + this.centerIndex;
       
       if (gridX >= 0 && gridX < this.gridSize && gridY >= 0 && gridY < this.gridSize) {
         const visited = position.visitedRooms.has(`${this.currentZoneId}:${roomId}`);
@@ -108,8 +107,7 @@ class MinimapManager {
     
     this.currentGrid = grid;
     return grid;
-  }
-    
+  } 
   /**
    * Получить данные для отрисовки миникарты
    * @returns {Object} данные миникарты
