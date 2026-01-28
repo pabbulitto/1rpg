@@ -1,4 +1,3 @@
-import { BattleSystem } from '..system/BattleSystem.js';
 const enemy = window.Enemy.createEnemy(...);
 
 class BattleService {
@@ -116,4 +115,5 @@ class BattleService {
 
 
 export { BattleService };
+
 
