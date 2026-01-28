@@ -56,6 +56,7 @@ class UIManager {
     
     this.elements.inventoryContent = document.getElementById('inventory-content');
     this.elements.equipmentContent = document.getElementById('equipment-content');
+    
   }
   
   bindEvents() {
@@ -74,6 +75,16 @@ class UIManager {
     this.elements.attackBtn.addEventListener('click', () => this.game.playerAttack());
     this.elements.potionBtn.addEventListener('click', () => this.game.useDefenseAction());
     this.elements.escapeBtn.addEventListener('click', () => this.game.tryEscape());
+    this.elements.statsTitle = document.getElementById('stats-title');
+    this.elements.goldOnHand = document.getElementById('gold-on-hand');
+    this.elements.goldInBank = document.getElementById('gold-in-bank');
+    this.elements.totalExp = document.getElementById('total-exp');
+    this.elements.expToNext = document.getElementById('exp-to-next');
+    
+    this.elements.affectsList = document.getElementById('affects-list');
+    this.elements.skillsList = document.getElementById('skills-list');
+    this.elements.spellsList = document.getElementById('spells-list');
+   
   }
   
   setupTabs() {
@@ -86,28 +97,34 @@ class UIManager {
   }
   
   switchTab(tabName) {
+    // Снимаем активный класс со всех вкладок и контента
     this.elements.tabs.forEach(tab => tab.classList.remove('active'));
     this.elements.tabContents.forEach(content => content.classList.remove('active'));
     
+    // Активируем выбранную вкладку
     const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
     const activeContent = document.getElementById(`${tabName}-tab`);
     
     if (activeTab) activeTab.classList.add('active');
     if (activeContent) activeContent.classList.add('active');
     
+    // Обработка специфичного контента для каждой вкладки
     if (tabName === 'inventory' || tabName === 'equipment') {
+      // Обновляем инвентарь/экипировку
       const invInfo = this.game.inventorySystem.getInventoryInfo();
       this.updateInventory(invInfo);
     }
     
+    // НОВОЕ: Обновляем вкладку характеристик при переключении
     if (tabName === 'stats') {
       const stats = this.game.player.getStats();
       this.updateStatsTab(stats);
     }
     
-    // НОВОЕ: Можно добавить для других вкладок позже
-    // if (tabName === 'skills') { ... }
-    // if (tabName === 'spells') { ... }
+    // НОВОЕ: Обновляем вкладку способностей при переключении
+    if (tabName === 'abilities') {
+      this.updateAbilitiesTab();
+    }
   }
   
   updateAll() {
@@ -126,17 +143,17 @@ class UIManager {
   updatePlayerStats(stats) {
     if (!stats) return;
     
-    this.elements.playerName.textContent = stats.name;
+    this.elements.playerName.textContent = stats.name || "Герой";
     this.elements.playerHealth.textContent = `${stats.health}/${stats.maxHealth}`;
-    this.elements.playerLevel.textContent = stats.level;
-    this.elements.playerExp.textContent = `${stats.exp}/${stats.expToNext}`;
-    this.elements.playerGold.textContent = stats.gold;
+    this.elements.playerLevel.textContent = stats.level || 1;
+    this.elements.playerExp.textContent = `${stats.exp}/${stats.expToNext || 50}`;
+    this.elements.playerGold.textContent = stats.gold || 0;
 
     if (this.elements.playerAttack) {
-      this.elements.playerAttack.textContent = stats.attack;
+      this.elements.playerAttack.textContent = stats.attack || 15;
     }
     if (this.elements.playerDefense) {
-      this.elements.playerDefense.textContent = stats.defense;
+      this.elements.playerDefense.textContent = stats.defense || 5;
     }
     
     // Прогресс-бары
@@ -151,10 +168,29 @@ class UIManager {
       this.elements.healthBar.style.background = '#44ff44';
     }
     
-    const expPercent = (stats.exp / stats.expToNext) * 100;
+    const expPercent = (stats.exp / (stats.expToNext || 50)) * 100;
     this.elements.expBar.style.width = `${expPercent}%`;
     
-    // НОВОЕ: Обновление вкладки характеристик
+    if (this.elements.statsTitle) {
+      const race = stats.race || "Человек";
+      const name = stats.name || "Герой";
+      const level = stats.level || 1;
+      this.elements.statsTitle.innerHTML = `<i class="fas fa-chart-bar"></i> [${race}] ${name} (Ур. ${level})`;
+    }
+    
+    if (this.elements.goldOnHand) {
+      this.elements.goldOnHand.textContent = stats.gold || 0;
+    }
+    if (this.elements.goldInBank) {
+      this.elements.goldInBank.textContent = stats.bankGold || 0;
+    }
+    if (this.elements.totalExp) {
+      this.elements.totalExp.textContent = stats.totalExp || stats.exp || 0;
+    }
+    if (this.elements.expToNext) {
+      this.elements.expToNext.textContent = stats.expToNext || 50;
+    }
+    
     this.updateStatsTab(stats);
   }
 
@@ -211,33 +247,59 @@ class UIManager {
           <div class="stat-row"><span class="stat-label">Физ. приёмы:</span><span class="stat-value">${stats.physicalResistance || 0}%</span></div>
         </div>
       </div>
-      
-      <!-- АФФЕКТЫ (условия) -->
-      <div class="conditions-block">
-        <h3><i class="fas fa-skull-crossbones"></i> Состояния</h3>
-        <div class="conditions-grid">
-          <div class="condition ${stats.conditions?.hungry ? 'active' : ''}">
-            <i class="fas fa-utensils"></i> Голод
-          </div>
-          <div class="condition ${stats.conditions?.thirsty ? 'active' : ''}">
-            <i class="fas fa-tint"></i> Жажда
-          </div>
-          <div class="condition ${stats.conditions?.poisoned ? 'active' : ''}">
-            <i class="fas fa-skull"></i> Отравление
-          </div>
-          <div class="condition ${stats.conditions?.blessed ? 'active' : ''}">
-            <i class="fas fa-pray"></i> Благословение
-          </div>
-          <div class="condition ${stats.conditions?.cursed ? 'active' : ''}">
-            <i class="fas fa-ghost"></i> Проклятие
-          </div>
-        </div>
-      </div>
     `;
     
     container.innerHTML = html;
   }
   
+  updateAbilitiesTab() {
+    // Получаем данные о способностях (заглушка - пока нет системы)
+    const abilitiesData = {
+      affects: [], // активные аффекты
+      skills: [],  // изученные умения  
+      spells: []   // известные заклинания
+    };
+    
+    // Обновляем список аффектов
+    if (this.elements.affectsList) {
+      if (abilitiesData.affects.length > 0) {
+        let html = '';
+        abilitiesData.affects.forEach(affect => {
+          html += `<div class="ability-item" data-id="${affect.id}">${affect.name}</div>`;
+        });
+        this.elements.affectsList.innerHTML = html;
+      } else {
+        this.elements.affectsList.innerHTML = '<div class="empty-message">Нет активных эффектов</div>';
+      }
+    }
+    
+    // Обновляем список умений
+    if (this.elements.skillsList) {
+      if (abilitiesData.skills.length > 0) {
+        let html = '';
+        abilitiesData.skills.forEach(skill => {
+          html += `<div class="ability-item" data-id="${skill.id}">${skill.name}</div>`;
+        });
+        this.elements.skillsList.innerHTML = html;
+      } else {
+        this.elements.skillsList.innerHTML = '<div class="empty-message">Умения не изучены</div>';
+      }
+    }
+    
+    // Обновляем список заклинаний
+    if (this.elements.spellsList) {
+      if (abilitiesData.spells.length > 0) {
+        let html = '';
+        abilitiesData.spells.forEach(spell => {
+          html += `<div class="ability-item" data-id="${spell.id}">${spell.name}</div>`;
+        });
+        this.elements.spellsList.innerHTML = html;
+      } else {
+        this.elements.spellsList.innerHTML = '<div class="empty-message">Заклинания неизвестны</div>';
+      }
+    }
+  }
+
   updateStatElement(id, label, value) {
     let container = document.getElementById('stats-content');
     if (!container) return;
