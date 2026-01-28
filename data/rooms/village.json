@@ -12,7 +12,8 @@
     },
     "isShop": false,
     "special": "central",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
   },
   "tavern": {
     "name": "Таверна 'Усталый путник'",
@@ -23,7 +24,8 @@
     },
     "isShop": true,
     "special": "shop",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": -1, "level": 0}
   },
   "blacksmith": {
     "name": "Кузница",
@@ -34,7 +36,8 @@
     },
     "isShop": true,
     "special": "smith",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 0, "level": 0}
   },
   "healer_hut": {
     "name": "Хижина целителя",
@@ -46,7 +49,8 @@
     },
     "isShop": true,
     "special": "healer",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 1, "level": 0}
   },
   "town_hall": {
     "name": "Ратуша",
@@ -57,7 +61,8 @@
     },
     "isShop": false,
     "special": "quests",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": -1, "y": 0, "level": 0}
   },
   "market": {
     "name": "Распутье",
@@ -71,7 +76,8 @@
     },
     "isShop": false,
     "special": "market",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 0, "y": -2, "level": 1}
   },
   "well": {
     "name": "Деревенский колодец",
@@ -82,6 +88,7 @@
     },
     "isShop": false,
     "special": "well",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 1, "level": 0}
   }
 }
