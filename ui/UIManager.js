@@ -334,6 +334,10 @@ class UIManager {
       return '';
     }
     
+    if (cell.directions && (cell.directions.up || cell.directions.down)) {
+      return '<i class="fas fa-stairs"></i>';
+    }
+    
     if (cell.isPlayer) {
       return '<i class="fas fa-user"></i>';
     }
@@ -342,8 +346,8 @@ class UIManager {
       if (cell.special) {
         const special = cell.special.toLowerCase();
         
-        if (special.includes('shop')) {
-          return '<i class="fas fa-store"></i>';
+        if (special.includes('shop') || special.includes('market')) {
+          return '<i class="fas fa-coins"></i>'; // СТОПКА МОНЕТ для магазина
         } else if (special.includes('blacksmith')) {
           return '<i class="fas fa-hammer"></i>';
         } else if (special.includes('healer')) {
@@ -779,5 +783,6 @@ class UIManager {
 }
 
 export { UIManager };
+
 
 
