@@ -179,14 +179,15 @@ class TimeSystem {
     
     // События времени
     emitTimeEvent(eventType, data) {
-        // Отправляем через глобальную шину или напрямую в UI
-        if (window.game?.uiManager) {
-            window.game.uiManager.addToLog(
-                `[Время: ${this.gameTime.hour}:${this.gameTime.minute}] ${eventType}`,
-                'time'
-            );
+        // Логируем ТОЛЬКО смену часа, а не каждый тик
+        if (eventType === 'hourChange' || eventType === 'seasonChange') {
+            if (window.game?.uiManager) {
+                window.game.uiManager.addToLog(
+                    `[Время: ${this.gameTime.hour.toString().padStart(2, '0')}:${this.gameTime.minute.toString().padStart(2, '0')}] ${eventType}`,
+                    'time'
+                );
+            }
         }
-        
         // Можно добавить EventBus позже
         if (window.EventBus) {
             window.EventBus.emit(`time:${eventType}`, data);
@@ -265,4 +266,5 @@ class TimeSystem {
 
 
 export { TimeSystem };
+
 
