@@ -1,5 +1,5 @@
-import { BattleSystem } from '../BattleSystem.js';
-import { Enemy } from '../Enemy.js';
+import { BattleSystem } from '..system/BattleSystem.js';
+const enemy = window.Enemy.createEnemy(...);
 
 class BattleService {
     constructor(game) {
@@ -116,3 +116,4 @@ class BattleService {
 
 
 export { BattleService };
+
