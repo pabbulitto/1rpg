@@ -91,7 +91,7 @@
     },
     "isShop": false,
     "special": "boss",
-    "depth": -1,
+    "depth": 0,
     "coordinates": {"x": 0, "y": 2, "level": -1}
   },
   "herb_garden": {
@@ -107,3 +107,4 @@
     "coordinates": {"x": 1, "y": 2, "level": 0}
   }
 }
+
