@@ -57,7 +57,7 @@
     ],
     "directions": {
       "west": "dark_forest",
-      "north": "cave_entrance"
+      "south": "cave_entrance"
     },
     "isShop": false,
     "special": "camp",
@@ -72,7 +72,7 @@
       {"type": "Скелет", "level": 5}
     ],
     "directions": {
-      "south": "abandoned_camp",
+      "north": "abandoned_camp",
       "down": "dungeon:entrance"
     },
     "isShop": false,
