@@ -12,7 +12,8 @@
     },
     "isShop": false,
     "special": "entrance",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
   },
   "ancient_tree": {
     "name": "Древнее Дерево",
@@ -28,7 +29,8 @@
     },
     "isShop": false,
     "special": "central",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 0, "level": 0}
   },
   "riverbank": {
     "name": "Берег реки",
@@ -42,7 +44,8 @@
     },
     "isShop": false,
     "special": "river",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": -1, "level": 0}
   },
   "witch_hut": {
     "name": "Избушка ведьмы",
@@ -56,7 +59,8 @@
     },
     "isShop": true,
     "special": "shop",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 1, "level": 0}
   },
   "fairy_glade": {
     "name": "Поляна фей",
@@ -70,7 +74,8 @@
     },
     "isShop": false,
     "special": "magic",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 1, "level": 0}
   },
   "wolf_cave": {
     "name": "Волчье логово",
@@ -86,7 +91,8 @@
     },
     "isShop": false,
     "special": "boss",
-    "depth": -1
+    "depth": -1,
+    "coordinates": {"x": 0, "y": 2, "level": -1}
   },
   "herb_garden": {
     "name": "Сад целебных трав",
@@ -97,6 +103,7 @@
     },
     "isShop": false,
     "special": "healing",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 2, "level": 0}
   }
 }
