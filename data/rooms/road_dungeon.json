@@ -29,7 +29,7 @@
     "isShop": false,
     "special": "bridge",
     "depth": 0,
-    "coordinates": {"x": 0, "y": 1, "level": 0}
+    "coordinates": {"x": 0, "y": -1, "level": 0}  
   },
   "dark_forest": {
     "name": "Темный лес",
@@ -46,7 +46,7 @@
     "isShop": false,
     "special": "forest",
     "depth": 0,
-    "coordinates": {"x": 0, "y": 2, "level": 0}
+    "coordinates": {"x": 0, "y": -2, "level": 0} 
   },
   "abandoned_camp": {
     "name": "Заброшенный лагерь",
@@ -62,7 +62,7 @@
     "isShop": false,
     "special": "camp",
     "depth": 0,
-    "coordinates": {"x": 1, "y": 2, "level": 0}
+    "coordinates": {"x": 1, "y": -2, "level": 0}  
   },
   "cave_entrance": {
     "name": "Перед пещерой",
@@ -78,6 +78,6 @@
     "isShop": false,
     "special": "dungeon_entrance",
     "depth": 0,
-    "coordinates": {"x": 1, "y": 3, "level": 0}
+    "coordinates": {"x": 1, "y": -3, "level": 0} 
   }
 }
