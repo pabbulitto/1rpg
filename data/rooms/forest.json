@@ -92,7 +92,7 @@
     "isShop": false,
     "special": "boss",
     "depth": 0,
-    "coordinates": {"x": 0, "y": 2, "level": -1}
+    "coordinates": {"x": 0, "y": 2, "level": 0}
   },
   "herb_garden": {
     "name": "Сад целебных трав",
@@ -107,5 +107,6 @@
     "coordinates": {"x": 1, "y": 2, "level": 0}
   }
 }
+
 
 
