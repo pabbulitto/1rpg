@@ -99,6 +99,15 @@ class UIManager {
       const invInfo = this.game.inventorySystem.getInventoryInfo();
       this.updateInventory(invInfo);
     }
+    
+    if (tabName === 'stats') {
+      const stats = this.game.player.getStats();
+      this.updateStatsTab(stats);
+    }
+    
+    // НОВОЕ: Можно добавить для других вкладок позже
+    // if (tabName === 'skills') { ... }
+    // if (tabName === 'spells') { ... }
   }
   
   updateAll() {
@@ -130,6 +139,7 @@ class UIManager {
       this.elements.playerDefense.textContent = stats.defense;
     }
     
+    // Прогресс-бары
     const healthPercent = (stats.health / stats.maxHealth) * 100;
     this.elements.healthBar.style.width = `${healthPercent}%`;
     
@@ -144,8 +154,88 @@ class UIManager {
     const expPercent = (stats.exp / stats.expToNext) * 100;
     this.elements.expBar.style.width = `${expPercent}%`;
     
-    this.updateStatElement('attack', 'Атака', stats.attack);
-    this.updateStatElement('defense', 'Защита', stats.defense);
+    // НОВОЕ: Обновление вкладки характеристик
+    this.updateStatsTab(stats);
+  }
+
+  updateStatsTab(stats) {
+    const container = document.getElementById('stats-content');
+    if (!container) return;
+    
+    let html = `
+      <div class="stats-grid">
+        <!-- БЛОК А: АТРИБУТЫ -->
+        <div class="stats-block">
+          <h3><i class="fas fa-dumbbell"></i> Атрибуты</h3>
+          <div class="stat-row"><span class="stat-label">Сила:</span><span class="stat-value">${stats.strength || 10}</span></div>
+          <div class="stat-row"><span class="stat-label">Ловкость:</span><span class="stat-value">${stats.agility || 10}</span></div>
+          <div class="stat-row"><span class="stat-label">Телосложение:</span><span class="stat-value">${stats.constitution || 10}</span></div>
+          <div class="stat-row"><span class="stat-label">Мудрость:</span><span class="stat-value">${stats.wisdom || 10}</span></div>
+          <div class="stat-row"><span class="stat-label">Интеллект:</span><span class="stat-value">${stats.intelligence || 10}</span></div>
+          <div class="stat-row"><span class="stat-label">Обаяние:</span><span class="stat-value">${stats.charisma || 10}</span></div>
+        </div>
+        
+        <!-- БЛОК Б: БОЕВЫЕ -->
+        <div class="stats-block">
+          <h3><i class="fas fa-fist-raised"></i> Боевые</h3>
+          <div class="stat-row"><span class="stat-label">Атака:</span><span class="stat-value">${stats.attack || 15}</span></div>
+          <div class="stat-row"><span class="stat-label">Защита:</span><span class="stat-value">${stats.defense || 5}</span></div>
+          <div class="stat-row"><span class="stat-label">Попадание:</span><span class="stat-value">${stats.hitChance || 75}%</span></div>
+          <div class="stat-row"><span class="stat-label">Крит шанс:</span><span class="stat-value">${stats.critChance || 5}%</span></div>
+          <div class="stat-row"><span class="stat-label">Сила крита:</span><span class="stat-value">${stats.critPower || 150}%</span></div>
+          <div class="stat-row"><span class="stat-label">Уворот:</span><span class="stat-value">${stats.dodge || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Инициатива:</span><span class="stat-value">${stats.initiative || 10}</span></div>
+          <div class="stat-row"><span class="stat-label">Блок (90% урона):</span><span class="stat-value">${stats.blockChance || 0}%</span></div>
+        </div>
+        
+        <!-- БЛОК В: РЕСУРСЫ -->
+        <div class="stats-block">
+          <h3><i class="fas fa-heartbeat"></i> Ресурсы</h3>
+          <div class="stat-row"><span class="stat-label">Здоровье:</span><span class="stat-value">${stats.health || 100}/${stats.maxHealth || 100}</span></div>
+          <div class="stat-row"><span class="stat-label">Восст. здоровья:</span><span class="stat-value">+${stats.healthRegen || 0}/ход</span></div>
+          <div class="stat-row"><span class="stat-label">Мана:</span><span class="stat-value">${stats.mana || 50}/${stats.maxMana || 50}</span></div>
+          <div class="stat-row"><span class="stat-label">Восст. маны:</span><span class="stat-value">+${stats.manaRegen || 0}/ход</span></div>
+          <div class="stat-row"><span class="stat-label">Выносливость:</span><span class="stat-value">${stats.stamina || 100}/${stats.maxStamina || 100}</span></div>
+          <div class="stat-row"><span class="stat-label">Восст. вынос.:</span><span class="stat-value">+${stats.staminaRegen || 0}/ход</span></div>
+        </div>
+        
+        <!-- БЛОК Г: СОПРОТИВЛЕНИЯ -->
+        <div class="stats-block">
+          <h3><i class="fas fa-shield-alt"></i> Сопротивления</h3>
+          <div class="stat-row"><span class="stat-label">Огонь:</span><span class="stat-value">${stats.fireResistance || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Вода:</span><span class="stat-value">${stats.waterResistance || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Земля:</span><span class="stat-value">${stats.earthResistance || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Воздух:</span><span class="stat-value">${stats.airResistance || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Тьма:</span><span class="stat-value">${stats.darkResistance || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Яды:</span><span class="stat-value">${stats.poisonResistance || 0}%</span></div>
+          <div class="stat-row"><span class="stat-label">Физ. приёмы:</span><span class="stat-value">${stats.physicalResistance || 0}%</span></div>
+        </div>
+      </div>
+      
+      <!-- АФФЕКТЫ (условия) -->
+      <div class="conditions-block">
+        <h3><i class="fas fa-skull-crossbones"></i> Состояния</h3>
+        <div class="conditions-grid">
+          <div class="condition ${stats.conditions?.hungry ? 'active' : ''}">
+            <i class="fas fa-utensils"></i> Голод
+          </div>
+          <div class="condition ${stats.conditions?.thirsty ? 'active' : ''}">
+            <i class="fas fa-tint"></i> Жажда
+          </div>
+          <div class="condition ${stats.conditions?.poisoned ? 'active' : ''}">
+            <i class="fas fa-skull"></i> Отравление
+          </div>
+          <div class="condition ${stats.conditions?.blessed ? 'active' : ''}">
+            <i class="fas fa-pray"></i> Благословение
+          </div>
+          <div class="condition ${stats.conditions?.cursed ? 'active' : ''}">
+            <i class="fas fa-ghost"></i> Проклятие
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.innerHTML = html;
   }
   
   updateStatElement(id, label, value) {
@@ -546,7 +636,7 @@ class UIManager {
         <div class="shop-tabs">
 
          <button class="shop-tab-btn active"data-tab="buy">
-            <i class="fas fa-coins"></i> Купить
+            <i class="fas fa-shopping-cart"></i> Купить
           </button>
           <button class="shop-tab-btn" data-tab="sell"> 
             <i class="fas fa-coins"></i> Продать
@@ -773,7 +863,3 @@ class UIManager {
 }
 
 export { UIManager };
-
-
-
-
