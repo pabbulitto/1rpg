@@ -1,5 +1,3 @@
-const enemy = window.Enemy.createEnemy(...);
-
 class BattleService {
     constructor(game) {
         this.game = game;
@@ -115,5 +113,6 @@ class BattleService {
 
 
 export { BattleService };
+
 
 
