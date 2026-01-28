@@ -52,11 +52,16 @@ class ZoneManager {
   }
   
   async loadJson(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText} для ${url}`);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText} для ${url}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error(`Ошибка загрузки JSON ${url}:`, error);
+      throw error;
     }
-    return response.json();
   }
   
   getCurrentRoomInfo() {
@@ -128,10 +133,13 @@ class ZoneManager {
     const [targetZone, targetRoom] = target.split(':');
     
     try {
-      await this.loadZone(targetZone);
+      const zoneData = await this.loadZone(targetZone);
       
-      const zoneData = this.loadedZones.get(targetZone);
-      if (!zoneData || !zoneData[targetRoom]) {
+      if (!zoneData) {
+        throw new Error(`Не удалось загрузить зону ${targetZone}`);
+      }
+      
+      if (!zoneData[targetRoom]) {
         throw new Error(`Комната ${targetRoom} не найдена в зоне ${targetZone}`);
       }
       
@@ -141,7 +149,6 @@ class ZoneManager {
       
       this.gameState.updatePosition(targetZone, targetRoom);
       
-      // Обновляем миникарту при смене зоны
       this.minimapManager.switchZone(targetZone);
       
       return {
@@ -218,3 +225,4 @@ class ZoneManager {
 }
 
 export { ZoneManager };
+
