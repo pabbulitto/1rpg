@@ -100,6 +100,14 @@ class MinimapManager {
           isPlayer: isPlayer,
           hasExit: hasExit,
           exitDirections: roomData.directions ? Object.keys(roomData.directions) : [],
+          directions: {
+            north: roomData.directions ? roomData.directions.hasOwnProperty('north') : false,
+            south: roomData.directions ? roomData.directions.hasOwnProperty('south') : false,
+            east: roomData.directions ? roomData.directions.hasOwnProperty('east') : false,
+            west: roomData.directions ? roomData.directions.hasOwnProperty('west') : false,
+            up: roomData.directions ? roomData.directions.hasOwnProperty('up') : false,
+            down: roomData.directions ? roomData.directions.hasOwnProperty('down') : false
+          },
           coordinates: { x: roomX, y: roomY, level: roomLevel }
         };
       }
