@@ -1,0 +1,77 @@
+{
+  "village_entrance": {
+    "name": "Покидая деревню",
+    "description": "Вы стоите на границе деревни. Дорога, ведущая к замку, уходит на юг. Воздух становится холоднее.",
+    "enemies": [
+      {"type": "Волк", "level": 4},
+      {"type": "Разбойник", "level": 4}
+    ],
+    "directions": {
+      "south": "winding_path",
+      "north": "village:market"
+    },
+    "isShop": false,
+    "special": "entrance",
+    "depth": 0
+  },
+  "winding_path": {
+    "name": "Извилистая тропа",
+    "description": "Узкая извилистая тропа, петляющая среди холмов. Вдали уже видны очертания замка.",
+    "enemies": [
+      {"type": "Скелет", "level": 5},
+      {"type": "Волк", "level": 5}
+    ],
+    "directions": {
+      "north": "village_entrance",
+      "west": "ruined_shrine",
+      "south": "drawbridge"
+    },
+    "isShop": false,
+    "special": "path",
+    "depth": 0
+  },
+  "ruined_shrine": {
+    "name": "Разрушенная часовня",
+    "description": "Старая часовня, почти полностью разрушенная временем и войной. В воздухе витает зловещая аура.",
+    "enemies": [
+      {"type": "Призрак", "level": 6},
+      {"type": "Скелет", "level": 6}
+    ],
+    "directions": {
+      "east": "winding_path"
+    },
+    "isShop": false,
+    "special": "shrine",
+    "depth": 0
+  },
+  "drawbridge": {
+    "name": "Перед подъемным мостом",
+    "description": "Вы стоите перед огромным, но опущенным подъемным мостом. Замок возвышается прямо перед вами.",
+    "enemies": [
+      {"type": "Страж-скелет", "level": 7},
+      {"type": "Страж-скелет", "level": 7}
+    ],
+    "directions": {
+      "north": "winding_path",
+      "east": "castle_gates"
+    },
+    "isShop": false,
+    "special": "drawbridge",
+    "depth": 0
+  },
+  "castle_gates": {
+    "name": "Перед вратами замка",
+    "description": "Массивные железные ворота замка. За ними начинается владение призраков и костяных стражей.",
+    "enemies": [
+      {"type": "Призрак рыцаря", "level": 8},
+      {"type": "Страж-скелет", "level": 8}
+    ],
+    "directions": {
+      "north": "drawbridge",
+      "east": "castle:castle_gate"
+    },
+    "isShop": false,
+    "special": "castle_entrance",
+    "depth": 0
+  }
+}

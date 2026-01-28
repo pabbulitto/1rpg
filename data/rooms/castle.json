@@ -1,0 +1,118 @@
+{
+  "castle_gate": {
+    "name": "Врата замка",
+    "description": "Огромные дубовые ворота, окованные железом, распахнуты настежь. Сквозь них виден заросший двор. Над аркой висит полустертый герб.",
+    "enemies": [
+      {"type": "Страж-скелет", "level": 8},
+      {"type": "Страж-скелет", "level": 8}
+    ],
+    "directions": {
+      "north": "courtyard",
+      "west": "road_castle:castle_gates"
+    },
+    "isShop": false,
+    "special": "entrance",
+    "depth": 0
+  },
+  "courtyard": {
+    "name": "Внутренний двор",
+    "description": "Обширный двор, заросший бурьяном и колючим кустарником. Посредине стоит иссохший фонтан. Разрушенные галереи окружают его по периметру.",
+    "enemies": [
+      {"type": "Призрак рыцаря", "level": 9},
+      {"type": "Призрак", "level": 8}
+    ],
+    "directions": {
+      "south": "castle_gate",
+      "east": "great_hall",
+      "west": "dungeon_entrance"
+    },
+    "isShop": false,
+    "special": "central",
+    "depth": 0
+  },
+  "great_hall": {
+    "name": "Большой зал",
+    "description": "Гигантский зал с когда-то богатым убранством. Гобелены истлели, длинный пиршественный стол покрыт толстым слоем пыли. Призрачный свет струится через разбитые витражи.",
+    "enemies": [
+      {"type": "Призрак", "level": 9},
+      {"type": "Призрак", "level": 9}
+    ],
+    "directions": {
+      "west": "courtyard",
+      "north": "kitchen",
+      "south": "library"
+    },
+    "isShop": false,
+    "special": "hall",
+    "depth": 0
+  },
+  "kitchen": {
+    "name": "Замковая кухня",
+    "description": "Огромный очаг, массивные верстаки и чан покрыты сажей и копотью. На полках стоят горшки с чем-то черным и окаменевшим. В воздухе запах гари.",
+    "enemies": [
+      {"type": "Призрак", "level": 8}
+    ],
+    "directions": {
+      "south": "great_hall"
+    },
+    "isShop": false,
+    "special": "loot",
+    "depth": 0
+  },
+  "library": {
+    "name": "Замковая библиотека",
+    "description": "Просторная комната, заставленная книжными шкафами до самого потолка. Многие книги лежат на полу. Здесь царит атмосфера спокойствия и знаний, несмотря на запустение.",
+    "enemies": [
+      {"type": "Призрак", "level": 9}
+    ],
+    "directions": {
+      "north": "great_hall",
+      "east": "throne_room"
+    },
+    "isShop": true,
+    "special": "shop",
+    "depth": 0
+  },
+  "throne_room": {
+    "name": "Тронный зал",
+    "description": "Величественный зал с высокими колоннами. В конце зала, на возвышении, стоит массивный трон из черного камня. Перед ним парят призрачные фигуры в королевских одеждах.",
+    "enemies": [
+      {"type": "Король-призрак", "level": 12},
+      {"type": "Королевская стража", "level": 10}
+    ],
+    "directions": {
+      "west": "library",
+      "north": "treasury"
+    },
+    "isShop": false,
+    "special": "boss",
+    "depth": 1
+  },
+  "treasury": {
+    "name": "Королевская сокровищница",
+    "description": "Небольшая, но прочная комната за железной дверью. Золотые монеты, драгоценные камни и произведения искусства сложены в аккуратные груды. В центре неподвижно стоит золотой голем.",
+    "enemies": [
+      {"type": "Золотой голем", "level": 11}
+    ],
+    "directions": {
+      "south": "throne_room"
+    },
+    "isShop": false,
+    "special": "treasure",
+    "depth": 1
+  },
+  "dungeon_entrance": {
+    "name": "Вход в темницу",
+    "description": "Узкая винтовая лестница, круто уходящая вниз, в полную тьму. Снизу доносится скрежет цепей и тихие стоны.",
+    "enemies": [
+      {"type": "Страж-скелет", "level": 9}
+    ],
+    "directions": {
+      "east": "courtyard",
+      "down": "castle_dungeon:entrance"
+    },
+    "isShop": false,
+    "special": "dungeon_entrance",
+    "depth": 0
+  }
+}

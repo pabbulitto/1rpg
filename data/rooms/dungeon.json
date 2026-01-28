@@ -1,0 +1,152 @@
+{
+  "entrance": {
+    "name": "Вход в подземелье",
+    "description": "Сырая каменная арка, ведущая вглубь скалы. Воздух холодный и затхлый, пахнет плесенью и чем-то гнилым. С потолка капает вода.",
+    "enemies": [
+      {"type": "Гоблин", "level": 3},
+      {"type": "Скелет", "level": 3}
+    ],
+    "directions": {
+      "south": "main_hall",
+      "up": "road_dungeon:cave_entrance"
+    },
+    "isShop": false,
+    "special": "entrance",
+    "depth": 1
+  },
+  "main_hall": {
+    "name": "Главный зал",
+    "description": "Обширный подземный зал с высоким сводчатым потолком. Посередине тлеют остатки костра. По стенам видны выцветшие фрески, изображающие древние битвы.",
+    "enemies": [
+      {"type": "Скелет", "level": 4},
+      {"type": "Скелет", "level": 4},
+      {"type": "Гоблин", "level": 4}
+    ],
+    "directions": {
+      "north": "entrance",
+      "east": "armory",
+      "west": "prison",
+      "south": "temple"
+    },
+    "isShop": false,
+    "special": "central",
+    "depth": 1
+  },
+  "armory": {
+    "name": "Оружейная",
+    "description": "Комната, заваленная сломанным оружием и доспехами. Стеллажи пусты и покрыты пылью. Кажется, здесь уже побывали мародеры.",
+    "enemies": [
+      {"type": "Гоблин", "level": 4},
+      {"type": "Орк", "level": 5}
+    ],
+    "directions": {
+      "west": "main_hall",
+      "north": "library"
+    },
+    "isShop": false,
+    "special": "loot",
+    "depth": 1
+  },
+  "prison": {
+    "name": "Тюремные камеры",
+    "description": "Ряд ржавых железных решеток. В камерах — лишь груды костей и истлевшие соломенные подстилки. Тишину нарушает лишь скрежет металла и шепот.",
+    "enemies": [
+      {"type": "Скелет", "level": 4},
+      {"type": "Призрак", "level": 4}
+    ],
+    "directions": {
+      "east": "main_hall"
+    },
+    "isShop": false,
+    "special": "prison",
+    "depth": 1
+  },
+  "temple": {
+    "name": "Заброшенный храм",
+    "description": "Полумрак, нарушаемый лишь слабым свечением разбитых витражей. У алтаря стоит огромная статуя забытого божества со зловещей ухмылкой.",
+    "enemies": [
+      {"type": "Страж-скелет", "level": 6},
+      {"type": "Призрак", "level": 5}
+    ],
+    "directions": {
+      "north": "main_hall",
+      "east": "treasury"
+    },
+    "isShop": false,
+    "special": "boss",
+    "depth": 1
+  },
+  "treasury": {
+    "name": "Сокровищница",
+    "description": "Небольшая комната. Сундуки разорены, золотые монеты разбросаны по полу. От былого богатства остались лишь осколки.",
+    "enemies": [],
+    "directions": {
+      "west": "temple"
+    },
+    "isShop": false,
+    "special": "treasure",
+    "depth": 1
+  },
+  "library": {
+    "name": "Забытая библиотека",
+    "description": "Полки, ломящиеся от старых фолиантов и свитков. Большинство книг истлело. В воздухе висит запах старой бумаги и магии.",
+    "enemies": [
+      {"type": "Призрак", "level": 5}
+    ],
+    "directions": {
+      "south": "armory",
+      "east": "forge"
+    },
+    "isShop": false,
+    "special": "knowledge",
+    "depth": 1
+  },
+  "forge": {
+    "name": "Кузница",
+    "description": "Горн давно погас, но жар все еще чувствуется. На наковальне лежит незаконченный клинок. В углу валяются инструменты.",
+    "enemies": [
+      {"type": "Орк", "level": 5},
+      {"type": "Огненный элементаль", "level": 6}
+    ],
+    "directions": {
+      "west": "library",
+      "south": "shop"
+    },
+    "isShop": false,
+    "special": "craft",
+    "depth": 1
+  },
+  "shop": {
+    "name": "Подпольный магазин",
+    "description": "Захламленное помещение, заставленное полками со странными товарами. За прилавком стоит сгорбленная фигура в капюшоне.",
+    "enemies": [],
+    "directions": {
+      "north": "forge"
+    },
+    "isShop": true,
+    "special": "shop",
+    "depth": 1
+  },
+  "exit_up": {
+    "name": "Выход на поверхность",
+    "description": "Узкая каменная лестница, ведущая вверх, к просвету. Оттуда доносится свежий воздух и пение птиц.",
+    "enemies": [],
+    "directions": {},
+    "isShop": false,
+    "special": "exit_up",
+    "depth": 1
+  },
+  "exit_down": {
+    "name": "Спуск в глубины",
+    "description": "Грубо вырубленная в скале шахта, уходящая в непроглядную тьму. Снизу доносится глухой гул и скрежет.",
+    "enemies": [
+      {"type": "Страж-скелет", "level": 7}
+    ],
+    "directions": {
+      "down": "dungeon_deep:entrance_deep"
+    },
+    "isShop": false,
+    "special": "exit_down",
+    "depth": 1
+  }
+}
