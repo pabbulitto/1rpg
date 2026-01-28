@@ -1,5 +1,5 @@
 import { BattleSystem } from '../BattleSystem.js';
-import { Enemy } from '..Enemy.js';
+import { Enemy } from '../Enemy.js';
 
 class BattleService {
     constructor(game) {
@@ -113,5 +113,6 @@ class BattleService {
         }, 1500);
     }
 }
+
 
 export { BattleService };
