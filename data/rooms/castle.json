@@ -12,7 +12,8 @@
     },
     "isShop": false,
     "special": "entrance",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
   },
   "courtyard": {
     "name": "Внутренний двор",
@@ -28,7 +29,8 @@
     },
     "isShop": false,
     "special": "central",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 0, "y": -1, "level": 0}
   },
   "great_hall": {
     "name": "Большой зал",
@@ -44,7 +46,8 @@
     },
     "isShop": false,
     "special": "hall",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": -1, "level": 0}
   },
   "kitchen": {
     "name": "Замковая кухня",
@@ -57,7 +60,8 @@
     },
     "isShop": false,
     "special": "loot",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": -2, "level": 0}
   },
   "library": {
     "name": "Замковая библиотека",
@@ -71,7 +75,8 @@
     },
     "isShop": true,
     "special": "shop",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 0, "level": 0}
   },
   "throne_room": {
     "name": "Тронный зал",
@@ -86,7 +91,8 @@
     },
     "isShop": false,
     "special": "boss",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 2, "y": 0, "level": 1}
   },
   "treasury": {
     "name": "Королевская сокровищница",
@@ -99,7 +105,8 @@
     },
     "isShop": false,
     "special": "treasure",
-    "depth": 1
+    "depth": 1,
+    "coordinates": {"x": 2, "y": -1, "level": 1}
   },
   "dungeon_entrance": {
     "name": "Вход в темницу",
@@ -113,6 +120,7 @@
     },
     "isShop": false,
     "special": "dungeon_entrance",
-    "depth": 0
+    "depth": 0,
+    "coordinates": {"x": -1, "y": -1, "level": 0}
   }
 }
