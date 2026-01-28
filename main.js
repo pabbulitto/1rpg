@@ -10,6 +10,7 @@ import { BattleService } from './services/BattleService.js';
 import { DataService } from './services/DataService.js';
 import { GameManager } from './services/GameManager.js';
 import { SaveLoadService } from './services/SaveLoadService.js';
+window.BattleSystem = BattleSystem;
 window.Enemy = Enemy;
 
 class Game {
@@ -95,4 +96,5 @@ window.addEventListener('DOMContentLoaded', () => {
     gameInstance.loadGame();
   });
 });
+
 
