@@ -25,43 +25,44 @@
       <button class="tab-button" data-tab="stats"><i class="fas fa-chart-bar"></i> Характеристики</button>
       <button class="tab-button" data-tab="inventory"><i class="fas fa-backpack"></i> Инвентарь</button>
       <button class="tab-button" data-tab="equipment"><i class="fas fa-tshirt"></i> Экипировка</button>
+      <button class="tab-button" data-tab="skills"><i class="fas fa-book-open"></i> Умения</button>
     </div>
 
     <div class="main-content">
       <!-- ЛЕВАЯ ПАНЕЛЬ -->
       <div class="left-panel">
-        <div class="card map-card">
+        <div class="card">
           <h2><i class="fas fa-map"></i> Миникарта</h2>
           <div id="minimap" class="minimap">Зона: Деревня<br>Комната: Площадь</div>
+        </div>
+        
+        <div class="card">
+          <div id="time-ui">Загрузка времени...</div>
         </div>
       </div>
 
       <!-- ЦЕНТРАЛЬНАЯ ПАНЕЛЬ -->
       <div class="center-panel">
         <div id="game-tab" class="tab-content active">
-          <div class="card room-card">
+          <div class="card">
             <h2 id="room-name">Деревня: Главная площадь</h2>
             
-            <!-- ЛОГ В ЦЕНТРАЛЬНОЙ ПАНЕЛИ -->
             <div class="log-card">
               <div id="log-content" class="log-content">
                 <div class="log-entry">🏰 Добро пожаловать в RPG!</div>
               </div>
             </div>
 
-            <!-- КНОПКИ ПОД ЛОГОМ -->
             <div class="buttons-container">
-              <!-- 6 КНОПОК СТРЕЛОК В 2 СТРОКИ -->
               <div class="directions-grid">
                 <button id="north-btn" class="dir-btn"><i class="fas fa-arrow-up"></i> Север</button>
+                <button id="up-btn" class="dir-btn"><i class="fas fa-angle-double-up"></i> Вверх</button>
+                <button id="down-btn" class="dir-btn"><i class="fas fa-angle-double-down"></i> Вниз</button>
                 <button id="south-btn" class="dir-btn"><i class="fas fa-arrow-down"></i> Юг</button>
                 <button id="west-btn" class="dir-btn"><i class="fas fa-arrow-left"></i> Запад</button>
                 <button id="east-btn" class="dir-btn"><i class="fas fa-arrow-right"></i> Восток</button>
-                <button id="up-btn" class="dir-btn"><i class="fas fa-angle-double-up"></i> Вверх</button>
-                <button id="down-btn" class="dir-btn"><i class="fas fa-angle-double-down"></i> Вниз</button>
               </div>
 
-              <!-- ОСТАЛЬНЫЕ КНОПКИ -->
               <div class="actions-row">
                 <button id="search-enemies-btn" class="btn btn-danger"><i class="fas fa-skull-crossbones"></i> Искать врагов</button>
                 <button id="shop-btn" class="btn btn-warning"><i class="fas fa-store"></i> Торговать</button>
@@ -76,55 +77,76 @@
           <h2><i class="fas fa-chart-bar"></i> Характеристики</h2>
           <div id="stats-content"></div>
         </div>
+        
         <div id="inventory-tab" class="tab-content card">
           <h2><i class="fas fa-backpack"></i> Инвентарь</h2>
           <div id="inventory-content"></div>
         </div>
+        
         <div id="equipment-tab" class="tab-content card">
           <h2><i class="fas fa-tshirt"></i> Экипировка</h2>
           <div id="equipment-content"></div>
         </div>
+        
+        <div id="skills-tab" class="tab-content card">
+          <div id="skills-ui"></div>
+        </div>
       </div>
 
       <!-- ПРАВАЯ ПАНЕЛЬ -->
-    <div class="right-panel">
-      <div class="right-top-row">
-        <div class="card character-card">
-          <h2><i class="fas fa-user"></i> Персонаж</h2>
-          <div class="character-info">
-            <div class="stat-row"><span class="stat-label">Имя:</span><span id="player-name" class="stat-value">Герой</span></div>
-            <div class="stat-row"><span class="stat-label">Уровень:</span><span id="player-level" class="stat-value">1</span></div>
-            <div class="stat-row"><span class="stat-label">Здоровье:</span><span id="player-health" class="stat-value">100/100</span></div>
-            <div class="health-bar"><div id="health-bar" class="health-fill"></div></div>
-            <div class="stat-row"><span class="stat-label">Опыт:</span><span id="player-exp" class="stat-value">0/50</span></div>
-            <div class="exp-bar"><div id="exp-bar" class="exp-fill"></div></div>
-            <div class="stat-row"><span class="stat-label">Золото:</span><span id="player-gold" class="stat-value gold-text">50 <i class="fas fa-coins gold-icon"></i></span></div>
-            <div class="stat-row"><span class="stat-label">Атака:</span><span id="player-attack" class="stat-value">15</span>
-            <span style="margin: 0 10px;">|</span><span class="stat-label">Защита:</span><span id="player-defense" class="stat-value">5</span>
+      <div class="right-panel">
+        <div class="right-top-row">
+          <div class="card">
+            <h2><i class="fas fa-user"></i> <span id="player-header">Герой [Ур. 1]</span></h2>
+            <div class="character-info">
+              <!-- Убраны строки "Имя:" и "Уровень:" - они теперь в заголовке -->
+              <div class="stat-row"><span class="stat-label">Здоровье:</span><span id="player-health" class="stat-value">100/100</span></div>
+              <div class="health-bar"><div id="health-bar" class="health-fill"></div></div>
+              
+              <!-- ДОБАВЛЯЕМ МАНУ -->
+              <div class="stat-row"><span class="stat-label">Мана:</span><span id="player-mana" class="stat-value">50/50</span></div>
+              <div class="mana-bar"><div id="mana-bar" class="mana-fill"></div></div>
+              
+              <!-- ДОБАВЛЯЕМ ВЫНОСЛИВОСТЬ -->
+              <div class="stat-row"><span class="stat-label">Выносливость:</span><span id="player-stamina" class="stat-value">100/100</span></div>
+              <div class="stamina-bar"><div id="stamina-bar" class="stamina-fill"></div></div>
+              
+              <div class="stat-row"><span class="stat-label">Опыт:</span><span id="player-exp" class="stat-value">0/50</span></div>
+              <div class="exp-bar"><div id="exp-bar" class="exp-fill"></div></div>
+              
+              <div class="stat-row"><span class="stat-label">Золото:</span><span id="player-gold" class="stat-value gold-text">50 <i class="fas fa-coins gold-icon"></i></span></div>
+              
+              <div class="stat-row">
+                <span class="stat-label">Атака:</span><span id="player-attack" class="stat-value">15</span>
+                <span style="margin: 0 10px;">|</span>
+                <span class="stat-label">Защита:</span><span id="player-defense" class="stat-value">5</span>
+              </div>
+            </div>
+            <button id="rest-btn" class="btn btn-secondary"><i class="fas fa-bed"></i> Отдохнуть</button>
+          </div>
+          
+          <div id="battle-ui" class="card battle-card">
+            <h2><i class="fas fa-fist-raised"></i> Бой</h2>
+            <div class="enemy-info">
+              <h3 id="enemy-name">-</h3>
+              <div class="enemy-health">Здоровье: <span id="enemy-health">-/-</span></div>
+            </div>
+            <div class="battle-actions">
+              <button id="attack-btn" class="btn btn-danger"><i class="fas fa-swords"></i> Атаковать</button>
+              <button id="potion-btn" class="btn btn-secondary"><i class="fas fa-shield-alt"></i> Защита</button>
+              <button id="escape-btn" class="btn btn-warning"><i class="fas fa-running"></i> Бежать</button>
             </div>
           </div>
-          <button id="rest-btn" class="btn btn-secondary"><i class="fas fa-bed"></i> Отдохнуть</button>
         </div>
         
-        <div id="battle-ui" class="card battle-card">
-          <h2><i class="fas fa-fist-raised"></i> Бой</h2>
-          <div class="enemy-info">
-            <h3 id="enemy-name">-</h3>
-            <div class="enemy-health">Здоровье: <span id="enemy-health">-/-</span></div>
-          </div>
-          <div class="battle-actions">
-            <button id="attack-btn" class="btn btn-danger"><i class="fas fa-swords"></i> Атаковать</button>
-            <button id="potion-btn" class="btn btn-secondary"><i class="fas fa-shield-alt"></i> Защита</button>
-            <button id="escape-btn" class="btn btn-warning"><i class="fas fa-running"></i> Бежать</button>
-          </div>
+        <div class="card">
+          <h2><i class="fas fa-belt"></i> Пояс</h2>
+          <div id="belt-slots"></div>
         </div>
       </div>
-      
-      <div class="card belt-card">
-        <h2><i class="fas fa-belt"></i> Пояс</h2>
-        <div id="belt-slots"></div>
-      </div>
     </div>
+  </div>
+  
   <script type="module" src="main.js"></script>
 </body>
 </html>
