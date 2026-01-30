@@ -10,7 +10,7 @@ class GameState {
       name: "Герой",
       level: 1,
       exp: 0,
-      expToNext: 50,
+      expToNext: 100,
       gold: 50,
       potions: 2,
       equipment: {
@@ -398,7 +398,7 @@ class GameState {
     while (this.player.exp >= this.player.expToNext) {
       this.player.exp -= this.player.expToNext;
       this.player.level++;
-      this.player.expToNext = Math.floor(this.player.expToNext * 1.5);
+      this.player.expToNext = Math.floor(this.player.expToNext * 2);
       levelsGained++;
       
       const baseStats = this.statManager.getBaseStats();
@@ -552,5 +552,6 @@ class GameState {
     }
   }
 }
+
 
 export { GameState };
