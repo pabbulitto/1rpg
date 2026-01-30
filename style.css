@@ -18,7 +18,7 @@ body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
   height: 95vh;
 }
 
@@ -33,8 +33,7 @@ body {
   border: 2px solid #3949ab;
   height: auto;
   min-height: auto;
-  gap: 5px;
-  position: static;
+  gap: 45px;
 }
 
 .header h1 {
@@ -49,7 +48,7 @@ body {
   flex: 1;
   background: none;
   border: none;
-  color: rgb(40, 85, 234);
+  color: rgb(41, 244, 223);
   border-radius: 0;
   padding: 0;
   font-size: 15px;
@@ -80,7 +79,7 @@ body {
 /* Основной контент */
 .main-content {
   display: flex;
-  gap: 5px;
+  gap: 3px;
   flex: 1;
   min-height: auto;
 }
@@ -89,7 +88,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 3px;
   min-width: 280px;
 }
 
@@ -97,30 +96,30 @@ body {
   flex: 2;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 3px;
   height: 700px;
 }
 
 /* Карточки */
 .card {
   background: rgba(30, 30, 46, 0.9);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 8x;
+  padding: 5px;
   border: 1px solid #444;
 }
 
 .card h2 {
   color: #4ecdc4;
   margin-bottom: 15px;
-  font-size: 20px;
+  font-size: 15px;
   border-bottom: 2px solid #3949ab;
   padding-bottom: 8px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
-/* Персонаж (уменьшен) */
+/* Персонаж */
 .character-info {
   display: flex;
   flex-direction: column;
@@ -135,6 +134,8 @@ body {
   flex: 1;
   min-width: 0;
 }
+
+/* ЕДИНЫЙ .stat-row (удален дубль) */
 .stat-row {
   display: flex;
   justify-content: space-between;
@@ -176,7 +177,37 @@ body {
   width: 0%;
 }
 
-/* Лог в центральной панели */
+/* Прогресс-бары маны и выносливости */
+.mana-bar, .stamina-bar {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 3px 0;
+}
+
+.mana-fill {
+  background: linear-gradient(90deg, #4a4aff, #8a8aff);
+  height: 100%; /* ← ЭТА СТРОКА */
+}
+
+.stamina-fill {
+  background: linear-gradient(90deg, #44ff44, #aaff44);
+  height: 100%; /* ← ЭТА СТРОКА */
+}
+
+/* Цвета значений в интерфейсе */
+#player-mana.stat-value {
+  color: #8a8aff;
+}
+
+#player-stamina.stat-value {
+  color: #aaff44;
+}
+
+
+
+/* Лог */
 .log-card {
   flex: 4;
   display: flex;
@@ -188,16 +219,15 @@ body {
   flex: 1;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 6px;
-  padding: 15px;
+  padding: 8px;
   overflow-y: auto;
   font-family: 'Courier New', monospace;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1;
 }
 
 .log-entry {
   padding: 5px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Кнопки под логом */
@@ -208,15 +238,13 @@ body {
   margin-top: 10px;
 }
 
-/* 6 кнопок стрелок в 2 строки */
+/* 6 кнопок стрелок */
 .directions-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 6px;
 }
-.gold-icon {
-  color: gold !important;
-}
+
 .directions-grid .dir-btn {
   width: 100%;
   height: 25px;
@@ -248,7 +276,7 @@ body {
   font-size: 14px;
 }
 
-/* Общие стили кнопок */
+/* ЕДИНЫЙ .btn (удалены дубли) */
 .btn {
   padding: 12px 20px;
   border: none;
@@ -285,7 +313,7 @@ body {
   color: #333;
 }
 
-/* Бой с красной подсветкой */
+/* Бой */
 .battle-card {
   background: rgba(139, 0, 0, 0.2);
   border: 1px solid #ff4444;
@@ -324,7 +352,7 @@ body {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 8px;
   overflow: visible;
-  margin-bottom: 15px;
+  margin-bottom: 1px;
 }
 
 .tab-button {
@@ -366,6 +394,7 @@ body {
   white-space: pre-wrap;
   min-height: 240px;
 }
+
 /* Стили для разных типов сообщений в логе */
 .log-entry.log-battle {
   color: #ff6b6b;
@@ -382,20 +411,23 @@ body {
   font-weight: bold;
 }
 
-/* Стиль для текста с золотом (опционально) */
+/* Стиль для текста с золотом */
 .gold-text {
   color: gold;
   font-weight: bold;
 }
+
 /* Стиль для сообщений о выходах */
 .log-entry.log-directions {
-  color: #4ecdc4; /* Сине-зеленый, как в дизайне */
+  color: #4ecdc4;
   font-weight: bold;
 }
-/* Стиль для жирного текста в логе (если поддерживается) */
+
+/* Стиль для жирного текста в логе */
 .log-entry strong {
-  color: #ffaa44; /* Оранжевый для выделения */
+  color: #ffaa44;
 }
+
 /* Стили инвентаря */
 .inventory-grid {
   display: grid;
@@ -438,14 +470,96 @@ body {
   gap: 5px;
   margin-top: 8px;
 }
+/* ==================== КОМПАКТНЫЙ ИНВЕНТАРЬ ==================== */
+.inventory-grid-compact {
+    display: block;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 8px;
+}
 
-.btn-inv {
-  padding: 5px 10px;
-  font-size: 12px;
-  border-radius: 4px;
-  border: none;
+.inventory-item-compact {
+    background: rgba(40, 40, 60, 0.8);
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    transition: all 0.2s ease;
+    width: auto;
+    display: inline-block;
+}
+
+.inventory-item-compact:hover {
+    background: rgba(50, 50, 70, 0.9);
+    border-color: #555;
+}
+
+.inv-compact-header {
+    margin-bottom: 6px;
+}
+
+.inv-name-compact {
+    color: #4ecdc4;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inv-actions-compact {
+    display: flex;
+    gap: 8px;
+}
+
+/* Кнопки в компактном виде */
+.inv-actions-compact .inv-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    flex: none;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #555;
+    background: #333;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.inv-actions-compact .inv-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+}
+
+/* Специфичные цвета кнопок */
+.inv-actions-compact .info-btn {
+    background: #3949ab;
+    border-color: #5c6bc0;
+}
+
+.inv-actions-compact .use-btn {
+    background: #4caf50;
+    border-color: #66bb6a;
+}
+
+.inv-actions-compact .equip-btn {
+    background: #ff9800;
+    border-color: #ffb74d;
+    color: #333;
+}
+
+.item-count {
+    color: #ffcc44;
+    font-size: 12px;
+    margin-left: 5px;
+}
+/* ЕДИНЫЙ .inv-btn (удален дубль) */
+.inv-btn {
+  padding: 3px 8px;
+  margin: 2px;
+  border: 1px solid #555;
+  background: #333;
+  color: white;
   cursor: pointer;
-  flex: 1;
 }
 
 .use-btn {
@@ -490,6 +604,7 @@ body {
   font-weight: bold;
   margin: 5px 0;
 }
+
 /* Стили магазина */
 #shop-modal-container {
   position: fixed;
@@ -580,6 +695,7 @@ body {
   padding-top: 15px;
   border-top: 1px solid #444;
 }
+
 /* Вкладки магазина */
 .shop-tabs {
   display: flex;
@@ -666,13 +782,9 @@ body {
   text-align: center;
   color: #a0a0c0;
   padding: 20px;
-
 }
-/* ==================== */
-/* СТИЛИ МИНИКАРТЫ */
-/* ==================== */
 
-/* Контейнер миникарты */
+/* ==================== СТИЛИ МИНИКАРТЫ ==================== */
 .minimap-header {
   font-weight: bold;
   text-align: center;
@@ -684,7 +796,6 @@ body {
   font-size: 0.9em;
 }
 
-/* Сетка миникарты 7x7 */
 .minimap-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -694,10 +805,9 @@ body {
   background: #34495e;
   padding: 4px;
   border-radius: 4px;
-  min-height: 210px; /* 7x30px */
+  min-height: 210px;
 }
 
-/* Базовая клетка */
 .minimap-cell {
   aspect-ratio: 1;
   display: flex;
@@ -711,7 +821,6 @@ body {
   overflow: hidden;
 }
 
-/* Состояния клеток */
 .minimap-cell.visited {
   opacity: 1;
 }
@@ -731,7 +840,7 @@ body {
   border: 1px dashed #3a5069;
 }
 
-/* Типы комнат на основе special */
+/* Типы комнат */
 .minimap-cell.cell-shop {
   background: #f39c12;
   color: #000;
@@ -780,14 +889,12 @@ body {
   border: 1px solid #4a5f7a;
 }
 
-/* Эффекты при наведении */
 .minimap-cell:hover {
   transform: scale(1.1);
   z-index: 3;
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
-/* Координаты игрока */
 .minimap-coordinates {
   text-align: center;
   font-size: 0.8em;
@@ -798,7 +905,6 @@ body {
   margin-top: 4px;
 }
 
-/* Сообщения об ошибках миникарты */
 .minimap-error {
   text-align: center;
   color: #e74c3c;
@@ -806,13 +912,11 @@ body {
   font-style: italic;
 }
 
-/* Иконки внутри клеток */
 .minimap-cell i {
   font-size: 0.9em;
   filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
 }
 
-/* Для клетки с игроком - анимация пульсации */
 @keyframes player-pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.1); }
@@ -824,27 +928,6 @@ body {
   color: #00ff00;
 }
 
-/* Адаптивность для маленьких экранов */
-@media (max-width: 1200px) {
-  .minimap-grid {
-    min-height: 175px; /* Уменьшаем на маленьких экранах */
-  }
-  
-  .minimap-cell {
-    font-size: 0.7em;
-  }
-}
-
-@media (max-width: 768px) {
-  .minimap-grid {
-    min-height: 140px;
-    gap: 1px;
-  }
-  
-  .minimap-cell i {
-    font-size: 0.6em;
-  }
-}
 .minimap-cell.no-north { border-top: 2px solid #2196F3; }
 .minimap-cell.no-south { border-bottom: 2px solid #2196F3; }
 .minimap-cell.no-east { border-right: 2px solid #2196F3; }
@@ -872,22 +955,6 @@ body {
   border-bottom: 1px solid #444;
   padding-bottom: 5px;
   font-size: 14px;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  font-size: 13px;
-}
-
-.stat-label {
-  color: #aaa;
-}
-
-.stat-value {
-  color: #fff;
-  font-weight: bold;
 }
 
 /* Состояния (аффекты) */
@@ -926,3 +993,78 @@ body {
   color: #ff4444;
 }
 
+/* InventoryUI */
+.info-btn { 
+  background: #444; 
+  border-color: #666; 
+}
+
+.item-info-modal { 
+  position: fixed; 
+  background: #1a1a1a; 
+  border: 2px solid #666; 
+  padding: 10px; 
+  z-index: 1000; 
+  max-width: 300px; 
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .minimap-grid {
+    min-height: 175px;
+  }
+  
+  .minimap-cell {
+    font-size: 0.7em;
+  }
+}
+
+@media (max-width: 768px) {
+  .minimap-grid {
+    min-height: 140px;
+    gap: 1px;
+  }
+  
+  .minimap-cell i {
+    font-size: 0.6em;
+  }
+}
+
+.gold-icon {
+  color: gold !important;
+}
+/* Три фрейма умений */
+.skills-three-frames {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.skills-frame {
+    flex: 1;
+    background: rgba(30, 30, 46, 0.9);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 400px;
+}
+
+.skills-frame h3 {
+    color: #4ecdc4;
+    margin-bottom: 12px;
+    font-size: 15px;
+    border-bottom: 2px solid #3949ab;
+    padding-bottom: 8px;
+}
+
+.frame-content {
+    min-height: 350px;
+    padding: 5px;
+}
+
+.no-data {
+    color: #a0a0c0;
+    font-style: italic;
+    text-align: center;
+    padding-top: 20px;
+}
