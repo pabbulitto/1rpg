@@ -1,0 +1,20 @@
+{
+  "village:tavern": {
+    "name": "Таверна 'Усталый путник'",
+    "description": "Здесь можно купить зелья и расходные предметы",
+    "type": "tavern",
+    "items": ["health_potion", "bread", "cheese", "beer"]
+  },
+  "village:blacksmith": {
+    "name": "Кузница",
+    "description": "Оружие и доспехи для настоящих воинов",
+    "type": "blacksmith", 
+    "items": ["rusty_sword", "iron_sword", "leather_jacket", "iron_helmet"]
+  },
+  "village:healer_hut": {
+    "name": "Хижина целителя",
+    "description": "Лечебные зелья и снадобья",
+    "type": "healer",
+    "items": ["health_potion", "strong_health_potion", "antidote", "bandage"]
+  }
+}

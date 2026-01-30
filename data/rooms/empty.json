@@ -1,0 +1,280 @@
+{
+  "room_01": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {},
+    "isShop": false,
+    "special": "тут специальный тип",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_02": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 1}
+    ],
+    "directions": {
+      "north": "тут целевая комната",
+      "south": "тут целевая комната",
+      "east": "тут целевая комната",
+      "west": "тут целевая комната",
+      "up": "тут целевая комната",
+      "down": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "тут специальный тип",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_03": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 1},
+      {"type": "тут тип врага", "level": 1}
+    ],
+    "directions": {
+      "north": "тут целевая комната",
+      "south": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "тут специальный тип",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_04": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 1},
+      {"type": "тут тип врага", "level": 2},
+      {"type": "тут тип врага", "level": 3}
+    ],
+    "directions": {
+      "east": "тут целевая комната",
+      "west": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "тут специальный тип",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_05": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "up": "тут целевая комната",
+      "down": "тут целевая комната"
+    },
+    "isShop": true,
+    "special": "shop",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_06": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 5}
+    ],
+    "directions": {
+      "north": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "boss",
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 0, "level": 1}
+  },
+  "room_07": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "south": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "entrance",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_08": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 3}
+    ],
+    "directions": {
+      "east": "тут целевая комната",
+      "west": "тут целевая комната",
+      "north": "тут целевая комната",
+      "south": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "central",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_09": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "west": "тут целевая комната"
+    },
+    "isShop": true,
+    "special": "blacksmith",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_10": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "east": "тут целевая комната"
+    },
+    "isShop": true,
+    "special": "healer",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_11": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 4}
+    ],
+    "directions": {},
+    "isShop": false,
+    "special": "dead_end",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_12": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "north": "zone:room",
+      "south": "zone:room"
+    },
+    "isShop": false,
+    "special": "corridor",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_13": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 2},
+      {"type": "тут тип врага", "level": 2}
+    ],
+    "directions": {
+      "up": "zone:room",
+      "down": "zone:room"
+    },
+    "isShop": false,
+    "special": "vertical",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_14": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "north": "тут целевая комната",
+      "east": "тут целевая комната",
+      "south": "тут целевая комната",
+      "west": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "crossroads",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_15": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 6}
+    ],
+    "directions": {
+      "north": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "guard",
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 0, "level": 1}
+  },
+  "room_16": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "south": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "treasure",
+    "depth": 1,
+    "coordinates": {"x": 0, "y": 0, "level": 1}
+  },
+  "room_17": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 1},
+      {"type": "тут тип врага", "level": 1},
+      {"type": "тут тип врага", "level": 1}
+    ],
+    "directions": {
+      "east": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "ambush",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_18": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "west": "тут целевая комната",
+      "east": "тут целевая комната"
+    },
+    "isShop": false,
+    "special": "bridge",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "room_19": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [
+      {"type": "тут тип врага", "level": 7}
+    ],
+    "directions": {},
+    "isShop": false,
+    "special": "arena",
+    "depth": 2,
+    "coordinates": {"x": 0, "y": 0, "level": 2}
+  },
+  "room_20": {
+    "name": "тут название комнаты",
+    "description": "тут описание комнаты",
+    "enemies": [],
+    "directions": {
+      "north": "тут целевая комната",
+      "down": "zone:room"
+    },
+    "isShop": false,
+    "special": "stairs",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  }
+}
