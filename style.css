@@ -162,14 +162,10 @@ body {
   margin: 3px 0;
 }
 
-.health-fill, .exp-fill {
-  height: 100%;
-  transition: width 0.5s ease;
-}
-
 .health-fill {
-  background: linear-gradient(90deg, #ff4444, #ffaa44);
-  width: 100%;
+    background: #ff4444 !important; /* красный */
+    height: 100%;
+    transition: width 0.3s ease;
 }
 
 .exp-fill {
@@ -315,6 +311,10 @@ body {
 
 /* Бой */
 .battle-card {
+  width: 195px !important;
+  max-width: 195px;
+  min-width: 195px;
+  overflow: hidden;
   background: rgba(139, 0, 0, 0.2);
   border: 1px solid #ff4444;
 }
