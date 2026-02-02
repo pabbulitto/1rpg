@@ -1,8 +1,9 @@
 import { DataService } from './services/DataService.js';
 import { GameState } from './core/GameState.js';
 import { Player } from './core/Player.js';
-import { Enemy } from './core/Enemy.js';
+import { EnemyService } from './services/EnemyService.js';
 import { Item } from './core/Item.js';
+import { EquipmentService } from './services/EquipmentService.js';
 import { ZoneManager } from './system/ZoneManager.js';
 import { BattleSystem } from './system/BattleSystem.js';
 import { InventorySystem } from './system/InventorySystem.js';
@@ -10,6 +11,7 @@ import { ShopSystem } from './system/ShopSystem.js';
 import { UIManager } from './ui/UIManager.js';
 import { BattleService } from './services/BattleService.js';
 import { GameManager } from './services/GameManager.js';
+import { BeltSystem } from './system/BeltSystem.js';
 import { SaveLoadService } from './services/SaveLoadService.js';
 
 // Импорт всех UI компонентов
@@ -22,20 +24,30 @@ import { LogUI } from './ui/components/LogUI.js';
 import { MinimapUI } from './ui/components/MinimapUI.js';
 import { BattleUI } from './ui/components/BattleUI.js';
 import { ShopUI } from './ui/components/ShopUI.js';
+import { BeltUI } from './ui/components/BeltUI.js';
 
 // Костыли для обратной совместимости (пока)
 window.BattleSystem = BattleSystem;
-window.Enemy = Enemy;
 window.Item = Item;
 
 class Game {
   constructor() {
     this.gameState = new GameState();
     this.dataService = new DataService();
+    this.enemyService = new EnemyService(this.dataService.enemiesData);
     this.player = new Player(this.gameState);
     this.zoneManager = new ZoneManager(this.gameState);
     this.battleSystem = new BattleSystem();
-    this.inventorySystem = new InventorySystem(this.gameState);
+    // Создаем EquipmentService
+    this.equipmentService = new EquipmentService(
+        this.gameState.eventBus,
+        this.gameState.statManager
+    );
+    this.inventorySystem = new InventorySystem(
+        this.gameState, 
+        this.equipmentService  // ← новый параметр
+    );
+    this.beltSystem = new BeltSystem(this.gameState, this.inventorySystem);
     this.shopSystem = new ShopSystem(this.gameState);
     this.saveLoadService = new SaveLoadService(this.gameState);
     
@@ -49,7 +61,8 @@ class Game {
       LogUI,
       MinimapUI,
       BattleUI,
-      ShopUI
+      ShopUI,
+      BeltUI
     };
     
     // Передаем компоненты в UIManager
@@ -62,46 +75,50 @@ class Game {
   
   async init() {
       try {
-          // === ВСЁ КАК БЫЛО В ИСХОДНОМ КОДЕ ===
+          // 1. Загружаем данные игры
           await this.dataService.loadGameData();
           
-          this.gameState.getTimeSystem().start();
+          // 2. Инициализируем EnemyService ПОСЛЕ загрузки данных
+          this.enemyService = new EnemyService(this.dataService.enemiesData);
           
+          // 3. Запускаем системы
+          this.gameState.getTimeSystem().start();
           this.gameState.updatePlayer({ gold: 50, potions: 2 });
           
+          // 4. Начальные предметы
           this.inventorySystem.addItemById('health_potion', 3);
           this.inventorySystem.addItemById('rusty_sword', 1);
           this.inventorySystem.addItemById("leather_jacket", 1);
           
+          // 5. Инициализируем зоны
           await this.zoneManager.init();
           
+          // 6. UI
           this.uiManager.init();
           this.isInitialized = true;
           
-          // === ДОБАВЛЯЕМ ТОЛЬКО ЭТО ===
+          // 7. Имя игрока (только для новой игры)
           let playerName = "Герой";
           const hasExistingSave = this.saveLoadService.hasSave();
           
           if (!hasExistingSave) {
-              // Только для новой игры
               const inputName = prompt("Введите имя вашего героя:", playerName);
               if (inputName && inputName.trim() !== "") {
                   playerName = inputName.trim();
               }
           } else {
-              // Для загруженной игры
               const saveInfo = this.saveLoadService.getSaveInfo();
               playerName = saveInfo?.playerName || "Герой";
           }
           
           // Устанавливаем имя
           this.gameState.updatePlayer({ name: playerName });
-          // === КОНЕЦ ДОБАВЛЕНИЯ ===
           
-          // Обновляем приветствие с именем (было без имени)
+          // Приветствие
           this.uiManager.addToLog(`🏰 Добро пожаловать, ${playerName}! 🏰`);
           this.uiManager.addToLog("Нажмите 'Исследовать', чтобы начать.");
           
+          // 8. Начинаем игру
           this.gameManager.explore();
           
       } catch (error) {
