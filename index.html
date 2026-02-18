@@ -112,15 +112,17 @@
               <div class="stamina-bar"><div id="stamina-bar" class="stamina-fill"></div></div>
               
               <div class="stat-row"><span class="stat-label">Опыт:</span><span id="player-exp" class="stat-value">0/50</span></div>
-              <div class="exp-bar"><div id="exp-bar" class="exp-fill"></div></div>
-              
+             
               <div class="stat-row"><span class="stat-label">Золото:</span><span id="player-gold" class="stat-value gold-text">50 <i class="fas fa-coins gold-icon"></i></span></div>
               
               <div class="stat-row">
-                <span class="stat-label">Атака:</span><span id="player-attack" class="stat-value">15</span>
-                <span style="margin: 0 10px;">|</span>
-                <span class="stat-label">Защита:</span><span id="player-defense" class="stat-value">5</span>
-              </div>
+                  <span class="stat-label">Атк:</span><span id="player-attack" class="stat-value">15</span>
+                  <span style="margin: 0 5px;">|</span>
+                  <span class="stat-label">КЗ:</span><span id="player-ac" class="stat-value">10</span>
+                  <span style="margin: 0 5px;">|</span>
+                </div> 
+              <div class="stat-row"><span class="stat-label">Броня:</span><span id="player-defense" class="stat-value">0ед</span>
+              </div>              
             </div>
           </div>
           
@@ -132,7 +134,8 @@
             </div>
             <div class="battle-actions">
               <button id="attack-btn" class="btn btn-danger"><i class="fas fa-swords"></i> Атаковать</button>
-              <button id="potion-btn" class="btn btn-secondary"><i class="fas fa-shield-alt"></i> Защита</button>
+              <button id="skills-btn" class="battle-btn"><i class="fas fa-shield-alt"></i>Умения</button>
+              <button id="spells-btn" class="battle-btn"><i class="fas fa-shield-alt"></i>Заклинания</button>
               <button id="escape-btn" class="btn btn-warning"><i class="fas fa-running"></i> Бежать</button>
             </div>
           </div>
