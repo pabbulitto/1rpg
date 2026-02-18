@@ -1,0 +1,32 @@
+{
+  "magic_missile": {
+    "name": "Магическая стрела",
+    "type": "spell",
+    "description": "Выпускает магическую стрелу, которая гарантированно попадает в цель.",
+    "school": "air",
+    "manaCost": 9,
+    "damageFormula": "2d4+intelligenceMod",
+    "requirements": {
+      "intelligence": 12,
+      "level": 1
+    },
+    "target": "enemy",
+    "cooldown": 0,
+    "animation": "magic_missile"
+  },
+  "fireball": {
+    "name": "Огненный шар",
+    "type": "spell",
+    "description": "Взрывающийся шар огня, наносящий огромный урон одной цели.",
+    "school": "fire",
+    "manaCost": 25,
+    "damageFormula": "(4d6+intelligenceMod)*(1+level/10)",
+    "requirements": {
+      "intelligence": 16,
+      "level": 3
+    },
+    "target": "enemy",
+    "cooldown": 3,
+    "animation": "fireball"
+  }
+}
