@@ -1,0 +1,300 @@
+{
+  "Гоблин": {
+    "name": "Гоблин",
+    "description": "Мелкий ворованный гуманоид",
+    "class": "rogue",
+    "race": "goblin",
+    "profession": "thief",
+    "faction": "humanoid",
+    "baseLevel": 1,
+    "baseStats": {
+      "strength": 8,
+      "dexterity": 12,
+      "constitution": 10,
+      "intelligence": 6,
+      "wisdom": 8,
+      "charisma": 6,
+      "maxHealth": 15,
+      "maxMana": 0,
+      "maxStamina": 20,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 1,
+      "armor": 0,
+      "defense": 2,
+      "attack": 3,
+      "spellPower": 1.0,
+      "initiative": 10
+    },
+    "attackFormula": "1d20+attackMod",
+    "damageFormula": "1d4+strengthMod",
+    "abilities": ["cowardly"],
+    "spells": [],
+    "skills": ["stealth"],
+    "aiType": "cowardly",
+    "detectionRange": 3,
+    "preferredRange": "melee",
+    "fleeThreshold": 0.3,
+    "equipmentChance": {
+      "right_hand": {
+        "itemId": "thief_dagger",
+        "chance": 0.4,
+        "statsBonus": { "attack": 1 }
+      }
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 3, "max": 5 }
+      },
+      "chance": {
+        "rusty_sword": 0.3,
+        "leather_belt": 0.2,
+        "health_potion": 0.1
+      }
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 10
+  },
+
+  "Волк": {
+    "name": "Волк",
+    "description": "Дикий хищник",
+    "class": "beast",
+    "race": "wolf",
+    "profession": null,
+    "faction": "beast",
+    "baseLevel": 1,
+    "baseStats": {
+      "strength": 12,
+      "dexterity": 14,
+      "constitution": 9,
+      "intelligence": 2,
+      "wisdom": 12,
+      "charisma": 6,
+      "maxHealth": 11,
+      "maxMana": 0,
+      "maxStamina": 25,
+      "healthRegen": 3,
+      "manaRegen": 0,
+      "staminaRegen": 2,
+      "armor": 1,
+      "defense": 3,
+      "attack": 4,
+      "spellPower": 1.0,
+      "initiative": 14
+    },
+    "attackFormula": "1d20+attackMod",
+    "damageFormula": "2d4+strengthMod",
+    "abilities": ["fast_attack"],
+    "spells": [],
+    "skills": [],
+    "aiType": "aggressive",
+    "detectionRange": 4,
+    "preferredRange": "melee",
+    "fleeThreshold": 0.15,
+    "equipmentChance": {},
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 1, "max": 3 }
+      },
+      "chance": {
+        "wolf_pelt": 0.8,
+        "wolf_fang": 0.6,
+        "raw_meat": 1.0
+      }
+    },
+    "naturalWeapon": {
+      "name": "Когти",
+      "damageFormula": "1d6+strengthMod",
+      "damageType": "slashing",
+      "attackFormula": "1d20+strengthMod"
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 8
+  },
+
+  "Лесной паук": {
+    "name": "Лесной паук",
+    "description": "Ядовитый паук",
+    "class": "beast",
+    "race": "spider",
+    "profession": null,
+    "faction": "beast",
+    "baseLevel": 1,
+    "baseStats": {
+      "strength": 7,
+      "dexterity": 14,
+      "constitution": 8,
+      "intelligence": 1,
+      "wisdom": 10,
+      "charisma": 3,
+      "maxHealth": 12,
+      "maxMana": 0,
+      "maxStamina": 20,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 1,
+      "armor": 0,
+      "defense": 2,
+      "attack": 3,
+      "spellPower": 1.0,
+      "initiative": 12
+    },
+    "attackFormula": "1d20+attackMod",
+    "damageFormula": "1d4+strengthMod",
+    "abilities": ["poison", "web"],
+    "spells": [],
+    "skills": [],
+    "aiType": "aggressive",
+    "detectionRange": 3,
+    "preferredRange": "melee",
+    "fleeThreshold": 0.1,
+    "equipmentChance": {},
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 2, "max": 4 }
+      },
+      "chance": {
+        "spider_silk": 0.7,
+        "spider_fang": 0.5,
+        "health_potion": 0.1
+      }
+    },
+    "naturalWeapon": {
+      "name": "Паучьи клыки",
+      "damageFormula": "1d4+dexterityMod",
+      "damageType": "piercing",
+      "attackFormula": "1d20+dexterityMod"
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 9
+  },
+
+  "Орк": {
+    "name": "Орк",
+    "description": "Сильный и агрессивный",
+    "class": "warrior",
+    "race": "orc",
+    "profession": null,
+    "faction": "humanoid",
+    "baseLevel": 2,
+    "baseStats": {
+      "strength": 16,
+      "dexterity": 9,
+      "constitution": 14,
+      "intelligence": 7,
+      "wisdom": 8,
+      "charisma": 6,
+      "maxHealth": 25,
+      "maxMana": 0,
+      "maxStamina": 30,
+      "healthRegen": 5,
+      "manaRegen": 0,
+      "staminaRegen": 2,
+      "armor": 2,
+      "defense": 4,
+      "attack": 5,
+      "spellPower": 1.0,
+      "initiative": 8
+    },
+    "attackFormula": "1d20+attackMod",
+    "damageFormula": "1d12+strengthMod",
+    "abilities": ["powerful_strike"],
+    "spells": [],
+    "skills": [],
+    "aiType": "aggressive",
+    "detectionRange": 3,
+    "preferredRange": "melee",
+    "fleeThreshold": 0.1,
+    "equipmentChance": {
+      "right_hand": {
+        "itemId": "iron_sword",
+        "chance": 0.3,
+        "statsBonus": { "attack": 2 }
+      },
+      "body": {
+        "itemId": "leather_jacket",
+        "chance": 0.4,
+        "statsBonus": { "defense": 2 }
+      }
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 5, "max": 10 }
+      },
+      "chance": {
+        "health_potion": 0.2,
+        "iron_sword": 0.2
+      }
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 25
+  },
+
+  "Разбойник": {
+    "name": "Разбойник",
+    "description": "Бродяга, промышляющий грабежом",
+    "class": "rogue",
+    "race": "human",
+    "profession": "thief",
+    "faction": "humanoid",
+    "baseLevel": 2,
+    "baseStats": {
+      "strength": 11,
+      "dexterity": 15,
+      "constitution": 10,
+      "intelligence": 10,
+      "wisdom": 10,
+      "charisma": 8,
+      "maxHealth": 18,
+      "maxMana": 0,
+      "maxStamina": 25,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 2,
+      "armor": 1,
+      "defense": 3,
+      "attack": 5,
+      "spellPower": 1.0,
+      "initiative": 14
+    },
+    "attackFormula": "1d20+attackMod",
+    "damageFormula": "1d6+dexterityMod",
+    "abilities": ["critical_strike", "gold_steal"],
+    "spells": [],
+    "skills": ["stealth", "lockpicking"],
+    "aiType": "aggressive",
+    "detectionRange": 4,
+    "preferredRange": "melee",
+    "fleeThreshold": 0.2,
+    "equipmentChance": {
+      "right_hand": {
+        "itemId": "thief_dagger",
+        "chance": 0.6,
+        "statsBonus": { "attack": 1, "dexterity": 1 }
+      },
+      "body": {
+        "itemId": "leather_jacket",
+        "chance": 0.5,
+        "statsBonus": { "defense": 2 }
+      }
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 8, "max": 12 }
+      },
+      "chance": {
+        "lockpick": 0.6,
+        "health_potion": 0.3,
+        "thief_dagger": 0.3
+      }
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 18
+  }
+}

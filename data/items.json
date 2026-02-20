@@ -1,0 +1,317 @@
+{
+  "health_potion": {
+    "name": "Зелье здоровья",
+    "type": "consumable",
+    "slot": null,
+    "stats": { "health": 30 },
+    "price": 20,
+    "storageCost": 3,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 99
+  },
+
+  "rusty_sword": {
+    "name": "Ржавый меч",
+    "type": "weapon",
+    "slot": "hand",
+    "damage": "1d6+strengthMod",
+    "damageType": "slashing",
+    "weight": 4,
+    "weaponType": "sword",
+    "range": "melee",
+    "properties": ["light"],
+    "material": "iron",
+    "stats": { "defense": 2, "strength": 1 },
+    "price": 15,
+    "storageCost": 3,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "iron_sword": {
+    "name": "Железный меч",
+    "type": "weapon",
+    "slot": "hand",
+    "damage": "1d8+strengthMod",
+    "damageType": "slashing",
+    "weight": 5,
+    "weaponType": "sword",
+    "range": "melee",
+    "properties": ["versatile"],
+    "material": "iron",
+    "stats": { "defense": 3 },
+    "price": 50,
+    "storageCost": 4,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "short_sword": {
+    "name": "Короткий меч",
+    "type": "weapon",
+    "slot": "hand",
+    "damage": "1d6+strengthMod",
+    "damageType": "piercing",
+    "weight": 3,
+    "weaponType": "sword",
+    "range": "melee",
+    "properties": ["light"],
+    "material": "iron",
+    "stats": { "defense": 2 },
+    "price": 40,
+    "storageCost": 3,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "thief_dagger": {
+    "name": "Кинжал разбойника",
+    "type": "weapon",
+    "slot": "hand",
+    "damage": "1d4+dexterityMod",
+    "damageType": "piercing",
+    "weight": 2,
+    "weaponType": "dagger",
+    "range": "melee",
+    "properties": ["light", "finesse"],
+    "material": "steel",
+    "stats": { "dexterity": 1 },
+    "price": 35,
+    "storageCost": 3,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "leather_jacket": {
+    "name": "Кожаная куртка",
+    "type": "armor",
+    "slot": "body",
+    "weight": 8,
+    "armorType": "light",
+    "stealthDisadvantage": false,
+    "material": "leather",
+    "stats": { "defense": 3, "armor": 15, "dexterity": 1 },
+    "price": 30,
+    "storageCost": 3,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "iron_helmet": {
+    "name": "Железный шлем",
+    "type": "armor",
+    "slot": "head",
+    "weight": 5,
+    "armorType": "medium",
+    "stealthDisadvantage": true,
+    "maxDexBonus": 2,
+    "material": "iron",
+    "stats": { "defense": 6, "armor": 15 },
+    "price": 75,
+    "storageCost": 4,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "leather_belt": {
+    "name": "Кожаный пояс",
+    "type": "armor",
+    "slot": "belt",
+    "weight": 1,
+    "armorType": "light",
+    "material": "leather",
+    "stats": { "maxHealth": 5, "stamina": 3 },
+    "price": 15,
+    "storageCost": 2,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  },
+
+  "lockpick": {
+    "name": "Отмычка",
+    "type": "tool",
+    "slot": null,
+    "stats": {},
+    "price": 15,
+    "storageCost": 2,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 10
+  },
+
+  "wolf_pelt": {
+    "name": "Волчья шкура",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 15,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 30
+  },
+
+  "wolf_fang": {
+    "name": "Волчий клык",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 8,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 20
+  },
+
+  "raw_meat": {
+    "name": "Сырое мясо",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 12,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 30,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 30
+  },
+
+  "spider_silk": {
+    "name": "Паучий шёлк",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 5,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 30
+  },
+
+  "spider_fang": {
+    "name": "Паучий клык",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 12,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 15
+  },
+
+  "gold": {
+    "name": "Золото",
+    "type": "currency",
+    "slot": null,
+    "stats": {},
+    "price": 1,
+    "storageCost": 0,
+    "storageFlag": null,
+    "lifetimeDays": 9999,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 999999
+  },
+
+  "corpse": {
+    "name": "Труп",
+    "type": "corpse",
+    "slot": null,
+    "stackable": false,
+    "price": 1,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 0,
+    "globalLimit": null,
+    "stats": {},
+    "description": "Бездыханное тело. Внутри могут быть ценные вещи."
+  },
+
+  "bone_fragment": {
+    "name": "Осколок кости",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 2,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 50
+  },
+
+  "orc_tusk": {
+    "name": "Клык орка",
+    "type": "material",
+    "slot": null,
+    "stats": {},
+    "price": 20,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 10
+  },
+
+  "stolen_gold": {
+    "name": "Украденное золото",
+    "type": "currency",
+    "slot": null,
+    "stats": {},
+    "price": 100,
+    "storageCost": 0,
+    "storageFlag": "no_storage",
+    "lifetimeDays": 9999,
+    "globalLimit": null,
+    "stackable": true,
+    "maxStack": 100
+  },
+
+  "leather_bracers": {
+    "name": "Кожаные наручи",
+    "type": "armor",
+    "slot": "arms",
+    "weight": 1,
+    "armorType": "light",
+    "stealthDisadvantage": false,
+    "material": "leather",
+    "stats": { "defense": 2, "armor": 5 },
+    "price": 25,
+    "storageCost": 2,
+    "storageFlag": null,
+    "lifetimeDays": 120,
+    "globalLimit": null,
+    "stackable": false
+  }
+}

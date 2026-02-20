@@ -1,0 +1,118 @@
+{
+  "forest_entrance": {
+    "name": "Опушка леса",
+    "terrain": "plain",
+    "description": "Граница между цивилизацией и диким лесом. Слышен шелест листвы и отдаленный вой волков.",
+    "enemies": [
+      {"type": "Волк", "level": 2},
+      {"type": "Гоблин", "level": 1}
+    ],
+    "directions": {
+      "east": "ancient_tree",
+      "west": "village:market"
+    },
+    "isShop": false,
+    "special": "entrance",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 0, "level": 0}
+  },
+  "ancient_tree": {
+    "name": "Древнее Дерево",
+    "terrain": "plain",
+    "description": "Огромное дерево, возраст которого исчисляется веками. Здесь обитают лесные пауки.",
+    "enemies": [
+      {"type": "Лесной паук", "level": 2},
+      {"type": "Лесной паук", "level": 1}
+    ],
+    "directions": {
+      "west": "forest_entrance",
+      "north": "riverbank",
+      "south": "witch_hut"
+    },
+    "isShop": false,
+    "special": "central",
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 0, "level": 0}
+  },
+  "riverbank": {
+    "name": "Берег реки",
+    "terrain": "forest",
+    "description": "Берег чистой лесной реки. Разбойники устроили здесь засаду.",
+    "enemies": [
+      {"type": "Разбойник", "level": 3},
+      {"type": "Разбойник", "level": 2}
+    ],
+    "directions": {
+      "south": "ancient_tree"
+    },
+    "isShop": false,
+    "special": "river",
+    "depth": 0,
+    "coordinates": {"x": 1, "y": -1, "level": 0}
+  },
+  "witch_hut": {
+    "name": "Избушка ведьмы",
+    "terrain": "forest",
+    "description": "Кривая избушка на курьих ножках. Вокруг бродят орки-налетчики.",
+    "enemies": [
+      {"type": "Орк", "level": 3},
+      {"type": "Орк", "level": 2}
+    ],
+    "directions": {
+      "north": "ancient_tree",
+      "west": "fairy_glade"
+    },
+    "isShop": false,
+    "special": "loot",
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 1, "level": 0}
+  },
+  "fairy_glade": {
+    "name": "Поляна",
+    "terrain": "forest",
+    "description": "Небольшая поляна, где пасутся дикие волки.",
+    "enemies": [
+      {"type": "Волк", "level": 2},
+      {"type": "Волк", "level": 1}
+    ],
+    "directions": {
+      "east": "witch_hut",
+      "south": "wolf_cave"
+    },
+    "isShop": false,
+    "special": "magic",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 1, "level": 0}
+  },
+  "wolf_cave": {
+    "name": "Волчье логово",
+    "terrain": "forest", 
+    "description": "Темная, зловонная пещера. Здесь обитает стая волков.",
+    "enemies": [
+      {"type": "Волк", "level": 3},
+      {"type": "Волк", "level": 2},
+      {"type": "Волк", "level": 2}
+    ],
+    "directions": {
+      "north": "fairy_glade",
+      "east": "herb_garden"
+    },
+    "isShop": false,
+    "special": "boss",
+    "depth": 0,
+    "coordinates": {"x": 0, "y": 2, "level": -1}
+  },
+  "herb_garden": {
+    "name": "Сад целебных трав",
+    "terrain": "plain",
+    "description": "Маленький ухоженный сад. Здесь можно отдохнуть.",
+    "enemies": [],
+    "directions": {
+      "west": "wolf_cave"
+    },
+    "isShop": false,
+    "special": "healing",
+    "depth": 0,
+    "coordinates": {"x": 1, "y": 2, "level": 0}
+  }
+}

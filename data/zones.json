@@ -1,0 +1,16 @@
+{
+  "village": {
+    "name": "Тихая деревня",
+    "startRoom": "village_square",
+    "theme": "village",
+    "unlockedByDefault": true,
+    "depthRange": [0, 0]
+  },
+  "forest": {
+    "name": "Зачарованный Лес",
+    "startRoom": "forest_entrance",
+    "theme": "forest",
+    "unlockedByDefault": true,
+    "depthRange": [0, 1]
+  }
+}
