@@ -1,0 +1,1070 @@
+/* Основные стили */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e6e6e6;
+  min-height: 100vh;
+  padding: 10px;
+}
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  height: 95vh;
+}
+
+/* ЗАГОЛОВОК С ОПИСАНИЕМ КОМНАТЫ */
+.header {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid #3949ab;
+  height: auto;
+  min-height: auto;
+  gap: 45px;
+}
+
+.header h1 {
+  font-size: 22px;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  flex-shrink: 0;
+}
+
+.room-description {
+  flex: 1;
+  background: none;
+  border: none;
+  color: rgb(41, 244, 223);
+  border-radius: 0;
+  padding: 0;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1.1;
+  min-height: 50px;
+  max-height: none;
+  overflow-y: visible;
+}
+
+.game-controls {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.game-controls button {
+  background: #3949ab;
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Основной контент */
+.main-content {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+  min-height: auto;
+}
+
+.left-panel, .right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 280px;
+}
+
+.center-panel {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  height: 700px;
+}
+
+/* Карточки */
+.card {
+  background: rgba(30, 30, 46, 0.9);
+  border-radius: 8x;
+  padding: 5px;
+  border: 1px solid #444;
+}
+
+.card h2 {
+  color: #4ecdc4;
+  margin-bottom: 15px;
+  font-size: 15px;
+  border-bottom: 2px solid #3949ab;
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Персонаж */
+.character-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.right-top-row {
+  display: flex;
+  gap: 5px;
+}
+.right-top-row > .card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ЕДИНЫЙ .stat-row (удален дубль) */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.stat-label {
+  color: #a0a0c0;
+  font-size: 14px;
+}
+
+.stat-value {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.health-bar, .exp-bar {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 3px 0;
+}
+
+.health-fill {
+    background: #ff4444 !important; /* красный */
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.exp-fill {
+  background: linear-gradient(90deg, #44ff44, #44aaff);
+  width: 0%;
+}
+
+/* Прогресс-бары маны и выносливости */
+.mana-bar, .stamina-bar {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 3px 0;
+}
+
+.mana-fill {
+  background: linear-gradient(90deg, #4a4aff, #8a8aff);
+  height: 100%; /* ← ЭТА СТРОКА */
+}
+
+.stamina-fill {
+  background: linear-gradient(90deg, #44ff44, #aaff44);
+  height: 100%; /* ← ЭТА СТРОКА */
+}
+
+/* Цвета значений в интерфейсе */
+#player-mana.stat-value {
+  color: #8a8aff;
+}
+
+#player-stamina.stat-value {
+  color: #aaff44;
+}
+
+
+
+/* Лог */
+.log-card {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+}
+
+.log-content {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 8px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.log-entry {
+  padding: 5px 0;
+}
+
+/* Кнопки под логом */
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* 6 кнопок стрелок */
+.directions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.directions-grid .dir-btn {
+  width: 100%;
+  height: 25px;
+  border-radius: 6px;
+  border: none;
+  background: #3949ab;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.directions-grid .dir-btn:hover {
+  background: #5c6bc0;
+}
+
+/* Остальные кнопки в ряд */
+.actions-row {
+  display: flex;
+  gap: 10px;
+}
+
+.actions-row .btn {
+  flex: 1;
+  height: 25px;
+  font-size: 14px;
+}
+
+/* ЕДИНЫЙ .btn (удалены дубли) */
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3949ab, #5c6bc0);
+  color: white;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #666, #888);
+  color: white;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ff4444, #ff6b6b);
+  color: white;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffaa44, #ffcc44);
+  color: #333;
+}
+
+/* Бой */
+.battle-card {
+  width: 195px !important;
+  max-width: 195px;
+  min-width: 195px;
+  overflow: hidden;
+  background: rgba(139, 0, 0, 0.2);
+  border: 1px solid #ff4444;
+}
+
+.enemy-info {
+  text-align: center;
+  margin: 15px 0;
+}
+
+.enemy-info h3 {
+  font-size: 20px;
+  color: #ff6b6b;
+  margin-bottom: 8px;
+}
+
+.enemy-health {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4444;
+}
+
+.battle-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.battle-actions .btn {
+  width: 100%;
+}
+
+/* Вкладки */
+.tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  overflow: visible;
+  margin-bottom: 1px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 15px;
+  background: transparent;
+  border: none;
+  color: #a0a0c0;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-button.active {
+  background: #3949ab;
+  color: white;
+  font-weight: bold;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Миникарта */
+.minimap {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  min-height: 240px;
+}
+
+/* Стили для разных типов сообщений в логе */
+.log-entry.log-battle {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.log-entry.log-victory {
+  color: #4ecdc4;
+  font-weight: bold;
+}
+
+.log-entry.log-error {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+/* Стиль для текста с золотом */
+.gold-text {
+  color: gold;
+  font-weight: bold;
+}
+
+/* Стиль для сообщений о выходах */
+.log-entry.log-directions {
+  color: #4ecdc4;
+  font-weight: bold;
+}
+
+/* Стиль для жирного текста в логе */
+.log-entry strong {
+  color: #ffaa44;
+}
+
+/* Стили инвентаря */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.inventory-item {
+  background: rgba(40, 40, 60, 0.8);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.item-name {
+  font-weight: bold;
+  color: #4ecdc4;
+}
+
+.item-type {
+  color: #a0a0c0;
+  font-size: 12px;
+}
+
+.item-stats {
+  color: #88ff88;
+  font-size: 13px;
+  margin: 5px 0;
+}
+
+.item-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+}
+/* ==================== КОМПАКТНЫЙ ИНВЕНТАРЬ ==================== */
+.inventory-grid-compact {
+    display: block;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 8px;
+}
+
+.inventory-item-compact {
+    background: rgba(40, 40, 60, 0.8);
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    transition: all 0.2s ease;
+    width: auto;
+    display: inline-block;
+}
+
+.inventory-item-compact:hover {
+    background: rgba(50, 50, 70, 0.9);
+    border-color: #555;
+}
+
+.inv-compact-header {
+    margin-bottom: 6px;
+}
+
+.inv-name-compact {
+    color: #4ecdc4;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inv-actions-compact {
+    display: flex;
+    gap: 8px;
+}
+
+/* Кнопки в компактном виде */
+.inv-actions-compact .inv-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    flex: none;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #555;
+    background: #333;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.inv-actions-compact .inv-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+}
+
+/* Специфичные цвета кнопок */
+.inv-actions-compact .info-btn {
+    background: #3949ab;
+    border-color: #5c6bc0;
+}
+
+.inv-actions-compact .use-btn {
+    background: #4caf50;
+    border-color: #66bb6a;
+}
+
+.inv-actions-compact .equip-btn {
+    background: #ff9800;
+    border-color: #ffb74d;
+    color: #333;
+}
+
+.item-count {
+    color: #ffcc44;
+    font-size: 12px;
+    margin-left: 5px;
+}
+/* ЕДИНЫЙ .inv-btn (удален дубль) */
+.inv-btn {
+  padding: 3px 8px;
+  margin: 2px;
+  border: 1px solid #555;
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+.use-btn {
+  background: #3949ab;
+  color: white;
+}
+
+.equip-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.unequip-btn {
+  background: #ff6b6b;
+  color: white;
+}
+
+/* Стили экипировки */
+.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.equipment-slot {
+  background: rgba(50, 50, 70, 0.7);
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+
+.slot-name {
+  color: #a0a0c0;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.slot-item {
+  color: #ffcc44;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+/* Стили магазина */
+#shop-modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.shop-modal {
+  background: rgba(30, 30, 46, 0.95);
+  border: 2px solid #3949ab;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.shop-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #3949ab;
+  padding-bottom: 15px;
+}
+
+.shop-gold {
+  font-size: 18px;
+  color: #ffcc44;
+  margin-top: 10px;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.shop-item {
+  background: rgba(40, 40, 60, 0.8);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.shop-item.cannot-afford {
+  opacity: 0.7;
+  border-color: #666;
+}
+
+.shop-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.item-price {
+  color: gold;
+  font-weight: bold;
+}
+
+.btn-shop {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-shop:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.shop-actions {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #444;
+}
+
+/* Вкладки магазина */
+.shop-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.shop-tab-btn {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: #a0a0c0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.shop-tab-btn.active {
+  background: #3949ab;
+  color: white;
+  font-weight: bold;
+}
+
+.shop-tab-content {
+  display: none;
+}
+
+.shop-tab-content.active {
+  display: block;
+}
+
+/* Продажа предметов */
+.sell-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sell-item {
+  background: rgba(40, 40, 60, 0.8);
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.sell-item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.item-sell-price {
+  color: gold;
+  font-weight: bold;
+}
+
+.btn-sell {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-sell:hover {
+  background: #66bb6a;
+}
+
+.empty-inventory {
+  text-align: center;
+  color: #a0a0c0;
+  padding: 20px;
+}
+
+/* ==================== СТИЛИ МИНИКАРТЫ ==================== */
+.minimap-header {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+  padding: 4px;
+  background: #2c3e50;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.minimap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 8px;
+  background: #34495e;
+  padding: 4px;
+  border-radius: 4px;
+  min-height: 210px;
+}
+
+.minimap-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  font-size: 0.8em;
+  transition: all 0.2s ease;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.minimap-cell.visited {
+  opacity: 1;
+}
+
+.minimap-cell.unvisited {
+  opacity: 0.4;
+}
+
+.minimap-cell.player {
+  border: 2px solid #00ff00 !important;
+  box-shadow: 0 0 5px #00ff00;
+  z-index: 2;
+}
+
+.minimap-cell.empty {
+  background: #2c3e50;
+  border: 1px dashed #3a5069;
+}
+
+/* Типы комнат */
+.minimap-cell.cell-shop {
+  background: #f39c12;
+  color: #000;
+  border: 1px solid #e67e22;
+}
+
+.minimap-cell.cell-forest {
+  background: #27ae60;
+  color: #fff;
+  border: 1px solid #229954;
+}
+
+.minimap-cell.cell-road {
+  background: #95a5a6;
+  color: #000;
+  border: 1px solid #7f8c8d;
+}
+
+.minimap-cell.cell-town {
+  background: #f1c40f;
+  color: #000;
+  border: 1px solid #f39c12;
+}
+
+.minimap-cell.cell-water {
+  background: #3498db;
+  color: #fff;
+  border: 1px solid #2980b9;
+}
+
+.minimap-cell.cell-cave {
+  background: #7d3c98;
+  color: #fff;
+  border: 1px solid #6c3483;
+}
+
+.minimap-cell.cell-boss {
+  background: #e74c3c;
+  color: #fff;
+  border: 1px solid #c0392b;
+}
+
+.minimap-cell.cell-default {
+  background: #5d6d7e;
+  color: #fff;
+  border: 1px solid #4a5f7a;
+}
+
+.minimap-cell:hover {
+  transform: scale(1.1);
+  z-index: 3;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.minimap-coordinates {
+  text-align: center;
+  font-size: 0.8em;
+  color: #bdc3c7;
+  background: #2c3e50;
+  padding: 4px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.minimap-error {
+  text-align: center;
+  color: #e74c3c;
+  padding: 10px;
+  font-style: italic;
+}
+
+.minimap-cell i {
+  font-size: 0.9em;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
+}
+
+@keyframes player-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.minimap-cell.player i {
+  animation: player-pulse 2s infinite;
+  color: #00ff00;
+}
+
+.minimap-cell.no-north { border-top: 2px solid #2196F3; }
+.minimap-cell.no-south { border-bottom: 2px solid #2196F3; }
+.minimap-cell.no-east { border-right: 2px solid #2196F3; }
+.minimap-cell.no-west { border-left: 2px solid #2196F3; }
+
+/* Стили для вкладки характеристик */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stats-block {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #444;
+}
+
+.stats-block h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #ffcc00;
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+  font-size: 14px;
+}
+
+/* Состояния (аффекты) */
+.conditions-block {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #444;
+  margin-top: 15px;
+}
+
+.conditions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.condition {
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  border: 1px solid #333;
+}
+
+.condition.active {
+  background: rgba(255, 0, 0, 0.2);
+  color: #ff6666;
+  border-color: #ff4444;
+}
+
+.condition.active i {
+  color: #ff4444;
+}
+
+/* InventoryUI */
+.info-btn { 
+  background: #444; 
+  border-color: #666; 
+}
+
+.item-info-modal { 
+  position: fixed; 
+  background: #1a1a1a; 
+  border: 2px solid #666; 
+  padding: 10px; 
+  z-index: 1000; 
+  max-width: 300px; 
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+  .minimap-grid {
+    min-height: 175px;
+  }
+  
+  .minimap-cell {
+    font-size: 0.7em;
+  }
+}
+
+@media (max-width: 768px) {
+  .minimap-grid {
+    min-height: 140px;
+    gap: 1px;
+  }
+  
+  .minimap-cell i {
+    font-size: 0.6em;
+  }
+}
+
+.gold-icon {
+  color: gold !important;
+}
+/* Три фрейма умений */
+.skills-three-frames {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.skills-frame {
+    flex: 1;
+    background: rgba(30, 30, 46, 0.9);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 400px;
+}
+
+.skills-frame h3 {
+    color: #4ecdc4;
+    margin-bottom: 12px;
+    font-size: 15px;
+    border-bottom: 2px solid #3949ab;
+    padding-bottom: 8px;
+}
+
+.frame-content {
+    min-height: 350px;
+    padding: 5px;
+}
+
+.no-data {
+    color: #a0a0c0;
+    font-style: italic;
+    text-align: center;
+    padding-top: 20px;
+}
