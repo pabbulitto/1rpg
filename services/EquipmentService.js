@@ -86,22 +86,31 @@ class EquipmentService {
         }
         
         // === ПРЯМЫЕ СЛОТЫ (head, body, arms, hands, belt, legs, feet) ===
-        const targetSlot = targetSlots[0];
+        // Если запрошен конкретный слот, он должен быть в targetSlots
+        if (requestedSlot && !targetSlots.includes(requestedSlot)) {
+            return {
+                success: false,
+                message: `Предмет нельзя надеть в слот ${requestedSlot}`,
+                errorCode: 'INVALID_SLOT'
+            };
+        }
+        
+        const targetSlot = requestedSlot || targetSlots[0];
         const equippedItem = currentEquipment[targetSlot];
         
-        // Проверка на уже надетый такой же предмет (для стакаемых)
-        if (equippedItem && equippedItem.id === item.id && equippedItem.stackable) {
-            return { 
-                success: false, 
-                message: "Этот предмет уже надет",
-                errorCode: 'ALREADY_EQUIPPED'
+        // Проверка, занят ли слот
+        if (equippedItem) {
+            return {
+                success: false,
+                message: `Слот ${targetSlot} уже занят`,
+                errorCode: 'SLOT_OCCUPIED'
             };
         }
         
         return { 
             success: true, 
             targetSlot: targetSlot,
-            slotsToClear: equippedItem ? [targetSlot] : []
+            slotsToClear: []
         };
     }
     
@@ -426,3 +435,4 @@ class EquipmentService {
 }
 
 export { EquipmentService };
+
