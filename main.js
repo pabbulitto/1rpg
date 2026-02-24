@@ -245,8 +245,11 @@ class Game {
           this.uiManager.showError(`Ошибка загрузки: ${result.error}`);
           return;
       }
-      this.player.container = this.gameState.getPlayerContainer();
-      // Синхронизируем PlayerCharacter с загруженными данными
+      
+      // ===== 1. Обновляем ссылку на контейнер (самое важное!) =====
+      this.player.container = this.gameState.playerContainer;
+      
+      // ===== 2. Синхронизируем PlayerCharacter с загруженными данными =====
       const savedPlayer = this.gameState.player;
       
       this.player.name = savedPlayer.name || this.player.name;
@@ -258,7 +261,7 @@ class Game {
           this.player.applyFinalStats(this.player.finalBaseStats);
       }
       
-      // Перезагружаем текущую зону
+      // ===== 3. Перезагружаем текущую зону =====
       const position = this.gameState.getPosition();
       if (!position.zone || !position.room) {
           console.error('loadGame: некорректная позиция в сохранении', position);
@@ -270,6 +273,9 @@ class Game {
           await this.zoneManager.loadZone(position.zone);
           this.zoneManager._initRoom(position.room);
           
+          // Добавляем игрока в комнату (на случай, если его там нет)
+          this.zoneManager.addEntity(position.room, this.player);
+          
           // Проверяем, что комната загрузилась
           const roomInfo = this.zoneManager.getCurrentRoomInfo();
           if (!roomInfo) {
@@ -278,8 +284,11 @@ class Game {
               return;
           }
           
+          // ===== 4. Обновляем UI =====
           this.uiManager.addToLog("Игра загружена", "success");
-          this.uiManager.updatePlayerStats(this.player.getStats());
+          this.uiManager.updateAll();  // обновить все компоненты UI
+          
+          // ===== 5. Показываем текущую комнату =====
           this.gameManager.explore();
           
       } catch (error) {
@@ -311,6 +320,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
 
 
 
