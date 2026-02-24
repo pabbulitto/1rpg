@@ -241,28 +241,50 @@ class Game {
 
   async loadGame() {
       const result = this.saveLoadService.loadGame();
-      if (result.success) {
-          const savedPlayer = this.gameState.player;
-          
-          this.player.name = savedPlayer.name || this.player.name;
-          this.player.class = savedPlayer.class || null;
-          this.player.race = savedPlayer.race || null;
-          this.player.finalBaseStats = savedPlayer.finalBaseStats || null;
-          
-          if (this.player.finalBaseStats) {
-              this.player.applyFinalStats(this.player.finalBaseStats);
-          }
-          
-          // Перезагружаем текущую зону
-          const position = this.gameState.getPosition();
+      if (!result.success) {
+          this.uiManager.showError(`Ошибка загрузки: ${result.error}`);
+          return;
+      }
+      
+      // Синхронизируем PlayerCharacter с загруженными данными
+      const savedPlayer = this.gameState.player;
+      
+      this.player.name = savedPlayer.name || this.player.name;
+      this.player.class = savedPlayer.class || null;
+      this.player.race = savedPlayer.race || null;
+      this.player.finalBaseStats = savedPlayer.finalBaseStats || null;
+      
+      if (this.player.finalBaseStats) {
+          this.player.applyFinalStats(this.player.finalBaseStats);
+      }
+      
+      // Перезагружаем текущую зону
+      const position = this.gameState.getPosition();
+      if (!position.zone || !position.room) {
+          console.error('loadGame: некорректная позиция в сохранении', position);
+          this.uiManager.showError('Ошибка загрузки: некорректная позиция');
+          return;
+      }
+      
+      try {
           await this.zoneManager.loadZone(position.zone);
           this.zoneManager._initRoom(position.room);
+          
+          // Проверяем, что комната загрузилась
+          const roomInfo = this.zoneManager.getCurrentRoomInfo();
+          if (!roomInfo) {
+              console.error('loadGame: не удалось загрузить комнату', position);
+              this.uiManager.showError('Ошибка загрузки: комната не найдена');
+              return;
+          }
           
           this.uiManager.addToLog("Игра загружена", "success");
           this.uiManager.updatePlayerStats(this.player.getStats());
           this.gameManager.explore();
-      } else {
-          this.uiManager.showError(`Ошибка загрузки: ${result.error}`);
+          
+      } catch (error) {
+          console.error('loadGame: ошибка загрузки зоны', error);
+          this.uiManager.showError(`Ошибка загрузки зоны: ${error.message}`);
       }
   }
 }
@@ -282,5 +304,12 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('load-btn')?.addEventListener('click', () => {
     gameInstance.loadGame();
   });
+  document.getElementById('new-game-btn')?.addEventListener('click', () => {
+    if (confirm('Начать новую игру? Весь прогресс будет потерян.')) {
+      localStorage.removeItem('rpg_save');
+      location.reload();
+    }
+  });
 });
+
 
