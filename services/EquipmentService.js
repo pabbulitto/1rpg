@@ -35,7 +35,7 @@ class EquipmentService {
      * @param {Object} player - объект игрока (для проверок требований)
      * @returns {Object} результат проверки
      */
-    canEquip(item, currentEquipment, player = null) {
+    canEquip(item, currentEquipment, player = null, requestedSlot = null) {
         if (!item || !item.slot) {
             return { 
                 success: false, 
@@ -77,7 +77,7 @@ class EquipmentService {
         
         // === ЛОГИКА ДЛЯ ОДНОРУЧНОГО ОРУЖИЯ ===
         if (slotType === 'hand') {
-            return this.validateHand(item, currentEquipment, player);
+            return this.validateHand(item, currentEquipment, player, requestedSlot);
         }
         
         // === ЛОГИКА ДЛЯ КОЛЕЦ, АМУЛЕТОВ И БРАСЛЕТОВ ===
@@ -168,7 +168,7 @@ class EquipmentService {
      * @param {Object} player - объект игрока
      * @returns {Object} результат проверки
      */
-    validateHand(item, currentEquipment, player = null) {
+    validateHand(item, currentEquipment, player = null, requestedSlot = null) {
         // 1. Проверка: правая рука занята двуручником?
         const rightHand = currentEquipment.right_hand;
         if (rightHand && rightHand.slot === 'two_handed') {
@@ -179,7 +179,49 @@ class EquipmentService {
             };
         }
         
-        // 2. Проверка требований по силе
+        // 2. Если запрошен конкретный слот
+        if (requestedSlot) {
+            // Проверяем, свободен ли слот
+            if (currentEquipment[requestedSlot]) {
+                return { 
+                    success: false, 
+                    message: `Слот ${requestedSlot === 'right_hand' ? 'правой' : 'левой'} руки уже занят`,
+                    errorCode: 'SLOT_OCCUPIED'
+                };
+            }
+            
+            // Проверяем требования по силе для запрошенного слота
+            if (player && item.requirements?.strength) {
+                const playerStrength = player.getStats().strength;
+                const req = item.requirements.strength;
+                
+                if (requestedSlot === 'right_hand' && playerStrength < req.right_hand) {
+                    return {
+                        success: false,
+                        message: `Вам нужно ${req.right_hand} силы для правой руки`,
+                        errorCode: 'STRENGTH_TOO_LOW_RIGHT'
+                    };
+                }
+                
+                if (requestedSlot === 'left_hand' && playerStrength < req.left_hand) {
+                    return {
+                        success: false,
+                        message: `Вам нужно ${req.left_hand} силы для левой руки`,
+                        errorCode: 'STRENGTH_TOO_LOW_LEFT'
+                    };
+                }
+            }
+            
+            // Если всё ок - надеваем в запрошенный слот
+            return { 
+                success: true, 
+                targetSlot: requestedSlot,
+                slotsToClear: []
+            };
+        }
+        
+        // 3. Если слот не запрошен - старая логика с поиском свободной руки
+        // Проверка требований по силе для двуручного/одноручного использования
         if (player && item.requirements?.strength) {
             const playerStrength = player.getStats().strength;
             const req = item.requirements.strength;
@@ -189,8 +231,8 @@ class EquipmentService {
                 // Можно использовать как двуручное - надеваем в правую руку, левую блокируем
                 return {
                     success: true,
-                    targetSlot: 'right_hand',  // надеваем в правую
-                    slotsToClear: ['right_hand', 'left_hand'],  // освобождаем обе руки
+                    targetSlot: 'right_hand',
+                    slotsToClear: ['right_hand', 'left_hand'],
                     message: `Используется двумя руками (требуется ${req.both_hands} силы)`
                 };
             }
@@ -215,7 +257,7 @@ class EquipmentService {
             }
         }
         
-        // 3. Ищем свободную руку
+        // Ищем свободную руку
         let targetSlot = null;
         if (!currentEquipment.right_hand) {
             targetSlot = 'right_hand';
