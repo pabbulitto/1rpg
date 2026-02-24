@@ -239,22 +239,24 @@ class Game {
       }
   }
 
-  loadGame() {
+  async loadGame() {
       const result = this.saveLoadService.loadGame();
       if (result.success) {
-          // После загрузки GameState, синхронизируем PlayerCharacter
-          const savedPlayer = this.gameState.player; // старый объект из сохранения
+          const savedPlayer = this.gameState.player;
           
-          // Обновляем поля в нашем PlayerCharacter
           this.player.name = savedPlayer.name || this.player.name;
           this.player.class = savedPlayer.class || null;
           this.player.race = savedPlayer.race || null;
           this.player.finalBaseStats = savedPlayer.finalBaseStats || null;
           
-          // Применяем финальные статы если они есть
           if (this.player.finalBaseStats) {
               this.player.applyFinalStats(this.player.finalBaseStats);
           }
+          
+          // Перезагружаем текущую зону
+          const position = this.gameState.getPosition();
+          await this.zoneManager.loadZone(position.zone);
+          this.zoneManager._initRoom(position.room);
           
           this.uiManager.addToLog("Игра загружена", "success");
           this.uiManager.updatePlayerStats(this.player.getStats());
@@ -281,3 +283,4 @@ window.addEventListener('DOMContentLoaded', () => {
     gameInstance.loadGame();
   });
 });
+
