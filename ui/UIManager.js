@@ -468,8 +468,8 @@ class UIManager {
         }
     }
 
-    onItemEquip(index) {
-        const result = this.game.player.equipItemFromInventory(index);
+    onItemEquip(index, preferredSlot = null) {
+        const result = this.game.player.equipItemFromInventory(index, preferredSlot);
         if (result.message) {
             this.addToLog(result.message, result.success ? 'success' : 'error');
         }
