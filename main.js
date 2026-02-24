@@ -245,7 +245,7 @@ class Game {
           this.uiManager.showError(`Ошибка загрузки: ${result.error}`);
           return;
       }
-      
+      this.player.container = this.gameState.getPlayerContainer();
       // Синхронизируем PlayerCharacter с загруженными данными
       const savedPlayer = this.gameState.player;
       
@@ -311,5 +311,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
 
 
