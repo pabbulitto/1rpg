@@ -205,7 +205,7 @@ class EntityContainer {
         }
 
         // 2. Проверяем возможность экипировки через EquipmentService
-        const validation = equipmentService.canEquip(item, this.equipment, player);
+        const validation = equipmentService.canEquip(item, this.equipment, player, slot);
         if (!validation.success) {
             return validation;
         }
@@ -399,5 +399,6 @@ class EntityContainer {
         this._isDirty = false;
     }
 }
+
 
 export { EntityContainer };
