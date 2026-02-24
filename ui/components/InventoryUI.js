@@ -95,6 +95,38 @@ class InventoryUI {
         const beltButtonHtml = canAddToBelt ? 
             `<button class="modal-btn belt-btn" data-action="belt">🎗️ В пояс</button>` : '';
         
+        // Генерируем кнопки для оружия
+        let weaponButtonsHtml = '';
+        if (item.type === 'weapon' && item.requirements?.strength) {
+            const req = item.requirements.strength;
+            const player = window.game.player;
+            const playerStrength = player?.getStats().strength || 0;
+            
+            // Кнопка для правой руки
+            if (req.right_hand !== undefined) {
+                const canUse = playerStrength >= req.right_hand;
+                weaponButtonsHtml += `<button class="modal-btn equip-right" data-action="equipRight" ${!canUse ? 'disabled' : ''}>
+                    👆 В правую руку${!canUse ? ` (нужно ${req.right_hand} силы)` : ''}
+                </button>`;
+            }
+            
+            // Кнопка для левой руки
+            if (req.left_hand !== undefined) {
+                const canUse = playerStrength >= req.left_hand;
+                weaponButtonsHtml += `<button class="modal-btn equip-left" data-action="equipLeft" ${!canUse ? 'disabled' : ''}>
+                    👈 В левую руку${!canUse ? ` (нужно ${req.left_hand} силы)` : ''}
+                </button>`;
+            }
+            
+            // Кнопка для обеих рук
+            if (req.both_hands !== undefined) {
+                const canUse = playerStrength >= req.both_hands;
+                weaponButtonsHtml += `<button class="modal-btn equip-both" data-action="equipBoth" ${!canUse ? 'disabled' : ''}>
+                    🤲 В обе руки${!canUse ? ` (нужно ${req.both_hands} силы)` : ''}
+                </button>`;
+            }
+        }
+        
         modal.innerHTML = `
             <div class="modal-header">
                 <h4>${item.name}</h4>
@@ -116,10 +148,14 @@ class InventoryUI {
             <div class="modal-actions">
                 ${item.type === 'consumable' ? 
                     `<button class="modal-btn use-btn" data-action="use">🧪 Использовать</button>` : ''}
-                ${item.slot && item.slot !== 'none' ? 
+                
+                ${weaponButtonsHtml}
+                
+                ${item.type === 'armor' ? 
                     `<button class="modal-btn equip-btn" data-action="equip">👕 Экипировать</button>` : ''}
+                
                 ${beltButtonHtml}
-                <!-- КНОПКА "БРОСИТЬ" ДЛЯ ВСЕХ ПРЕДМЕТОВ -->
+                
                 <button class="modal-btn drop-btn" data-action="drop">🗑️ Бросить</button>
                 <button class="modal-btn close-btn" data-action="close">✕ Закрыть</button>
             </div>
@@ -153,7 +189,16 @@ class InventoryUI {
                 if (this.onItemUse) this.onItemUse(index);
                 break;
             case 'equip':
-                if (this.onItemEquip) this.onItemEquip(index);
+                if (this.onItemEquip) this.onItemEquip(index, null);
+                break;
+            case 'equipRight':
+                if (this.onItemEquip) this.onItemEquip(index, 'right_hand');
+                break;
+            case 'equipLeft':
+                if (this.onItemEquip) this.onItemEquip(index, 'left_hand');
+                break;
+            case 'equipBoth':
+                if (this.onItemEquip) this.onItemEquip(index, 'both_hands');
                 break;
             case 'belt':
                 if (this.onAddToBelt) this.onAddToBelt(index);
