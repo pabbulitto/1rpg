@@ -1,5 +1,6 @@
 import { BattleSystem } from '../system/BattleSystem.js';
 import { PlayerCharacter } from '../core/PlayerCharacter.js';
+import { EntityContainer } from '../core/EntityContainer.js';
 /**
  * BattleOrchestrator - центральный координатор боя
  * Содержит ВСЮ бизнес-логику завершения боя
@@ -105,14 +106,22 @@ class BattleOrchestrator {
         const zonesData = this.game.zoneManager?.zonesData;
         const oldPlayer = this.game.player; 
         
-        if (!zonesData?.village?.startRoom) {
-            console.error('BattleOrchestrator: стартовая точка не найдена');
-            return;
+        // Определяем стартовую точку
+        let startZone = oldPlayer.startZone || 'village';
+        let startRoom = oldPlayer.startRoom;
+        
+        // Проверяем, что комната существует (если не задана в oldPlayer)
+        if (!startRoom) {
+            if (!zonesData?.village?.startRoom) {
+                console.error('BattleOrchestrator: стартовая точка не найдена');
+                return;
+            }
+            // Используем стартовую комнату деревни как fallback
+            startRoom = zonesData.village.startRoom;
         }
-        
-        const startZone = 'village';
-        const startRoom = zonesData.village.startRoom;
-        
+        // ===== СОЗДАЁМ НОВЫЙ КОНТЕЙНЕР =====
+        const newContainer = new EntityContainer();
+        gameState.playerContainer = newContainer;          
         // ===== 1. СОЗДАЕМ НОВОГО ИГРОКА =====
         const newPlayer = new PlayerCharacter(gameState, {
             eventBus: gameState.eventBus,
@@ -120,7 +129,7 @@ class BattleOrchestrator {
             abilityService: this.game.abilityService,
             battleSystem: this.game.battleSystem
         });
-        
+
         // Копируем имя и уровень
         newPlayer.name = oldPlayer.name;
         newPlayer.level = oldPlayer.level;
@@ -170,6 +179,14 @@ class BattleOrchestrator {
         this.game.gameState.eventBus.emit('battle:end');
         this.game.gameState.eventBus.emit('exploration:show');
         this.game.gameState.eventBus.emit('player:statsChanged', this.game.player.getStats());
+        
+        // Обновить список трупов
+        const roomId = this.game.gameState.getPosition().room;
+        const entities = this.game.zoneManager.getRoomEntitiesInfo(roomId);
+        this.game.gameState.eventBus.emit('room:entitiesUpdated', {
+            roomId: roomId,
+            entities: entities
+        });
         
         if (this.combatSystem) {
             this.combatSystem.currentBattle = null;
