@@ -1,0 +1,778 @@
+{
+  "Гоблин": {
+    "name": "Гоблин",
+    "description": "Мелкий ворованный гуманоид, но в стае опасен",
+    "sprite": "assets/sprites/creatures/goblin.png",
+    "class": "rogue",
+    "race": "goblin",
+    "profession": "thief",
+    "faction": "humanoid",
+    "baseStats": {
+      "strength": 15,
+      "dexterity": 17,
+      "constitution": 12,
+      "intelligence": 8,
+      "wisdom": 8,
+      "charisma": 6,
+      "baseHealth": 35,
+      "maxMana": 16,
+      "maxStamina": 25,
+      "healthRegen": 3,
+      "manaRegen": 0,
+      "staminaRegen": 2,
+      "armor": 1,
+      "defense": 3,
+      "spellPower": 1.0,
+      "initiative": 14
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "damageFormula": "1d6",
+    "abilities": [],
+    "spells": [],
+    "skills": [],
+    "aiType": "cowardly",
+    "detectionRange": 3,
+    "preferredRange": "melee",
+    "fleeThreshold": 0.3,
+    "equipmentChance": {
+      "right_hand": {
+        "itemId": "thief_dagger",
+        "chance": 0.6
+      }
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 5, "max": 10 }
+      },
+      "chance": {
+        "rusty_sword": 0.2,
+        "leather_belt": 0.3,
+        "health_potion": 0.2
+      }
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 35
+  },
+
+  "Лесной паук": {
+    "name": "Лесной паук",
+    "description": "Ядовитый паук, плетущий ловчие сети",
+    "sprite": "assets/sprites/creatures/forest_spider.png",
+    "class": "beast",
+    "race": "spider",
+    "profession": null,
+    "faction": "beast",
+    "baseStats": {
+      "strength": 14,
+      "dexterity": 18,
+      "constitution": 12,
+      "intelligence": 2,
+      "wisdom": 10,
+      "charisma": 3,
+      "baseHealth": 25,
+      "maxMana": 22,
+      "maxStamina": 25,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 2,
+      "armor": 2,
+      "defense": 4,
+      "spellPower": 1.0,
+      "initiative": 16
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Паучьи клыки",
+      "damage": "1d6",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 3, "max": 6 }
+      },
+      "chance": {
+        "spider_silk": 0.8
+      }
+    },
+    "corpseDecay": 40,
+    "respawnTime": 45,
+    "experienceReward": 20
+  },
+
+  "Волк": {
+    "name": "Волк",
+    "description": "Хищник, охотящийся стаей",
+    "sprite": "assets/sprites/creatures/wolf.png",
+    "class": "beast",
+    "race": "wolf",
+    "profession": null,
+    "faction": "beast",
+    "baseStats": {
+      "strength": 18,
+      "dexterity": 16,
+      "constitution": 14,
+      "intelligence": 4,
+      "wisdom": 12,
+      "charisma": 6,
+      "baseHealth": 45,
+      "maxMana": 16,
+      "maxStamina": 30,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 3,
+      "armor": 2,
+      "defense": 5,
+      "spellPower": 1.0,
+      "initiative": 14
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Когти",
+      "damage": "1d8",
+      "damageType": "slashing"
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 2, "max": 5 }
+      },
+      "chance": {
+        "wolf_pelt": 0.9,
+        "wolf_fang": 0.7,
+        "raw_meat": 1.0
+      }
+    },
+    "corpseDecay": 45,
+    "respawnTime": 50,
+    "experienceReward": 35
+  },
+
+  "Разбойник": {
+    "name": "Разбойник",
+    "description": "Бывалый грабитель, знающий цену внезапной атаке",
+    "sprite": "assets/sprites/creatures/bandit.png",
+    "class": "rogue",
+    "race": "human",
+    "profession": "thief",
+    "faction": "humanoid",
+    "baseStats": {
+      "strength": 17,
+      "dexterity": 20,
+      "constitution": 14,
+      "intelligence": 10,
+      "wisdom": 10,
+      "charisma": 8,
+      "baseHealth": 50,
+      "maxMana": 10,
+      "maxStamina": 30,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 3,
+      "armor": 2,
+      "defense": 6,
+      "spellPower": 1.0,
+      "initiative": 18
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "damageFormula": "2d4",
+    "equipmentChance": {
+      "right_hand": {
+        "itemId": "thief_dagger",
+        "chance": 0.8
+      },
+      "body": {
+        "itemId": "leather_jacket",
+        "chance": 0.6
+      }
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 15, "max": 25 }
+      },
+      "chance": {
+        "lockpick": 0.7,
+        "health_potion": 0.4,
+        "thief_dagger": 0.2
+      }
+    },
+    "corpseDecay": 50,
+    "respawnTime": 60,
+    "experienceReward": 45
+  },
+
+  "Орк": {
+    "name": "Орк",
+    "description": "Массивный воин, не знающий страха",
+    "sprite": "assets/sprites/creatures/orc.png",
+    "class": "warrior",
+    "race": "orc",
+    "profession": null,
+    "faction": "humanoid",
+    "baseStats": {
+      "strength": 20,
+      "dexterity": 16,
+      "constitution": 18,
+      "intelligence": 6,
+      "wisdom": 8,
+      "charisma": 6,
+      "baseHealth": 60,
+      "maxMana": 10,
+      "maxStamina": 35,
+      "healthRegen": 5,
+      "manaRegen": 0,
+      "staminaRegen": 3,
+      "armor": 4,
+      "defense": 8,
+      "spellPower": 1.0,
+      "initiative": 8
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "damageFormula": "1d12",
+    "equipmentChance": {
+      "right_hand": {
+        "itemId": "iron_sword",
+        "chance": 0.5
+      },
+      "head": {
+        "itemId": "iron_helmet",
+        "chance": 0.3
+      }
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 10, "max": 20 }
+      },
+      "chance": {
+        "health_potion": 0.5,
+        "iron_sword": 0.2
+      }
+    },
+    "corpseDecay": 55,
+    "respawnTime": 70,
+    "experienceReward": 60
+  },
+
+  "Жужалица": {
+    "name": "Жужалица",
+    "description": "Огромный жук с массивным панцирем, угрожающе жужжит крыльями",
+    "sprite": "assets/sprites/creatures/forest_spider.png",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 21,
+      "dexterity": 12,
+      "constitution": 20,
+      "intelligence": 2,
+      "wisdom": 8,
+      "charisma": 3,
+      "baseHealth": 48,
+      "maxMana": 10,
+      "maxStamina": 50,
+      "healthRegen": 8,
+      "manaRegen": 0,
+      "staminaRegen": 4,
+      "armor": 15,
+      "defense": 10,
+      "spellPower": 1.0,
+      "initiative": 8
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Жвалы",
+      "damage": "2d6",
+      "damageType": "slashing"
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 1, "max": 3 }
+      },
+      "chance": {
+        "chitin_armor": 0.3
+      }
+    },
+    "corpseDecay": 40,
+    "respawnTime": 80,
+    "experienceReward": 60
+  },
+
+  "Старая крыса": {
+    "name": "Старая крыса",
+    "description": "Огромная матерая крыса с красными глазами, чувствуется сила и злоба",
+    "class": "beast",
+    "race": "rodent",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 20,
+      "dexterity": 20,
+      "constitution": 18,
+      "intelligence": 8,
+      "wisdom": 14,
+      "charisma": 5,
+      "baseHealth": 58,
+      "maxMana": 30,
+      "maxStamina": 60,
+      "healthRegen": 10,
+      "manaRegen": 0,
+      "staminaRegen": 6,
+      "armor": 8,
+      "defense": 12,
+      "spellPower": 1.0,
+      "initiative": 16
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Крысиный укус",
+      "damage": "2d6",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+        "gold": { "min": 3, "max": 5 }
+      },
+      "chance": {
+        "rat_eye_amulet": 0.1
+      }
+    },
+    "corpseDecay": 60,
+    "respawnTime": 80,
+    "experienceReward": 70
+  },
+
+  "Прыгун": {
+    "name": "Прыгун",
+    "description": "Мелкий кровососущий паразит, быстро прыгает и больно кусается",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 14,
+      "dexterity": 20,
+      "constitution": 12,
+      "intelligence": 2,
+      "wisdom": 8,
+      "charisma": 2,
+      "baseHealth": 30,
+      "maxMana": 10,
+      "maxStamina": 30,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 4,
+      "armor": 1,
+      "defense": 4,
+      "spellPower": 1.0,
+      "initiative": 18
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Укус",
+      "damage": "1d6",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 30,
+    "respawnTime": 40,
+    "experienceReward": 25
+  },
+
+  "Крылохлоп": {
+    "name": "Крылохлоп",
+    "description": "Надоедливое летающее насекомое, вечно жужжит под ухом",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 14,
+      "dexterity": 18,
+      "constitution": 10,
+      "intelligence": 2,
+      "wisdom": 8,
+      "charisma": 3,
+      "baseHealth": 28,
+      "maxMana": 16,
+      "maxStamina": 25,
+      "healthRegen": 3,
+      "manaRegen": 0,
+      "staminaRegen": 4,
+      "armor": 0,
+      "defense": 3,
+      "spellPower": 1.0,
+      "initiative": 16
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Жужжание",
+      "damage": "1d6",
+      "damageType": "bludgeoning"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 30,
+    "respawnTime": 35,
+    "experienceReward": 20
+  },
+
+  "Тараканище": {
+    "name": "Тараканище",
+    "description": "Крупный усатый таракан, быстро бегает по углам",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 15,
+      "dexterity": 16,
+      "constitution": 14,
+      "intelligence": 2,
+      "wisdom": 9,
+      "charisma": 2,
+      "baseHealth": 40,
+      "maxMana": 10,
+      "maxStamina": 30,
+      "healthRegen": 5,
+      "manaRegen": 0,
+      "staminaRegen": 3,
+      "armor": 4,
+      "defense": 5,
+      "spellPower": 1.0,
+      "initiative": 12
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Укус",
+      "damage": "2d4",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 40,
+    "respawnTime": 50,
+    "experienceReward": 35
+  },
+
+  "Большой Комар": {
+    "name": "Большой Комар",
+    "description": "Здоровенный комар с длинным жалом, ищет чем бы поживиться",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 15,
+      "dexterity": 18,
+      "constitution": 12,
+      "intelligence": 2,
+      "wisdom": 9,
+      "charisma": 3,
+      "baseHealth": 35,
+      "maxMana": 11,
+      "maxStamina": 28,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 4,
+      "armor": 1,
+      "defense": 4,
+      "spellPower": 1.0,
+      "initiative": 16
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Жало",
+      "damage": "1d6",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 35,
+    "respawnTime": 45,
+    "experienceReward": 30
+  },
+
+  "Ночной огонек": {
+    "name": "Ночной огонек",
+    "description": "Мелкое светящееся насекомое, безобидное, но красивое",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 14,
+      "dexterity": 16,
+      "constitution": 10,
+      "intelligence": 2,
+      "wisdom": 8,
+      "charisma": 8,
+      "baseHealth": 25,
+      "maxMana": 18,
+      "maxStamina": 20,
+      "healthRegen": 2,
+      "manaRegen": 0,
+      "staminaRegen": 2,
+      "armor": 0,
+      "defense": 2,
+      "spellPower": 1.0,
+      "initiative": 12
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Слабый укус",
+      "damage": "1d4",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 25,
+    "respawnTime": 30,
+    "experienceReward": 20
+  },
+
+  "Пылекрыл": {
+    "name": "Пылекрыл",
+    "description": "Мелкая моль, портит одежду и продукты",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 14,
+      "dexterity": 16,
+      "constitution": 10,
+      "intelligence": 2,
+      "wisdom": 7,
+      "charisma": 3,
+      "baseHealth": 28,
+      "maxMana": 18,
+      "maxStamina": 20,
+      "healthRegen": 3,
+      "manaRegen": 0,
+      "staminaRegen": 3,
+      "armor": 0,
+      "defense": 2,
+      "spellPower": 1.0,
+      "initiative": 14
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Кусается",
+      "damage": "1d4",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 30,
+    "respawnTime": 35,
+    "experienceReward": 20
+  },
+
+  "Плоскоспин": {
+    "name": "Плоскоспин",
+    "description": "Мелкий клоп с противным запахом",
+    "class": "beast",
+    "race": "insect",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 14,
+      "dexterity": 14,
+      "constitution": 14,
+      "intelligence": 2,
+      "wisdom": 8,
+      "charisma": 2,
+      "baseHealth": 35,
+      "maxMana": 16,
+      "maxStamina": 30,
+      "healthRegen": 4,
+      "manaRegen": 0,
+      "staminaRegen": 3,
+      "armor": 6,
+      "defense": 6,
+      "spellPower": 1.0,
+      "initiative": 10
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Укус",
+      "damage": "1d6",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {}
+    },
+    "corpseDecay": 40,
+    "respawnTime": 50,
+    "experienceReward": 28
+  },
+
+  "Мышь": {
+    "name": "Мышь",
+    "description": "Серая мышь, шуршит в углах",
+    "class": "beast",
+    "race": "rodent",
+    "profession": null,
+    "faction": "vermin",
+    "baseStats": {
+      "strength": 16,
+      "dexterity": 18,
+      "constitution": 13,
+      "intelligence": 4,
+      "wisdom": 10,
+      "charisma": 4,
+      "baseHealth": 40,
+      "maxMana": 15,
+      "maxStamina": 25,
+      "healthRegen": 3,
+      "manaRegen": 0,
+      "staminaRegen": 4,
+      "armor": 0,
+      "defense": 3,
+      "spellPower": 1.0,
+      "initiative": 16
+    },
+    "baseLevel": 1,
+    "healthPerLevel": 5,
+    "manaPerLevel": 3,
+    "staminaPerLevel": 4,
+    "attackPerLevel": 0.4,
+    "armorPerLevel": 0.5,
+    "damageModPerLevel": 0.4,
+    "hitrollPerLevel": 0.2,
+    "naturalWeapon": {
+      "name": "Укус",
+      "damage": "1d6",
+      "damageType": "piercing"
+    },
+    "inventory": {
+      "guaranteed": {
+      },
+      "chance": {
+        "wool_clump": 0.3
+      }
+    },
+    "corpseDecay": 35,
+    "respawnTime": 40,
+    "experienceReward": 30
+  }
+}
