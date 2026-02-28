@@ -393,8 +393,9 @@ class ZoneManager {
             }
         }
 
-        // Клетка игрока всегда считается занятой для новых сущностей
-        if (window.game?.player && window.game.player.gridX !== undefined) {
+        // Клетка игрока считается занятой только если он уже в этой комнате
+        if (window.game?.player && window.game.player.gridX !== undefined && 
+            window.game.player.roomId === roomId) {
             occupiedCells.add(`${window.game.player.gridX},${window.game.player.gridY}`);
         }
       // Поиск по спирали
@@ -685,5 +686,6 @@ class ZoneManager {
     return null;
   }
 }
+
 
 export { ZoneManager };
