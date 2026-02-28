@@ -1,0 +1,583 @@
+{
+  "name": "Деревушка на юго-западе",
+    "r1c5": {
+      "name": "северный тупик",
+      "description": "Небольшой закоулок с видом на холм.",
+      "background": "assets/backgrounds/southwest_village/dead_end_21.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "south": "r2c5"      
+      }
+    },
+    "r2c3": {
+      "name": "Лавка",
+      "description": "Небольшая лавка, где торгуют разными товарами.",
+      "background": "assets/backgrounds/southwest_village/interior_generic.jpg",
+      "terrain": "road",
+      "npcs": ["merchant_1"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "r2c4"
+      }
+    },
+    "r2c4": {
+      "name": "Перекресток",
+      "description": "Небольшая площадь, откуда расходятся пути.",
+      "background": "assets/backgrounds/southwest_village/crossroads_3.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r2c3",
+        "east": "r2c5",
+        "south": "r3c4"
+      }
+    },
+    "r2c5": {
+      "name": "Торговая улица",
+      "description": "Улица, ведущая к центру деревни.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r2c4",
+        "north": "r1c5",
+        "south": "r3c4"
+      }
+    },
+    "r3c4": {
+      "name": "Центральная площадь",
+      "description": "Главная площадь деревни, где собираются жители.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": ["town_crier"],
+      "objects": ["well"],
+      "items": [],
+      "directions": {
+        "north": "r2c4",
+        "south": "r4c4",
+        "east": "r3c7"
+      }
+    },
+    "r3c7": {
+      "name": "Мастерская",
+      "description": "Мастерская, где работают ремесленники.",
+      "background": "assets/backgrounds/southwest_village/interior_generic.jpg",
+      "terrain": "road",
+      "npcs": ["artisan"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r3c4",
+        "south": "r4c7"
+      }
+    },
+    "r4c2": {
+      "name": "У выхода из деревни",
+      "description": "Дальше дорога уходит в лес.",
+      "background": "assets/backgrounds/southwest_village/wst_town_gate.jpg",
+      "terrain": "road",
+      "npcs": ["gate_guard"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "r4c3"
+      }
+    },
+    "r4c3": {
+      "name": "Западная улица",
+      "description": "Улица, ведущая к центру.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r4c2",
+        "east": "r4c4"
+      }
+    },
+    "r4c4": {
+      "name": "Центральная площадь (юг)",
+      "description": "Южная часть центральной площади.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r3c4",
+        "west": "r4c3",
+        "east": "r4c5",
+        "south": "r5c4"
+      }
+    },
+    "r4c5": {
+      "name": "Восточная улица",
+      "description": "Улица, ведущая к восточной части деревни.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r4c4",
+        "east": "r4c6"
+      }
+    },
+    "r4c6": {
+      "name": "Восточная площадь",
+      "description": "Небольшая площадь в восточной части.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": ["street_vendor"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r4c5",
+        "east": "r4c7"
+      }
+    },
+    "r4c7": {
+      "name": "Восточный тупик",
+      "description": "Дорога, ведущая на восток.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r3c7",
+        "west": "r4c6",
+        "east": "r4c8",
+        "south": "r5c7"
+      }
+    },
+    "r4c8": {
+      "name": "Храм",
+      "description": "Небольшой храм на окраине деревни.",
+      "background": "assets/backgrounds/southwest_village/interior_generic.jpg",
+      "terrain": "road",
+      "npcs": ["priest"],
+      "objects": ["altar"],
+      "items": [],
+      "directions": {
+        "west": "r4c7"
+      }
+    },
+    "r5c4": {
+      "name": "Южная улица",
+      "description": "Улица, ведущая к южной части.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r4c4",
+        "south": "r6c4"
+      }
+    },
+    "r5c7": {
+      "name": "Юго-восточная площадь",
+      "description": "Небольшая площадь у храма.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": ["pilgrim"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r4c7",
+        "south": "r6c5"
+      }
+    },
+    "r6c3": {
+      "name": "Западный рынок",
+      "description": "Рынок в западной части деревни.",
+      "background": "assets/backgrounds/southwest_village/marketplace.jpg",
+      "terrain": "road",
+      "npcs": ["merchant_2"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "r6c4"
+      }
+    },
+    "r6c4": {
+      "name": "Южный перекресток",
+      "description": "Перекресток в южной части деревни.",
+      "background": "assets/backgrounds/southwest_village/crossroads.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r5c4",
+        "west": "r6c3",
+        "east": "r6c5",
+        "south": "r7c4"
+      }
+    },
+    "r6c5": {
+      "name": "Восточный рынок",
+      "description": "Рынок в восточной части деревни.",
+      "background": "assets/backgrounds/southwest_village/marketplace.jpg",
+      "terrain": "road",
+      "npcs": ["merchant_3"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r6c4",
+        "north": "r5c7"
+      }
+    },
+    "r7c4": {
+      "name": "Южная площадь",
+      "description": "Небольшая площадь на юге деревни.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r6c4",
+        "south": "r8c4"
+      }
+    },
+    "r8c3": {
+      "name": "Кузница",
+      "description": "Кузница, где куют оружие и инструменты.",
+      "background": "assets/backgrounds/southwest_village/interior_generic.jpg",
+      "terrain": "road",
+      "npcs": ["blacksmith"],
+      "objects": ["forge"],
+      "items": [],
+      "directions": {
+        "east": "r8c4"
+      }
+    },
+    "r8c4": {
+      "name": "Южная улица",
+      "description": "Улица в южной части деревни.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r7c4",
+        "west": "r8c3",
+        "east": "r8c5",
+        "south": "r9c4"
+      }
+    },
+    "r8c5": {
+      "name": "Таверна",
+      "description": "Таверна, где можно отдохнуть и поесть.",
+      "background": "assets/backgrounds/southwest_village/interior_generic.jpg",
+      "terrain": "road",
+      "npcs": ["innkeeper"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r8c4"
+      }
+    },
+    "r9c2": {
+      "name": "Колодец",
+      "description": "Старый каменный колодец.",
+      "background": "assets/backgrounds/southwest_village/well_1.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": ["well"],
+      "items": [],
+      "directions": {
+        "east": "r9c4"
+      }
+    },
+    "r9c4": {
+      "name": "Южный перекресток",
+      "description": "Перекресток дорог в южной части.",
+      "background": "assets/backgrounds/southwest_village/crossroads.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r8c4",
+        "west": "r9c2",
+        "south": "r10c4"
+      }
+    },
+    "r10c1": {
+      "name": "Западная застава",
+      "description": "Небольшая застава на западе.",
+      "background": "assets/backgrounds/southwest_village/est2_dead_end.jpg",
+      "terrain": "road",
+      "npcs": ["guard"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "r10c2"
+      }
+    },
+    "r10c2": {
+      "name": "Западная дорога",
+      "description": "Дорога, ведущая к заставе.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r10c1",
+        "east": "r10c3",
+        "south": "r11c2"
+      }
+    },
+    "r10c3": {
+      "name": "Перекресток",
+      "description": "Перекресток дорог.",
+      "background": "assets/backgrounds/southwest_village/crossroads.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r10c2",
+        "east": "r10c4"
+      }
+    },
+    "r10c4": {
+      "name": "Центральная площадь (юг)",
+      "description": "Южная часть центральной площади.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": ["town_herald"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r9c4",
+        "west": "r10c3",
+        "east": "r10c5",
+        "south": "r11c4"
+      }
+    },
+    "r10c5": {
+      "name": "Восточная дорога",
+      "description": "Дорога, ведущая на восток.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r10c4",
+        "east": "r10c6"
+      }
+    },
+    "r10c6": {
+      "name": "Восточная застава",
+      "description": "Небольшая застава на востоке.",
+      "background": "assets/backgrounds/southwest_village/wst1_dead_end.jpg",
+      "terrain": "road",
+      "npcs": ["guard"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r10c5"
+      }
+    },
+    "r11c2": {
+      "name": "Южная дорога",
+      "description": "Дорога, ведущая на юг.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r10c2",
+        "east": "r11c4"
+      }
+    },
+    "r11c4": {
+      "name": "Южный перекресток",
+      "description": "Перекресток в южной части.",
+      "background": "assets/backgrounds/southwest_village/crossroads.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r10c4",
+        "west": "r11c2",
+        "south": "r12c4"
+      }
+    },
+    "r12c4": {
+      "name": "Южная площадь",
+      "description": "Небольшая площадь на юге.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r11c4",
+        "east": "r12c5",
+        "south": "r13c4"
+      }
+    },
+    "r12c5": {
+      "name": "Восточная улица",
+      "description": "Улица, ведущая к восточной части.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r12c4",
+        "east": "r12c6"
+      }
+    },
+    "r12c6": {
+      "name": "Восточная площадь",
+      "description": "Небольшая площадь на востоке.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": ["merchant_4"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r12c5",
+        "east": "r12c7"
+      }
+    },
+    "r12c7": {
+      "name": "Перед старым домом",
+      "description": "Рядом виднеется покосившийся старый дом.",
+      "background": "assets/backgrounds/southwest_village/abandoned_house_exterior.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r12c6",
+        "east":"abandoned_house:old_house"
+      }
+    },
+    "r13c3": {
+      "name": "Южная таверна",
+      "description": "Небольшая таверна на юге деревни.",
+      "background": "assets/backgrounds/southwest_village/interior_generic.jpg",
+      "terrain": "road",
+      "npcs": ["barkeeper"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "r13c4"
+      }
+    },
+    "r13c4": {
+      "name": "Южная улица",
+      "description": "Улица в южной части деревни.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r12c4",
+        "west": "r13c3",
+        "south": "r14c4"
+      }
+    },
+    "r14c4": {
+      "name": "Южный перекресток",
+      "description": "Перекресток на юге деревни.",
+      "background": "assets/backgrounds/southwest_village/crossroads.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r13c4",
+        "south": "r15c4"
+      }
+    },
+    "r15c2": {
+      "name": "Западная окраина",
+      "description": "Окраина деревни на западе.",
+      "background": "assets/backgrounds/southwest_village/wst1_dead_end .jpg",
+      "terrain": "road",
+      "npcs": ["hermit"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "r15c3"
+      }
+    },
+    "r15c3": {
+      "name": "Тропа",
+      "description": "Тропа, ведущая к центру.",
+      "background": "assets/backgrounds/southwest_village/street_view.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r15c2",
+        "east": "r15c4"
+      }
+    },
+    "r15c4": {
+      "name": "Южная площадь",
+      "description": "Площадь в южной части деревни.",
+      "background": "assets/backgrounds/southwest_village/town_square.jpg",
+      "terrain": "road",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r14c4",
+        "west": "r15c3",
+        "east": "r15c5",
+        "south": "r16c4"
+      }
+    },
+    "r15c5": {
+      "name": "Восточная окраина",
+      "description": "Окраина деревни на востоке.",
+      "background": "assets/backgrounds/southwest_village/est2_dead_end.jpg",
+      
+      "terrain": "road",
+      "npcs": ["hunter"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "r15c4"
+      }
+    },
+    "r16c4": {
+      "name": "Южные ворота",
+      "description": "Ворота, ведущие из деревни на юг.",
+      "background": "assets/backgrounds/southwest_village/sth_town_gate.jpg",
+      "terrain": "road",
+      "npcs": ["gatekeeper"],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "r15c4",
+        "south": "village:market"
+      }
+    }
+}

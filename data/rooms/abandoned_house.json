@@ -1,0 +1,277 @@
+{
+  "name": "Заброшенный дом",
+    "old_house": {
+      "name": "Заброшенный дом",
+      "description": "Заброшенный дом",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "porch",
+        "west": "southwest_village:r12c7"
+      }
+    },
+    "porch": {
+      "name": "На крыльце",
+      "description": "На крыльце",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "old_house",
+        "east": "entryway_a"
+      }
+    },
+    "entryway_a": {
+      "name": "В сенях",
+      "description": "В сенях",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "porch",
+        "east": "entryway_b"
+      },
+      "enemies": [
+        { "type": "Прыгун", "level": 1 },
+        { "type": "Мышь", "level": 1 }
+      ]
+    },
+    "entryway_b": {
+      "name": "В сенях",
+      "description": "В сенях",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "entryway_a",
+        "south": "izba_a"
+      },
+      "enemies": [
+        { "type": "Крылохлоп", "level": 1 },
+        { "type": "Крылохлоп", "level": 1 }
+      ]
+    },
+    "izba_a": {
+      "name": "В избе",
+      "description": "В избе",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "entryway_b",
+        "south": "oven"
+      },
+      "enemies": [
+        { "type": "Большой Комар", "level": 1 },
+        { "type": "Крылохлоп", "level": 1 },
+        { "type": "Тараканище", "level": 1 }
+      ]
+    },
+    "izba_b": {
+      "name": "В избе",
+      "description": "В избе",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "izba_c",
+        "south": "hayloft_1"
+      },
+      "enemies": [
+        { "type": "Плоскоспин", "level": 1 }
+      ]
+    },
+    "izba_c": {
+      "name": "В избе",
+      "description": "В избе",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "izba_b",
+        "east": "oven"
+      },
+      "enemies": [
+        { "type": "Ночной огонек", "level": 1 },
+        { "type": "Тараканище", "level": 1 }
+      ]
+    },
+    "oven": {
+      "name": "У печи",
+      "description": "У печи",
+      "terrain": "dungedungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "izba_a",
+        "east": "kitchen",
+        "west": "izba_c" 
+      },
+      "enemies": [
+        { "type": "Пылекрыл", "level": 1 },
+        { "type": "Плоскоспин", "level": 1 }
+      ]
+    },
+    "kitchen": {
+      "name": "На кухне",
+      "description": "На кухне",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "oven",
+        "down": "cellar_1"
+      },
+      "enemies": [
+        { "type": "Большой Комар", "level": 1 }
+      ]
+    },
+    "hayloft_1": {
+      "name": "На сеновале",
+      "description": "На сеновале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "izba_b",
+        "east": "hayloft_2",
+        "south": "hayloft_4"
+      },
+      "enemies": []
+    },
+    "hayloft_2": {
+      "name": "На сеновале",
+      "description": "На сеновале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "hayloft_1",
+        "south": "hayloft_3"
+      },
+      "enemies": [
+        { "type": "Мышь", "level": 1 }
+      ]
+    },
+    "hayloft_3": {
+      "name": "На сеновале",
+      "description": "На сеновале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "hayloft_2",
+        "west": "hayloft_4"
+      },
+      "enemies": [
+        { "type": "Тараканище", "level": 1 }
+      ]
+    },
+    "hayloft_4": {
+      "name": "На сеновале",
+      "description": "На сеновале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "hayloft_1",
+        "east": "hayloft_3"
+      },
+      "enemies": []
+    },
+    "cellar_1": {
+      "name": "В подвале",
+      "description": "В подвале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "up": "kitchen",
+        "east": "cellar_2",
+        "south": "cellar_4"
+      },
+      "enemies": [
+        { "type": "Прыгун", "level": 1 },
+        { "type": "Жужалица", "level": 2 },
+        { "type": "Плоскоспин", "level": 1 }
+      ]
+    },
+    "cellar_2": {
+      "name": "В подвале",
+      "description": "В подвале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "west": "cellar_1",
+        "south": "cellar_3"
+      },
+      "enemies": [
+        { "type": "Большой Комар", "level": 1 },
+        { "type": "Пылекрыл", "level": 1 }
+      ]
+    },
+    "cellar_3": {
+      "name": "В подвале",
+      "description": "В подвале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "cellar_2",
+        "west": "cellar_4"
+      },
+      "enemies": [
+        { "type": "Тараканище", "level": 1 },
+        { "type": "Плоскоспин", "level": 1 }
+      ]
+    },
+    "cellar_4": {
+      "name": "В подвале",
+      "description": "В подвале",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "cellar_1",
+        "east": "cellar_3",
+        "south": "dead_end"
+      },
+      "enemies": [
+        { "type": "Мышь", "level": 1 },
+        { "type": "Прыгун", "level": 1 }
+      ]
+    },
+    "dead_end": {
+      "name": "Глухой угол",
+      "description": "Глухой угол",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "cellar_4"
+      },
+      "enemies": [
+        { "type": "Старая крыса", "level": 3 }
+      ]
+    }
+}
