@@ -3,7 +3,7 @@ class TimeSystem {
         this.gameState = gameState;
         
         this.currentTick = 0;
-        this.tickInterval = 4000; // 4 секунд = 1 игровой тик
+        this.tickInterval = 3000; // 3 секунд = 1 игровой тик
         this.isRunning = false;
         this.tickTimer = null;
         
@@ -285,4 +285,5 @@ class TimeSystem {
 
 
 export { TimeSystem };
+
 
