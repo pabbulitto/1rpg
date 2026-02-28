@@ -19,6 +19,7 @@ import { ActionHandler } from './core/ActionHandler.js';
 import { AbilityService } from './services/AbilityService.js';
 import { itemService } from './services/ItemService.js';
 import { GraphicsEngine } from './ui/GraphicsEngine.js';
+import { BattleCanvas } from './ui/BattleCanvas.js';
 import { GroundBag } from './core/GroundBag.js';
 // Импорт всех UI компонентов
 import { CharacterCreationUI } from './ui/components/CharacterCreationUI.js';
@@ -28,7 +29,6 @@ import { EquipmentUI } from './ui/components/EquipmentUI.js';
 import { SkillsUI } from './ui/components/SkillsUI.js';
 import { TimeUI } from './ui/components/TimeUI.js';
 import { LogUI } from './ui/components/LogUI.js';
-import { BattleUI } from './ui/components/BattleUI.js';
 import { ShopUI } from './ui/components/ShopUI.js';
 import { BeltUI } from './ui/components/BeltUI.js';
 import { itemRegistry } from './core/ItemRegistry.js';
@@ -78,6 +78,7 @@ class Game {
     // 6. Остальные системы
     this.zoneManager = new ZoneManager(this.gameState);
     this.graphicsEngine = new GraphicsEngine('game-canvas', this);
+    this.battleCanvas = new BattleCanvas('battle-canvas', this);
 
     this.equipmentService = new EquipmentService(
       this.gameState.eventBus,
@@ -111,12 +112,11 @@ class Game {
       SkillsUI,
       TimeUI,
       LogUI,
-      BattleUI,
       ShopUI,
       BeltUI
     };
     
-    this.uiManager = new UIManager(this, uiComponents, this.graphicsEngine);
+    this.uiManager = new UIManager(this, uiComponents, this.graphicsEngine, this.battleCanvas);
     this.gameManager = new GameManager(this);
     
     this.isInitialized = false;
@@ -184,6 +184,7 @@ class Game {
         this.player.race = raceId;
         // Устанавливаем спрайт в зависимости от класса
         this.player.sprite = `assets/sprites/player/${classId}.png`;
+        this.player.portrait = `assets/portraits/${classId}.png`;
         // Применяем финальные статы
         this.player.applyFinalStats(finalStats);
         
@@ -195,12 +196,16 @@ class Game {
             if (item) this.gameState.playerContainer.addItem(item);
           });
         }
-        
         // === ДОБАВЛЕНО: врождённые способности ===
         if (classData?.innateAbilities && this.abilityService) {
           classData.innateAbilities.forEach(abilityId => {
             this.abilityService.addAbilityToCharacter(this.player.id, abilityId);
           });
+        }
+                // Добавляем тестовые способности
+        if (this.abilityService) {
+            this.abilityService.addAbilityToCharacter(this.player.id, 'kick');
+            this.abilityService.addAbilityToCharacter(this.player.id, 'magic_missile');
         }
         // Применяем стартовую позицию из расы
         const raceData = this.dataService.getRaceData(raceId);

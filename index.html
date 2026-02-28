@@ -25,23 +25,13 @@
         <!-- ВКЛАДКА ИГРА -->
         <div id="game-tab" class="tab-content active">
           <!-- Канвас 900×507 -->
-          <div style="margin-bottom: 2px;">
-            <canvas id="game-canvas" width="900" height="507" style="display: block; background: #1a1a2e;"></canvas>
+          <div style="margin-bottom: 0px; position: relative; height: 507px;">
+            <canvas id="game-canvas" width="900" height="507" 
+                    style="display: block; background: #1a1a2e;"></canvas>
+            <canvas id="battle-canvas" width="900" height="507" 
+                    style="display: none; background: #1a1a2e;"></canvas>
           </div>
-          
-          <!-- Кнопки направлений -->
-          <div class="buttons-container">
-            <div class="directions-grid">
-              <button id="north-btn" class="dir-btn"><i class="fas fa-arrow-up"></i> Север</button>
-              <button id="up-btn" class="dir-btn"><i class="fas fa-angle-double-up"></i> Вверх</button>
-              <button id="down-btn" class="dir-btn"><i class="fas fa-angle-double-down"></i> Вниз</button>
-              <button id="south-btn" class="dir-btn"><i class="fas fa-arrow-down"></i> Юг</button>
-              <button id="west-btn" class="dir-btn"><i class="fas fa-arrow-left"></i> Запад</button>
-              <button id="east-btn" class="dir-btn"><i class="fas fa-arrow-right"></i> Восток</button>
-            </div>
-          </div>
-        </div>
-
+         </div>  
         <!-- ДРУГИЕ ВКЛАДКИ -->
         <div id="stats-tab" class="tab-content card">
           <h2><i class="fas fa-chart-bar"></i> Характеристики</h2>
@@ -65,8 +55,8 @@
 
       <!-- ПРАВАЯ ПАНЕЛЬ -->
       <div class="right-panel">
-        <!-- Верхний ряд: персонаж + блок боя -->
-        <div class="right-top-row" style="display: flex; gap: 2px; margin-bottom: 2px; height: 280px;">
+        <!-- Верхний ряд: персонаж + контейнер для динамического контента -->
+        <div class="right-top-row" style="display: flex; gap: 1px; margin-bottom: 0px; height: 280px;">
           <!-- Блок персонаж -->
           <div class="card" style="flex: 1; overflow-y: auto;">
             <h2><i class="fas fa-user"></i> <span id="player-header">Герой [Ур. 1]</span></h2>
@@ -82,25 +72,15 @@
             </div>
           </div>
 
-          <!-- Блок боя -->
+          <!-- Контейнер для динамического контента (как в BattleUI) -->
           <div id="battle-ui" class="card battle-card" style="flex: 1; overflow-y: auto;">
-            <h2><i class="fas fa-fist-raised"></i> Бой</h2>
-            <div class="enemy-info">
-              <h3 id="enemy-name">-</h3>
-              <div class="enemy-health">Здоровье: <span id="enemy-health">-/-</span></div>
-            </div>
-            <div class="battle-actions">
-              <button id="attack-btn" class="btn btn-danger"><i class="fas fa-swords"></i> Атаковать</button>
-              <button id="skills-btn" class="battle-btn"><i class="fas fa-shield-alt"></i>Умения</button>
-              <button id="spells-btn" class="battle-btn"><i class="fas fa-shield-alt"></i>Заклинания</button>
-              <button id="escape-btn" class="btn btn-warning"><i class="fas fa-running"></i> Бежать</button>
-            </div>
+            <!-- Сюда UIManager будет вставлять контент -->
           </div>
-        </div>
+        </div> <!-- Важно! Закрытие right-top-row -->
 
         <!-- Лог -->
         <div class="card" style="margin-bottom: 1px;">
-          <div id="log-content" class="log-content" style="height: 220px; overflow-y: auto;">
+          <div id="log-content" class="log-content" style="height: 210px; overflow-y: auto;">
             <div class="log-entry">🏰 Добро пожаловать в RPG!</div>
           </div>
         </div>
