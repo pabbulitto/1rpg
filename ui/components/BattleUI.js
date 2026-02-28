@@ -61,10 +61,6 @@ class BattleUI {
                     <i class="fas fa-box"></i> Трупы
                     <span class="tab-count" id="corpses-count">0</span>
                 </button>
-                <button class="location-tab" data-tab="items">
-                    <i class="fas fa-apple-alt"></i> Предметы
-                    <span class="tab-count" id="items-count">0</span>
-                </button>
             </div>
             <div class="location-content">
                 <div id="location-enemies" class="location-pane active"></div>
@@ -841,5 +837,6 @@ class BattleUI {
         }
     }
 }
+
 
 export { BattleUI };
