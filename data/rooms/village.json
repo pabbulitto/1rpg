@@ -1,0 +1,87 @@
+{
+  "village_square": {
+    "name": "Центральная площадь",
+    "description": "Сердце небольшой деревни. Вымощенная булыжником площадь окружена уютными домами с соломенными крышами. В центре стоит колодец, а вокруг снуют мирные жители. Отсюда расходятся несколько улочек.",
+    "terrain": "road",
+    "npcs": [],
+    "objects": ["well"],
+    "items": [],
+    "directions": {
+      "north": "tavern",
+      "east": "blacksmith",
+      "south": "healer_hut",
+      "west": "town_hall",
+      "up": "market"
+    }
+  },
+  "tavern": {
+    "name": "Таверна",
+    "description": "Теплое, пропахшее элем и жареным мясом помещение. Массивные деревянные столы, за которыми сидят местные жители и редкие путники. За стойкой хмурый трактирщик полирует кружки.",
+    "terrain": "road",
+    "npcs": ["innkeeper"],
+    "objects": [],
+    "items": [],
+    "directions": {
+      "south": "village_square"
+    }
+  },
+  "blacksmith": {
+    "name": "Кузница",
+    "description": "Невыносимо жарко и шумно. Воздух дрожит от ударов молота о наковальню. У горна, озаренного багровым светом раскаленного металла, стоит могучий кузнец. Стены увешаны заготовками оружия и доспехов.",
+    "terrain": "road",
+    "npcs": ["blacksmith"],
+    "objects": [],
+    "items": [],
+    "directions": {
+      "west": "village_square"
+    }
+  },
+  "healer_hut": {
+    "name": "Хижина целителя",
+    "description": "Небольшой домик на окраине, утопающий в зарослях лечебных трав. Внутри пахнет сушеными растениями и благовониями. Полки заставлены склянками и сушеными корешками. Пожилая женщина в платке перебирает травы.",
+    "terrain": "road",
+    "npcs": ["healer"],
+    "objects": [],
+    "items": [],
+    "directions": {
+      "north": "village_square",
+      "east": "well"
+    }
+  },
+  "town_hall": {
+    "name": "Ратуша",
+    "description": "Самое большое и официальное здание в деревне. Внутри прохладно и просторно. На стенах висят старые карты и указы. За грубым дубовым столом сидит староста, окруженный бумагами.",
+    "terrain": "road",
+    "npcs": ["mayor"],
+    "objects": [],
+    "items": [],
+    "directions": {
+      "east": "village_square"
+    }
+  },
+  "market": {
+    "name": "Распутье",
+    "description": "На обветренной вершине холма пересекаются несколько троп.",
+    "background": "assets/backgrounds/village/field_crossroads.jpg",
+    "terrain": "road",
+    "npcs": ["gypsy"],
+    "objects": [],
+    "items": [],
+    "directions": {
+      "down": "village_square",
+      "east": "forest:forest_entrance",
+      "north":"southwest_village:r16c4"
+    }
+  },
+  "well": {
+    "name": "Колодец",
+    "description": "Старый каменный колодец с деревянным срубом и воротом. Вода чистая и холодная.",
+    "terrain": "road",
+    "npcs": [],
+    "objects": ["well"],
+    "items": [],
+    "directions": {
+      "west": "healer_hut"
+    }
+  }
+}
