@@ -214,16 +214,9 @@ class BeltSystem {
             return { success: false, reason: 'Слот пуст' };
         }
         
-        const battleState = this.gameState.getBattleState();
-        if (battleState.inBattle) {
-            if (this.battleOrchestrator) {
-                this.battleOrchestrator.useItemInBattle(slotIndex, true);
-                return { success: true, message: 'Предмет используется в бою' };
-            }
-            return { success: false, reason: 'BattleOrchestrator не найден' };
-        }
-        
         const { item } = beltData;
+        
+        // Проверка типа предмета
         if (item.type !== "consumable") {
             return { success: false, message: "Нельзя использовать этот предмет" };
         }
@@ -235,15 +228,25 @@ class BeltSystem {
         
         const useResult = item.use(player);
         
-        if (useResult.success) {
-            // Удаляем предмет из пояса (не уменьшаем count, сразу удаляем)
-            this.beltSlots[slotIndex] = null;
+        if (useResult && useResult.success) {
+            // Уменьшаем количество
+            item.count--;
             
-            this.eventBus.emit('belt:itemRemoved', {
-                slotIndex: slotIndex,
-                item: item.getInfo()
-            });
+            if (item.count <= 0) {
+                this.beltSlots[slotIndex] = null;
+                this.eventBus.emit('belt:itemRemoved', {
+                    slotIndex: slotIndex,
+                    item: item.getInfo()
+                });
+            } else {
+                this.eventBus.emit('belt:itemUpdated', {
+                    slotIndex: slotIndex,
+                    count: item.count,
+                    item: item.getInfo()
+                });
+            }
             
+            // События обновления
             this.eventBus.emit('belt:itemUsed', {
                 slotIndex: slotIndex,
                 item: item.getInfo(),
@@ -256,7 +259,7 @@ class BeltSystem {
                 this.gameState.getPlayer());
         }
         
-        return useResult;
+        return useResult; 
     }
     
     /**

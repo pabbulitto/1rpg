@@ -19,7 +19,6 @@ class PlayerCharacter extends Character {
             eventBus: gameState?.getEventBus() || dependencies.eventBus,
             equipmentService: dependencies.equipmentService,
             abilityService: dependencies.abilityService,
-            itemService: dependencies.itemService,
             battleSystem: dependencies.battleSystem
         });
         

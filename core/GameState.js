@@ -250,6 +250,8 @@ class GameState {
       magicArmorClass: finalStats.magicArmorClass,
       armorValue: finalStats.armorValue || 0,
       damageReduction: finalStats.damageReduction || 0,
+      defense: finalStats.defense || 0,
+
       
       // === РЕГЕНЕРАЦИЯ ===
       healthRegen: finalStats.healthRegen || 0,

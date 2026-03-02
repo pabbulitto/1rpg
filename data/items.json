@@ -4,7 +4,7 @@
     "type": "consumable",
     "icon": "assets/sprites/items/health_potion.png",
     "slot": null,
-    "stats": { "health": 20 },
+    "stats": { "health": 13 },
     "price": 20,
     "storageCost": 3,
     "storageFlag": null,
@@ -35,7 +35,8 @@
     },
     "flags": [],
     "stats": {
-      "defense": 2
+      "defense": 2,
+      "strength": 2
     }
   },
 
@@ -146,7 +147,7 @@
     "material": "leather",
     "maxDurability": 120,
     "defense": 3,
-    "armor": 10,
+    "armor": 6,
     "flags": [],
     "stats": {}
   },
@@ -388,4 +389,3 @@
     "price": 150
   }
 }
-

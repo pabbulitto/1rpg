@@ -16,7 +16,7 @@ import { SaveLoadService } from './services/SaveLoadService.js';
 import { DiceRoller } from './system/DiceRoller.js';
 import { CombatSystem } from './system/CombatSystem.js';
 import { AbilityService } from './services/AbilityService.js';
-import { itemService } from './services/ItemService.js';
+import { itemRegistry } from './core/ItemRegistry.js';
 import { GraphicsEngine } from './ui/GraphicsEngine.js';
 import { BattleCanvas } from './ui/BattleCanvas.js';
 import { GroundBag } from './core/GroundBag.js';
@@ -30,15 +30,13 @@ import { TimeUI } from './ui/components/TimeUI.js';
 import { LogUI } from './ui/components/LogUI.js';
 import { ShopUI } from './ui/components/ShopUI.js';
 import { BeltUI } from './ui/components/BeltUI.js';
-import { itemRegistry } from './core/ItemRegistry.js';
+
 
 
 class Game {
   constructor() {
     this.gameState = new GameState();
     this.dataService = new DataService();
-    itemService.init();
-    window.itemService = itemService;
     this.abilityService = new AbilityService(this.gameState);
     // 1. Создаем DiceRoller
     this.diceRoller = new DiceRoller();

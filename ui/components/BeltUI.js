@@ -230,7 +230,7 @@ class BeltUI {
         const beltInfo = this.beltSystem.getBeltInfo();
         const activeSlots = beltInfo.activeSlots;
         
-        let html = `<div style="width:200px; height:auto; min-height:auto; display:flex; flex-direction:column; background:#2f1239;">`;
+        let html = `<div style="width:200px; height:auto; min-height:auto; display:flex; flex-direction:column; background:#14141e;">`;
         // Верхняя полоса 200×50 со спрайтом пояса
         html += `<div style="width:200px; height:50px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #444;">`;
         html += `<img src="assets/sprites/ui/belt.png" style="max-width:190px; max-height:40px; object-fit:contain;">`;
@@ -341,6 +341,12 @@ class BeltUI {
                     message: result.message,
                     type: result.success ? 'success' : 'error'
                 });
+            }
+            if (result.success) {
+                // Обновить интерфейс принудительно
+                this.eventBus.emit('player:statsUpdated');
+                this.eventBus.emit('inventory:updated');
+                this.render(); // перерисовать пояс
             }
             this.closeBeltModal();
         });

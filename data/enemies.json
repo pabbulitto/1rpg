@@ -57,8 +57,8 @@
         "health_potion": 0.2
       }
     },
-    "corpseDecay": 45,
-    "respawnTime": 50,
+    "corpseDecay": 40,
+    "respawnTime": 40,
     "experienceReward": 35
   },
 
@@ -163,8 +163,8 @@
         "raw_meat": 1.0
       }
     },
-    "corpseDecay": 45,
-    "respawnTime": 50,
+    "corpseDecay": 35,
+    "respawnTime": 40,
     "experienceReward": 35
   },
 
@@ -217,8 +217,8 @@
         "raw_meat": 1.0
       }
     },
-    "corpseDecay": 45,
-    "respawnTime": 50,
+    "corpseDecay": 35,
+    "respawnTime": 40,
     "experienceReward": 35
   },
 
@@ -277,8 +277,8 @@
         "thief_dagger": 0.2
       }
     },
-    "corpseDecay": 50,
-    "respawnTime": 60,
+    "corpseDecay": 35,
+    "respawnTime": 40,
     "experienceReward": 45
   },
 
@@ -336,9 +336,9 @@
         "iron_sword": 0.2
       }
     },
-    "corpseDecay": 55,
-    "respawnTime": 70,
-    "experienceReward": 60
+    "corpseDecay": 35,
+    "respawnTime": 30,
+    "experienceReward": 65
   },
 
   "Жужалица": {
@@ -388,8 +388,8 @@
         "chitin_armor": 0.3
       }
     },
-    "corpseDecay": 40,
-    "respawnTime": 80,
+    "corpseDecay": 30,
+    "respawnTime": 30,
     "experienceReward": 60
   },
 
@@ -439,8 +439,8 @@
         "rat_eye_amulet": 0.1
       }
     },
-    "corpseDecay": 60,
-    "respawnTime": 80,
+    "corpseDecay": 45,
+    "respawnTime": 50,
     "experienceReward": 70
   },
 
@@ -488,7 +488,7 @@
       "chance": {}
     },
     "corpseDecay": 30,
-    "respawnTime": 40,
+    "respawnTime": 30,
     "experienceReward": 25
   },
 
@@ -536,7 +536,7 @@
       "chance": {}
     },
     "corpseDecay": 30,
-    "respawnTime": 35,
+    "respawnTime": 33,
     "experienceReward": 20
   },
 
@@ -583,8 +583,8 @@
       },
       "chance": {}
     },
-    "corpseDecay": 40,
-    "respawnTime": 50,
+    "corpseDecay": 30,
+    "respawnTime": 33,
     "experienceReward": 35
   },
 
@@ -632,7 +632,7 @@
       "chance": {}
     },
     "corpseDecay": 35,
-    "respawnTime": 45,
+    "respawnTime": 35,
     "experienceReward": 30
   },
 
@@ -775,8 +775,8 @@
       },
       "chance": {}
     },
-    "corpseDecay": 40,
-    "respawnTime": 50,
+    "corpseDecay": 30,
+    "respawnTime": 30,
     "experienceReward": 28
   },
 
@@ -825,8 +825,8 @@
         "wool_clump": 0.3
       }
     },
-    "corpseDecay": 35,
-    "respawnTime": 40,
+    "corpseDecay": 30,
+    "respawnTime": 30,
     "experienceReward": 30
   }
 }

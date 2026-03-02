@@ -367,48 +367,51 @@ class EquipmentService {
      */
     applyEquipmentModifiers(slot, item) {
         const sourceId = `equipment_${slot}`;
+        const armorSourceId = `equipment_armor_${slot}`;
         
+        // Всегда удаляем оба модификатора (и основные статы, и броню)
         this.statManager.removeModifier(sourceId);
+        this.statManager.removeModifier(armorSourceId);
         
-        if (item && item.stats && Object.keys(item.stats).length > 0) {
-            const itemStats = { ...item.stats };
-            
-            // Конвертируем health/maxHealth
-            if (itemStats.health !== undefined) {
-                itemStats.maxHealth = (itemStats.maxHealth || 0) + itemStats.health;
-                delete itemStats.health;
+        if (item) {
+            // Применяем основные статы из item.stats
+            if (item.stats && Object.keys(item.stats).length > 0) {
+                const itemStats = { ...item.stats };
+                
+                // Конвертируем health/maxHealth
+                if (itemStats.health !== undefined) {
+                    itemStats.maxHealth = (itemStats.maxHealth || 0) + itemStats.health;
+                    delete itemStats.health;
+                }
+                
+                // Конвертируем stamina/maxStamina
+                if (itemStats.stamina !== undefined) {
+                    itemStats.maxStamina = (itemStats.maxStamina || 0) + itemStats.stamina;
+                    delete itemStats.stamina;
+                }
+                
+                const currentHealth = this.statManager.getResource('health');
+                const currentMana = this.statManager.getResource('mana');
+                const currentStamina = this.statManager.getResource('stamina');
+                
+                this.statManager.addModifier(sourceId, itemStats);
+                
+                const finalStats = this.statManager.getFinalStats();
+                
+                this.statManager.setResource('health', Math.min(currentHealth, finalStats.maxHealth));
+                this.statManager.setResource('mana', Math.min(currentMana, finalStats.maxMana));
+                this.statManager.setResource('stamina', Math.min(currentStamina, finalStats.maxStamina));
             }
             
-            // Конвертируем stamina/maxStamina
-            if (itemStats.stamina !== undefined) {
-                itemStats.maxStamina = (itemStats.maxStamina || 0) + itemStats.stamina;
-                delete itemStats.stamina;
-            }
-            
-            const currentHealth = this.statManager.getResource('health');
-            const currentMana = this.statManager.getResource('mana');
-            const currentStamina = this.statManager.getResource('stamina');
-            
-            this.statManager.addModifier(sourceId, itemStats);
-            
-            const finalStats = this.statManager.getFinalStats();
-            
-            this.statManager.setResource('health', Math.min(currentHealth, finalStats.maxHealth));
-            this.statManager.setResource('mana', Math.min(currentMana, finalStats.maxMana));
-            this.statManager.setResource('stamina', Math.min(currentStamina, finalStats.maxStamina));
-        }
-        
-        // Отдельно применяем defense и armor для брони
-        if (item && item.type === 'armor') {
-            const armorSourceId = `equipment_armor_${slot}`;
-            this.statManager.removeModifier(armorSourceId);
-            
-            const armorStats = {};
-            if (item.defense) armorStats.defense = item.defense;
-            if (item.armor) armorStats.armor = item.armor;
-            
-            if (Object.keys(armorStats).length > 0) {
-                this.statManager.addModifier(armorSourceId, armorStats);
+            // Отдельно применяем defense и armor для брони
+            if (item.type === 'armor') {
+                const armorStats = {};
+                if (item.defense) armorStats.defense = item.defense;
+                if (item.armor) armorStats.armor = item.armor;
+                
+                if (Object.keys(armorStats).length > 0) {
+                    this.statManager.addModifier(armorSourceId, armorStats);
+                }
             }
         }
         
@@ -424,7 +427,8 @@ class EquipmentService {
                 stats: item.stats,
                 defense: item.defense,
                 armor: item.armor,
-                sourceId
+                sourceId,
+                armorSourceId
             });
         } else {
             console.log(`EquipmentService: снят предмет из слота ${slot}`);

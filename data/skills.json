@@ -9,7 +9,7 @@
     "staminaCost": 7,
     "damageFormula": "1d4 + floor(strengthMod-4) + floor(bootWeight/2)",
     "requirements": { 
-      "strength": 12,
+      "strength": 16,
       "level": 1
     },
     "target": "enemy",

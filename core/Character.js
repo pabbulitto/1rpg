@@ -14,7 +14,6 @@ class Character {
         this.eventBus = dependencies.eventBus || null;
         this.equipmentService = dependencies.equipmentService || null;
         this.abilityService = dependencies.abilityService || null;
-        this.itemService = dependencies.itemService || null;
         
         // УНИКАЛЬНЫЙ ID (сохраняем старый формат)
         this.id = `char_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

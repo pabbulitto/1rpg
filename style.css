@@ -758,29 +758,6 @@ body {
   color: #a0a0c0;
   padding: 20px;
 }
-/* Стили для вкладки характеристик */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.stats-block {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 12px;
-  border: 1px solid #444;
-}
-
-.stats-block h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #ffcc00;
-  border-bottom: 1px solid #444;
-  padding-bottom: 5px;
-  font-size: 14px;
-}
 
 /* Состояния (аффекты) */
 .conditions-block {
@@ -1365,4 +1342,26 @@ body {
 
 .room-player-name.enemy {
     color: #ff6b6b;
+}
+/* Фиксированные размеры для всех вкладок */
+.tab-content {
+    width: 900px;
+    height: 507px;
+    display: none;
+    overflow: hidden;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Контейнеры внутри вкладок занимают всё пространство */
+#stats-content,
+#inventory-content,
+#equipment-content,
+#skills-ui {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    box-sizing: border-box;
 }
