@@ -4,7 +4,7 @@
     "type": "consumable",
     "icon": "assets/sprites/items/health_potion.png",
     "slot": null,
-    "stats": { "health": 13 },
+    "stats": { "health": 20 },
     "price": 20,
     "storageCost": 3,
     "storageFlag": null,
@@ -388,3 +388,4 @@
     "price": 150
   }
 }
+
