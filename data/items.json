@@ -2,8 +2,9 @@
   "health_potion": {
     "name": "Зелье здоровья",
     "type": "consumable",
+    "icon": "assets/sprites/items/health_potion.png",
     "slot": null,
-    "stats": { "health": 30 },
+    "stats": { "health": 13 },
     "price": 20,
     "storageCost": 3,
     "storageFlag": null,
@@ -59,7 +60,7 @@
     },
     "flags": [],
     "stats": {
-      "defense": 3
+      "defense": 4
     }
   },
 

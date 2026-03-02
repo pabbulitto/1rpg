@@ -130,7 +130,10 @@ class BattleOrchestrator {
             abilityService: this.game.abilityService,
             battleSystem: this.game.battleSystem
         });
-
+        const oldAbilities = this.game.abilityService.getCharacterAbilities(oldPlayer.id);
+        oldAbilities.forEach(ability => {
+            this.game.abilityService.addAbilityToCharacter(newPlayer.id, ability.id);
+        });
         // Копируем имя и уровень
         newPlayer.name = oldPlayer.name;
         newPlayer.level = oldPlayer.level;
@@ -138,7 +141,10 @@ class BattleOrchestrator {
         // Копируем опыт (с учетом штрафа, который будет позже)
         newPlayer.exp = oldPlayer.exp;
         newPlayer.expToNext = oldPlayer.expToNext;
-        
+        newPlayer.sprite = oldPlayer.originalSprite || oldPlayer.sprite;     // копируем спрайт
+        newPlayer.portrait = oldPlayer.portrait; // копируем портрет
+        newPlayer.width = 85;
+        newPlayer.height = 85;
         // ===== 2. УСТАНАВЛИВАЕМ РЕСУРСЫ В 0 =====
         const statManager = newPlayer.getStatManager();
         statManager.setResource('health', 1);
@@ -252,7 +258,7 @@ class BattleOrchestrator {
         const playerResult = this.game.player.takeDamage(attackResult.damage, {
             isCritical: attackResult.isCritical
         });
-                
+        const enemyDamage = attackResult.damage;        
         this.game.gameState.eventBus.emit('log:batch', [
             { message: `Вы использовали ${item.name}`, type: 'battle' },
             { message: `${enemy.name} атакует!`, type: 'battle' },

@@ -15,7 +15,6 @@ import { BeltSystem } from './system/BeltSystem.js';
 import { SaveLoadService } from './services/SaveLoadService.js';
 import { DiceRoller } from './system/DiceRoller.js';
 import { CombatSystem } from './system/CombatSystem.js';
-import { ActionHandler } from './core/ActionHandler.js';
 import { AbilityService } from './services/AbilityService.js';
 import { itemService } from './services/ItemService.js';
 import { GraphicsEngine } from './ui/GraphicsEngine.js';
@@ -61,14 +60,6 @@ class Game {
       battleSystem: this.battleSystem
     });
     
-    // 5. Создаем ActionHandler с игроком
-    this.actionHandler = new ActionHandler(
-      this.gameState.eventBus,
-      this.combatSystem,
-      this.abilityService,
-      this.player
-    );
-    
     this.battleOrchestrator = new BattleOrchestrator(
         this,
         this.battleSystem,
@@ -78,7 +69,7 @@ class Game {
     // 6. Остальные системы
     this.zoneManager = new ZoneManager(this.gameState);
     this.graphicsEngine = new GraphicsEngine('game-canvas', this);
-    this.battleCanvas = new BattleCanvas('battle-canvas', this);
+    this.battleCanvas = new BattleCanvas('battle-canvas', this, this.beltSystem);;
 
     this.equipmentService = new EquipmentService(
       this.gameState.eventBus,
@@ -118,7 +109,13 @@ class Game {
     
     this.uiManager = new UIManager(this, uiComponents, this.graphicsEngine, this.battleCanvas);
     this.gameManager = new GameManager(this);
-    
+    // Пояс в инвентаре
+    const inventoryBeltContainer = document.getElementById('inventory-belt-container');
+    if (inventoryBeltContainer) {
+        this.inventoryBeltUI = new BeltUI(inventoryBeltContainer, this.gameState.eventBus, this.beltSystem);
+        this.inventoryBeltUI.init();
+    }
+        
     this.isInitialized = false;
   }
   

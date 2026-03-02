@@ -7,10 +7,12 @@
  * Центральная область: ячейки 85×85 для спрайтов (8×3)
  * Нижняя панель: сетка 50×50 (18×3 ячейки) для умений/пояса
  */
+import { BeltUI } from './components/BeltUI.js';
 
 class BattleCanvas {
-    constructor(canvasId, game) {
+    constructor(canvasId, game, beltSystem) {
         this.game = game;
+        this.beltSystem = beltSystem;
         this.eventBus = game.gameState?.eventBus;
         this.combatSystem = game.combatSystem;
         this.battleOrchestrator = game.battleOrchestrator;
@@ -41,7 +43,8 @@ class BattleCanvas {
         this.abilityCellSize = 50;
         this.abilityCols = 18; // 900 / 50
         this.abilityRows = 3;   // 150 / 50
-        
+        // Пояс
+        this.beltContainer = null;
         // Состояние боя
         this.currentBattle = null;
         this.playerTeam = [];    // массив участников команды игрока
@@ -69,7 +72,6 @@ class BattleCanvas {
         this.onBattleStart = this.onBattleStart.bind(this);
         this.onBattleUpdate = this.onBattleUpdate.bind(this);
         this.onBattleEnd = this.onBattleEnd.bind(this);
-        this.onPlayerAction = this.onPlayerAction.bind(this);
         
         // Инъекция стилей
         this.injectStyles();
@@ -150,6 +152,29 @@ class BattleCanvas {
         this.eventBus.on('battle:roundComplete', (results) => {
             this.showRoundResults(results);
         });
+    
+        // Создаем контейнер для пояса
+        this.beltContainer = document.createElement('div');
+        this.beltContainer.id = 'battle-belt-container';
+        this.beltContainer.style.position = 'absolute';
+        this.beltContainer.style.bottom = '0';
+        this.beltContainer.style.right = '0';
+        this.beltContainer.style.width = '200px';
+        this.beltContainer.style.height = '150px';
+        this.beltContainer.style.pointerEvents = 'auto';
+        this.beltContainer.style.display = 'none'; // скрыт по умолчанию
+        this.beltContainer.style.zIndex = '10';
+
+        this.canvas.parentNode.style.position = 'relative';
+        this.canvas.parentNode.style.width = '900px';
+        this.canvas.parentNode.style.height = '507px';
+        this.canvas.parentNode.style.margin = '0 auto';
+        // Добавляем в родительский контейнер канваса
+        this.canvas.parentNode.style.position = 'relative';
+        this.canvas.parentNode.appendChild(this.beltContainer);
+        // Создаем BeltUI и передаем ему этот контейнер
+        this.beltUI = new BeltUI(this.beltContainer, this.eventBus, this.game.beltSystem);
+        this.beltUI.init();
 
         this.isInitialized = true;
         console.log('BattleCanvas: инициализирован');
@@ -170,57 +195,71 @@ class BattleCanvas {
     show() {
         this.canvas.style.display = 'block';
         this.isVisible = true;
+        if (this.beltContainer) {
+            this.beltContainer.style.display = 'block';
+        }
         this.render();
     }
     
     hide() {
         this.canvas.style.display = 'none';
         this.isVisible = false;
+        if (this.beltContainer) {
+            this.beltContainer.style.display = 'none';
+        }
     }
     
     // ========== АНИМАЦИИ ==========
-    
-    triggerAttack(attackerId) {
-        this.animations.set(attackerId, {
-            type: 'attack',
-            timer: 12, 
-            data: { offsetX: 0, offsetY: 0 }
-        });
-    }
     
     triggerDamage(targetId, damageType) {
         // Определяем цвет в зависимости от типа урона
         let color;
         if (damageType === 'critical') {
-            color = '#8b0000'; // темно-красный для критического урона
+            color = '#540202'; // темно-красный для критического урона
         } else if (damageType === 'physical') {
             color = '#ff0000'; // красный для физического урона
         } else if (damageType === 'magical') {
-            color = '#0066ff'; // синий для магического урона
+            color = '#864383'; // синий для магического урона
         } else {
             color = '#ff0000'; // по умолчанию красный
         }
         
-        // Добавляем анимацию
-        this.animations.set(targetId, {
-            type: 'damage',
-            timer: 12,
-            data: { 
-                color: color,
-                shake: true 
-            }
-        });
+        if (!this.animations.has(targetId)) {
+            this.animations.set(targetId, []);
+        }
+        
+        const anims = this.animations.get(targetId);
+        if (Array.isArray(anims)) {
+            anims.push({
+                type: 'damage',
+                timer: 12,
+                data: { color, shake: true }
+            });
+        } else {
+            // Если вдруг там не массив — перезаписываем
+            this.animations.set(targetId, [{
+                type: 'damage',
+                timer: 12,
+                data: { color, shake: true }
+            }]);
+        }
     }
     
     triggerBlock(targetId) {
-        this.animations.set(targetId, {
+        if (!this.animations.has(targetId)) {
+            this.animations.set(targetId, []);
+        }
+        this.animations.get(targetId).push({
             type: 'block',
-            timer: 10, // 10 кадров = ~0.5 сек при 60fps
+            timer: 10
         });
     }
     
     triggerEvade(targetId) {
-        this.animations.set(targetId, {
+        if (!this.animations.has(targetId)) {
+            this.animations.set(targetId, []);
+        }
+        this.animations.get(targetId).push({
             type: 'evade',
             timer: 55,
             data: { 
@@ -234,9 +273,21 @@ class BattleCanvas {
     }
     
     updateAnimations() {
-        for (const [id, anim] of this.animations.entries()) {
-            anim.timer--;
-            if (anim.timer <= 0) {
+        for (const [id, anims] of this.animations.entries()) {
+            if (!Array.isArray(anims)) {
+                // Если вдруг там не массив — удаляем
+                this.animations.delete(id);
+                continue;
+            }
+            
+            const activeAnims = anims.filter(anim => {
+                anim.timer--;
+                return anim.timer > 0;
+            });
+            
+            if (activeAnims.length > 0) {
+                this.animations.set(id, activeAnims);
+            } else {
                 this.animations.delete(id);
             }
         }
@@ -300,31 +351,10 @@ class BattleCanvas {
         this.enemyTeam = [];
         this.abilities = [];
         this.beltSlots = [];
-        this.selectedAbility = null;
         this.selectedAction = null;
         this.selectedTarget = null;
         this.animations.clear();
         this.hide();
-    }
-    
-    onPlayerAction(data) {
-        if (data.actionType === 'attack' && data.result) {
-            const result = data.result;
-            
-            // Анимация атаки для игрока
-            this.triggerAttack(this.game.player.id);
-            
-            // Анимация для цели
-            if (result.hit) {
-                if (result.blocked) {
-                    this.triggerBlock(result.targetId);
-                } else if (result.evaded) {
-                    this.triggerEvade(result.targetId);
-                } else {
-                    this.triggerDamage(result.targetId, result.damageType || 'physical');
-                }
-            }
-        }
     }
     
     // ========== ФОРМИРОВАНИЕ КОМАНД ==========
@@ -438,7 +468,7 @@ class BattleCanvas {
         if (!abilityService) return;
         
         const player = this.game.player;
-        this.abilities = abilityService.getAvailableAbilitiesForCharacter(player);
+        this.abilities = abilityService.getCharacterAbilities(player.id);
     }
 
     // ========== ЗАГРУЗКА РЕСУРСОВ ==========
@@ -485,20 +515,43 @@ class BattleCanvas {
             img.src = src;
         });
     }
-    
     // ========== ОТРИСОВКА ==========
-    
     async render() {
         if (!this.isVisible) return;
         
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
+
         await this.drawBackground();
-        this.drawTopBar();
-        this.drawLeftColumn();
-        this.drawRightColumn();
+        // Союзники (исключая игрока)
+        const allies = this.playerTeam.filter(m => !m.isPlayer);
+                        // Левая верхняя
+        this.ctx.fillStyle = 'rgba(30, 30, 46, 0.8)';
+        this.ctx.fillRect(0, 0, 450, this.topBarHeight);
+        
+        // Правая верхняя
+        this.ctx.fillStyle = 'rgba(46, 30, 30, 0.8)';
+        this.ctx.fillRect(450, 0, 450, this.topBarHeight);
+        
+        // Левая боковая
+        this.ctx.fillStyle = 'rgba(30, 30, 46, 0.8)';
+        this.ctx.fillRect(0, this.topBarHeight, this.sideColumnWidth, this.centerHeight);
+        
+        // Правая боковая
+        this.ctx.fillStyle = 'rgba(46, 30, 30, 0.8)';
+        this.ctx.fillRect(790, this.topBarHeight, this.sideColumnWidth, this.centerHeight);
+        
+        // Враги
+        const enemies = this.enemyTeam;
+        // Левая верхняя (союзники, первые 8)
+        await this.drawEntityBlocks(0, 0, allies.slice(0, 8), 4, 2);
+        // Левая боковая (союзники, остальные)
+        await this.drawEntityBlocks(0, this.topBarHeight, allies.slice(8), 1, 5);
+        // Правая верхняя (враги, первые 8)
+        await this.drawEntityBlocks(450, 0, enemies.slice(0, 8), 4, 2);
+        // Правая боковая (враги, остальные)
+        await this.drawEntityBlocks(790, this.topBarHeight, enemies.slice(8), 1, 5);
+
         await this.drawCenterSprites();
-        this.drawBottomPanel();
         this.drawTargetHighlight();
         await this.drawBottomPanel();
     }
@@ -511,46 +564,6 @@ class BattleCanvas {
             this.ctx.fillStyle = '#1a1a2e';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
-    }
-    
-    drawTopBar() {
-        const barY = 0;
-        
-        // Левая часть (информация об игроке)
-        this.ctx.fillStyle = 'rgba(30, 30, 46, 0.8)';
-        this.ctx.fillRect(0, barY, 450, this.topBarHeight);
-        
-        // Правая часть (информация о врагах)
-        this.ctx.fillStyle = 'rgba(46, 30, 30, 0.8)';
-        this.ctx.fillRect(450, barY, 450, this.topBarHeight);
-        
-        // Разделитель
-        this.ctx.strokeStyle = '#666';
-        this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
-        this.ctx.moveTo(450, barY);
-        this.ctx.lineTo(450, barY + this.topBarHeight);
-        this.ctx.stroke();
-    }
-    
-    drawLeftColumn() {
-        const x = 0;
-        const y = this.topBarHeight;
-        
-        this.ctx.fillStyle = 'rgba(30, 30, 46, 0.8)';
-        this.ctx.fillRect(x, y, this.sideColumnWidth, this.centerHeight);
-        
-        // TODO: статы игрока
-    }
-    
-    drawRightColumn() {
-        const x = this.canvas.width - this.sideColumnWidth;
-        const y = this.topBarHeight;
-        
-        this.ctx.fillStyle = 'rgba(46, 30, 30, 0.8)';
-        this.ctx.fillRect(x, y, this.sideColumnWidth, this.centerHeight);
-        
-        // TODO: информация о врагах (количество, уровень)
     }
     
     async drawCenterSprites() {
@@ -581,78 +594,101 @@ class BattleCanvas {
     }
     
     async drawEntityWithAnimations(entity, x, y) {
-        const anim = this.animations.get(entity.id);
+        const anims = this.animations.get(entity.id) || []; 
         let drawX = x;
         let drawY = y;
         let spriteToDraw = entity.sprite;
         
-        // Применяем анимации
-        if (anim) {
+        // Применяем анимации (встряска, смещение)
+        for (const anim of anims) {
             switch (anim.type) {
-                    
                 case 'damage':
-                    // Вспышка + встряхивание
+                    // Встряхивание
                     if (anim.data.shake) {
                         drawX += (Math.random() * 8) - 4;
                         drawY += (Math.random() * 8) - 4;
                     }
-                    // Вспышка будет применена после отрисовки спрайта
                     break;
                     
                 case 'evade':
                     // Вертикальное смещение
                     drawY += anim.data.offsetY;
                     break;
-                    
-                case 'block':
-                    // Будет нарисован щит после спрайта
-                    break;
             }
         }
         
         // Рисуем спрайт
         if (entity.isCorpse) {
-            // Для трупов рисуем крест или специальный спрайт
-            this.ctx.fillStyle = '#666666';
-            this.ctx.fillRect(drawX + 10, drawY + 10, 65, 65);
-            this.ctx.strokeStyle = '#ffffff';
-            this.ctx.lineWidth = 3;
-            this.ctx.beginPath();
-            this.ctx.moveTo(drawX + 20, drawY + 20);
-            this.ctx.lineTo(drawX + 70, drawY + 70);
-            this.ctx.moveTo(drawX + 70, drawY + 20);
-            this.ctx.lineTo(drawX + 20, drawY + 70);
-            this.ctx.stroke();
+            const corpseSprite = 'assets/sprites/items/corpse1.png'; 
+            const sprite = await this.loadSprite(corpseSprite);
+            if (sprite) {
+                this.ctx.drawImage(sprite, drawX, drawY, this.spriteCellSize, this.spriteCellSize);
+            } else {
+                // заглушка если спрайт не загрузился
+                this.ctx.fillStyle = '#666666';
+                this.ctx.fillRect(drawX + 10, drawY + 10, 65, 65);
+                this.ctx.strokeStyle = '#ffffff';
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath();
+                this.ctx.moveTo(drawX + 20, drawY + 20);
+                this.ctx.lineTo(drawX + 70, drawY + 70);
+                this.ctx.moveTo(drawX + 70, drawY + 20);
+                this.ctx.lineTo(drawX + 20, drawY + 70);
+                this.ctx.stroke();
+            }
         } else {
             const sprite = await this.loadSprite(entity.sprite);
             if (sprite) {
                 this.ctx.drawImage(sprite, drawX, drawY, this.spriteCellSize, this.spriteCellSize);
             } else {
-                // Заглушка
                 this.ctx.fillStyle = entity.isPlayer ? '#44ff44' : '#ff4444';
                 this.ctx.fillRect(drawX + 10, drawY + 10, 65, 65);
             }
         }
         
-        // Применяем вспышку урона
-        if (anim && anim.type === 'damage') {
-            this.ctx.fillStyle = anim.data.color;
-            this.ctx.globalAlpha = 0.5;
-            this.ctx.beginPath();
-            this.ctx.arc(drawX + this.spriteCellSize/2, drawY + this.spriteCellSize/2, 
-                        this.spriteCellSize/2, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.globalAlpha = 1.0;
+        // Рисуем ВСЕ вспышки урона
+        for (const anim of anims) {
+            if (anim.type === 'damage') {
+                const centerX = drawX + this.spriteCellSize / 2;
+                const centerY = drawY + this.spriteCellSize / 2;
+                const outerRadius = this.spriteCellSize * 0.4;
+                const innerRadius = outerRadius * 0.4;
+                const spikes = 5;
+                
+                this.ctx.fillStyle = anim.data.color;
+                this.ctx.globalAlpha = 0.6;
+                
+                // Рисуем звезду
+                this.ctx.beginPath();
+                let rot = Math.PI / 2 * 3;
+                const step = Math.PI / spikes;
+                
+                for (let i = 0; i < spikes; i++) {
+                    let x = centerX + Math.cos(rot) * outerRadius;
+                    let y = centerY + Math.sin(rot) * outerRadius;
+                    this.ctx.lineTo(x, y);
+                    rot += step;
+                    
+                    x = centerX + Math.cos(rot) * innerRadius;
+                    y = centerY + Math.sin(rot) * innerRadius;
+                    this.ctx.lineTo(x, y);
+                    rot += step;
+                }
+                
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1.0;
+            }
         }
         
-        // Рисуем щит при блоке
-        if (anim && anim.type === 'block') {
+        // Рисуем щит при блоке (только один, так как блок не накладывается)
+        const blockAnim = anims.find(anim => anim.type === 'block');
+        if (blockAnim) {
             this.ctx.fillStyle = '#888888';
             this.ctx.fillRect(drawX + 15, drawY + 15, 55, 55);
             this.ctx.strokeStyle = '#cccccc';
             this.ctx.lineWidth = 3;
             this.ctx.strokeRect(drawX + 15, drawY + 15, 55, 55);
-            // Рисуем символ щита
             this.ctx.fillStyle = '#dddddd';
             this.ctx.font = '40px "Font Awesome 6 Free"';
             this.ctx.fillText('🛡️', drawX + 25, drawY + 65);
@@ -674,6 +710,51 @@ class BattleCanvas {
         this.ctx.fillRect(x, y, healthWidth, height);
     }
     
+    async drawEntityBlock(x, y, entity) {
+        const blockWidth = 110;
+        const blockHeight = 50;
+        
+        // Рамка блока
+        this.ctx.strokeStyle = '#444';
+        this.ctx.strokeRect(x, y, blockWidth, blockHeight);
+        
+        // Спрайт 50×50
+        if (entity.sprite) {
+            const sprite = await this.loadSprite(entity.sprite);
+            if (sprite) {
+                this.ctx.drawImage(sprite, x + 5, y + 2, 46, 46);
+            }
+        }
+        
+        // Текст HP в две строки
+        this.ctx.fillStyle = '#ff0000';
+        this.ctx.font = 'bold 16px monospace';
+        this.ctx.textAlign = 'right';
+        
+        // Максимальное здоровье (сверху)
+        this.ctx.fillText(`${entity.maxHealth}`, x + 100, y + 20);
+        
+        // Текущее здоровье (снизу)
+        this.ctx.fillText(`${entity.health}`, x + 100, y + 40);
+    }
+
+    async drawEntityBlocks(startX, startY, entities, maxCols, maxRows) {
+        const blockWidth = 110;
+        const blockHeight = 50;
+        
+        for (let row = 0; row < maxRows; row++) {
+            for (let col = 0; col < maxCols; col++) {
+                const index = row * maxCols + col;
+                if (index >= entities.length) return;
+                
+                const x = startX + (col * blockWidth);
+                const y = startY + (row * blockHeight);
+                
+               await this.drawEntityBlock(x, y, entities[index]);
+            }
+        }
+    }
+
     async drawBottomPanel() {
         const y = this.canvas.height - this.bottomBarHeight;
         
@@ -683,31 +764,20 @@ class BattleCanvas {
         
         // Портрет игрока (слева, 100×150)
         const player = this.game.player;
+
+        // Фон под портретом (всегда)
+        this.ctx.fillStyle = '#2f1239';
+        this.ctx.fillRect(0, y, 100, this.bottomBarHeight);
+        this.ctx.strokeStyle = '#666';
+        this.ctx.strokeRect(0, y, 100, this.bottomBarHeight);
+
+        // Портрет поверх фона (если есть)
         if (player && player.portrait) {
             const img = await this.loadSprite(player.portrait);
             if (img) {
                 this.ctx.drawImage(img, 0, y, 100, this.bottomBarHeight);
-            } else {
-                // Заглушка
-                this.ctx.fillStyle = '#2a2a2a';
-                this.ctx.fillRect(0, y, 100, this.bottomBarHeight);
-                this.ctx.strokeStyle = '#666';
-                this.ctx.strokeRect(0, y, 100, this.bottomBarHeight);
             }
-        } else {
-            // Заглушка
-            this.ctx.fillStyle = '#2a2a2a';
-            this.ctx.fillRect(0, y, 100, this.bottomBarHeight);
-            this.ctx.strokeStyle = '#666';
-            this.ctx.strokeRect(0, y, 100, this.bottomBarHeight);
         }
-        
-        // ===== 2. ОБЛАСТЬ ПОЯСА (справа, 200×150) =====
-        const beltX = this.canvas.width - 200;
-        this.ctx.strokeStyle = '#666';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(beltX, y, 200, this.bottomBarHeight);
-        // TODO: сюда потом вставим готовый BeltUI
         
         // ===== 3. СЕТКА СПОСОБНОСТЕЙ (посередине, 12×3) =====
         const startX = 100; // начинаем после портрета
@@ -738,7 +808,13 @@ class BattleCanvas {
                         // Заглушка
                         this.ctx.fillStyle = '#3949ab';
                         this.ctx.fillRect(x + 5, cellY + 5, 40, 40);
-                    }    
+                    } 
+                    const canUse = ability.canUse(this.game.player);
+                    if (!canUse.success) {
+                        // Затемнение поверх ячейки
+                        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                        this.ctx.fillRect(x, cellY, 50, 50);
+                    }  
                     // Кулдаун
                     if (ability.currentCooldown > 0) {
                         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -760,14 +836,14 @@ class BattleCanvas {
             const index = this.abilities.indexOf(ability);
             
             if (index !== -1) {
-                const row = Math.floor(index / abilityCols);
-                const col = index % abilityCols;
+                const row = Math.floor(index / 12);
+                const col = index % 12;
                 const x = startX + (col * this.abilityCellSize);
                 const cellY = y + (row * this.abilityCellSize);
                 
-                this.ctx.strokeStyle = '#ffaa44';
-                this.ctx.lineWidth = 3;
-                this.ctx.strokeRect(x, cellY, this.abilityCellSize, this.abilityCellSize);
+                // Заливка желтым с прозрачностью
+                this.ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+                this.ctx.fillRect(x, cellY, this.abilityCellSize, this.abilityCellSize);
             }
         }
     }
@@ -803,8 +879,7 @@ class BattleCanvas {
         
         const canvasX = (e.clientX - rect.left) * scaleX;
         const canvasY = (e.clientY - rect.top) * scaleY;
-        
-        // Определяем зону клика
+       
         if (canvasY < this.topBarHeight) {
             this.handleTopBarClick(canvasX, canvasY);
         } else if (canvasY > this.canvas.height - this.bottomBarHeight) {
@@ -860,10 +935,11 @@ class BattleCanvas {
         const adjustedX = offsetX - startX;
         console.log('offsetX =', offsetX, 'adjustedX =', adjustedX);
         if (adjustedX < 0) return;
-        const col = Math.floor(offsetX / this.abilityCellSize);
+        
+        const col = Math.floor(adjustedX / this.abilityCellSize);  
         const row = Math.floor(offsetY / this.abilityCellSize);
         
-        if (col < 0 || col >= 12 || row < 0 || row >= this.abilityRows)  return;
+        if (col < 0 || col >= 12 || row < 0 || row >= this.abilityRows) return;
             
         const index = row * 12 + col;
         if (this.abilities[index]) {
@@ -874,13 +950,10 @@ class BattleCanvas {
                     data: ability
                 };
                 this.eventBus?.emit('log:add', {
-                message: `🎯 Вы приготовили ${ability.name}`,
-                type: 'info'
-                    });
-                    
-                this.eventBus?.emit('combat:playerSelectedAction', {
-                    action: this.selectedAction
+                    message: `🎯 Вы приготовили ${ability.name}`,
+                    type: 'info'
                 });
+                
                 // Отправляем выбранное действие в CombatSystem
                 this.eventBus?.emit('combat:playerSelectedAction', {
                     action: this.selectedAction

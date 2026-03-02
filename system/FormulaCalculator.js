@@ -48,8 +48,8 @@ class FormulaCalculator {
         return baseHealth + (constitution - 10) + healthBonus;
     }
     //Регенерация здоровья за тик    
-    calculateHealthRegen() {
-        return 5; // Фиксированное значение для баланса
+    calculateHealthRegen(constitution) {
+        return 5 + Math.max(0, Math.floor((constitution - 14) / 2));
     }
     /**
      * Прирост здоровья за уровень
@@ -78,7 +78,7 @@ class FormulaCalculator {
      * @returns {number} мана за тик
      */
     calculateManaRegen(wisdom) {
-        return 1 + Math.floor((wisdom - 10) / 10);
+        return 2 + Math.max(0, Math.floor((wisdom - 14) / 2));
     }
     
     /**
@@ -138,7 +138,7 @@ class FormulaCalculator {
      * @returns {number} выносливость за тик
      */
     calculateStaminaRegen(dexterity) {
-        return 3 + Math.floor((dexterity - 10) / 10);
+        return 4 + Math.max(0, Math.floor((dexterity - 14) / 2));
     }
     
     /**

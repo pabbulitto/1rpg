@@ -148,7 +148,7 @@ class StatManager {
     
     // --- РЕГЕНЕРАЦИЯ ---
     // Используем значения из baseStats (из JSON), если они есть, иначе рассчитываем по формуле
-    result.healthRegen = this.baseStats.healthRegen || this.formulaCalculator.calculateHealthRegen();
+    result.healthRegen = this.baseStats.healthRegen || this.formulaCalculator.calculateHealthRegen(result.constitution);
     result.manaRegen = this.baseStats.manaRegen || this.formulaCalculator.calculateManaRegen(result.wisdom);
     result.staminaRegen = this.baseStats.staminaRegen || this.formulaCalculator.calculateStaminaRegen(result.dexterity);
     

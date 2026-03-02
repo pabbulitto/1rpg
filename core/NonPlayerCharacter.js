@@ -11,7 +11,7 @@ import { ItemDataRegistry } from '../data/ItemDataRegistry.js';
  * - Союзники, торговцы, квестодатели (потом)
  * 
  * Имеют собственные характеристики, инвентарь, экипировку.
- * Не зависят от GameState.
+ * Не зависят от GameState.а
  */
 class NonPlayerCharacter extends Character {
     constructor(dependencies = {}) {
@@ -165,7 +165,6 @@ class NonPlayerCharacter extends Character {
             }
             
             if (!hits) return 0;
-            console.log(`ATTACK: ${this.name} ПРОМАХ: формула=${attackFormula}, бросок=${attackResult.total}, натур=${naturalRoll}, AC=${playerAC}`);
             const damageResult = this.battleSystem.diceRoller.roll(damageFormula, context);
             let damage = damageResult.total;
             damage += damroll;
@@ -179,7 +178,6 @@ class NonPlayerCharacter extends Character {
             } else {
                 damage += levelDamageBonus;
             }
-            console.log(`ATTACK: ${this.name} ПОПАЛ: формула=${attackFormula}, бросок=${attackResult.total}, натур=${naturalRoll}, AC=${playerAC}, урон=${damage}, крит=${isCritical}`);
             return {
                 damage: Math.max(0, damage),
                 isCritical: isCritical

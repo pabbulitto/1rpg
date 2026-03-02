@@ -78,6 +78,9 @@ class GraphicsEngine {
                     this.handleRoomUpdate(this.zoneManager?.getCurrentRoomInfo());
                 }
             });
+            this.eventBus.on('player:statsChanged', () => {
+                this.render(); 
+            });
         }
         
         // Вешаем обработчик клика
@@ -203,6 +206,7 @@ class GraphicsEngine {
         for (const entity of this.entities) {
             await this._drawEntity(entity);
         }
+        this.drawExpBar();
         this.drawDirectionButtons();
     }
     
@@ -519,7 +523,42 @@ class GraphicsEngine {
             this.handleRoomUpdate(roomInfo);
         }
     }
-    
+    drawExpBar() {
+        const player = this.game.player;
+        if (!player) return;
+        
+        const stats = player.getStats();
+        const exp = stats.exp || 0;
+        const expToNext = stats.expToNext || 100;
+        
+        // Полоса во всю ширину 
+        const barWidth = 900; 
+        const barHeight = 24;
+        const x = 0; 
+        const y = this.canvas.height - barHeight; 
+        
+        // Фон
+        this.ctx.fillStyle = '#222';
+        this.ctx.fillRect(x, y, barWidth, barHeight);
+        
+        // Заливка опыта
+        const percent = Math.min(100, (exp / expToNext) * 100);
+        const fillWidth = (barWidth * percent) / 100;
+        this.ctx.fillStyle = '#ffaa44';
+        this.ctx.fillRect(x, y, fillWidth, barHeight);
+        
+        // Рамка (тонкая)
+        this.ctx.strokeStyle = '#666';
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(x, y, barWidth, barHeight);
+        
+        // Текст 
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = 'bold 14px monospace';
+        this.ctx.textAlign = 'left';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(`${exp}/${expToNext}`, x + 20, y + barHeight/2);
+    }
     /**
      * Очистить ресурсы
      */

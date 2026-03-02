@@ -2,13 +2,14 @@
   "magic_missile": {
     "name": "Магическая стрела",
     "type": "spell",
+    "isBattle": true,
     "description": "Выпускает магическую стрелу, которая гарантированно попадает в цель.",
     "icon": "assets/sprites/abilities/magic_missile.jpg",
     "school": "air",
-    "manaCost": 9,
+    "manaCost": 8,
     "damageFormula": "2d4",
     "requirements": {
-      "intelligence": 11,
+      "intelligence": 16,
       "level": 1
     },
     "target": "enemy",

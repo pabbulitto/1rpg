@@ -66,7 +66,7 @@ class PlayerCharacter extends Character {
         // === СОСТОЯНИЯ (для эффектов) ===
         this.activeEffects = []; // будут загружены из GameState при необходимости
 
-        this.corpseSprite = 'assets/sprites/effects/corpse1.png';
+        this.corpseSprite = 'assets/sprites/items/corpse1.png';
     }
 
     /**

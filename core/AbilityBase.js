@@ -105,8 +105,9 @@ class AbilityBase {
         
         return {
             success: true,
-            message: `${caster.name || 'Вы'} используете ${this.name}!`,
+            message: `${caster.name || 'Вы'} использует ${this.name}!`,
             damage: damage,
+            damageType: this.type === 'spell' ? 'magical' : 'physical',
             ability: this,
             caster: caster,
             target: target
@@ -139,13 +140,30 @@ class AbilityBase {
      * Рассчитать урон способности
      */
     calculateDamage(caster, target = null) {
-        // ... получение extendedStats ...
+        const stats = caster.getStats ? caster.getStats() : caster.stats || {};
+        const equipment = caster.getEquipment ? caster.getEquipment() : {};
+        const feetItem = equipment.feet;
+        const extendedStats = {
+            strength: stats.strength || 10,
+            dexterity: stats.dexterity || 10,
+            constitution: stats.constitution || 10,
+            intelligence: stats.intelligence || 10,
+            wisdom: stats.wisdom || 10,
+            charisma: stats.charisma || 10,
+            strengthMod: Math.floor(((stats.strength || 10) - 10) / 2),
+            dexterityMod: Math.floor(((stats.dexterity || 10) - 10) / 2),
+            constitutionMod: Math.floor(((stats.constitution || 10) - 10) / 2),
+            intelligenceMod: Math.floor(((stats.intelligence || 10) - 10) / 2),
+            wisdomMod: Math.floor(((stats.wisdom || 10) - 10) / 2),
+            charismaMod: Math.floor(((stats.charisma || 10) - 10) / 2),
+            bootWeight: feetItem?.weight || 0,
+            level: stats.level || 1
+        };
         
         const formula = this.damageFormula;
         if (!formula || formula === '0') return 0;
         
         try {
-            // Проверяем есть ли DiceRoller (через window.game или передать в конструктор)
             let diceRoller = null;
             if (window.game?.battleSystem?.diceRoller) {
                 diceRoller = window.game.battleSystem.diceRoller;
@@ -153,21 +171,17 @@ class AbilityBase {
                 diceRoller = caster.battleSystem.diceRoller;
             }
             
-            // Если есть DiceRoller И формула содержит броски (dX) - использовать его
             if (diceRoller && formula.toLowerCase().includes('d')) {
                 const result = diceRoller.roll(formula, extendedStats);
                 return result.total;
             }
             
-            // Иначе использовать FormulaParser (для чистых математических формул)
             return this.formulaParser.evaluate(formula, extendedStats);
-            
         } catch (error) {
             console.error(`AbilityBase: ошибка расчета формулы "${formula}":`, error);
             return 0;
         }
     }
-    
     /**
      * Применить эффекты способности (заглушка для расширения)
      */

@@ -1,6 +1,6 @@
 /**
  * CombatSystem - система мгновенных действий в бою
- * Интегрируется с ActionHandler для обработки выбора игрока
+ * Получает выбранные действия игрока через combat:playerSelectedAction 
  * Управляет текущим боем и передачей хода
  */
 class CombatSystem {
@@ -8,7 +8,7 @@ class CombatSystem {
         this.battleSystem = battleSystem;
         this.eventBus = eventBus;
         this.currentBattle = null; 
-
+        this.playerAction = null; 
         this.setupEventListeners();
     }
 
@@ -19,6 +19,10 @@ class CombatSystem {
         });
         
         this.eventBus.on('time:tick', () => this.processRound());
+        this.eventBus.on('combat:playerSelectedAction', (data) => {
+            console.log('CombatSystem: получено действие', data);
+            this.playerAction = data.action;
+        });
     }
     
     /**
@@ -46,6 +50,7 @@ class CombatSystem {
             round: 1,
             turn: 'player'
         };
+        this.playerAction = null;
     }
     
     /**
@@ -72,7 +77,8 @@ class CombatSystem {
         }
         
         // 2. ОЧИСТИТЬ СОСТОЯНИЕ БОЯ
-        this.currentBattle = null;        
+        this.currentBattle = null; 
+        this.playerAction = null;       
         // 3. ЭМИТИТЬ СОБЫТИЕ ДЛЯ UI
         this.eventBus.emit(victory ? 'battle:victory' : 'battle:defeat');
         this.eventBus.emit('battle:end');
@@ -145,11 +151,18 @@ class CombatSystem {
         if (player.getStats().health > 0) {
             for (const enemy of enemies) {
                 const attackResult = this.battleSystem.playerAttack(player, enemy);
-                results.playerAttacks.push({
-                    target: enemy.id,
-                    result: attackResult
-                });
-                
+                if (attackResult.damage > 0) {
+                    results.playerAttacks.push({
+                        target: enemy.id,
+                        result: attackResult
+                    });
+                } else {
+                    // Промах игрока
+                    results.playerAttacks.push({
+                        target: enemy.id,
+                        result: { damage: 0, log: attackResult.log || [] }
+                    });
+                }
                 // Добавляем лог от playerAttack
                 if (attackResult.log && attackResult.log.length > 0) {
                     attackResult.log.forEach(msg => {
@@ -203,6 +216,12 @@ class CombatSystem {
                         message: `${enemy.name} промахнулся по вам!`, 
                         type: 'battle' 
                     });
+                    results.enemyAttacks.push({
+                        attacker: enemy.id,
+                        attackerName: enemy.name,
+                        damage: 0,
+                        isCritical: false
+                    });
                 }
             }
         }
@@ -210,51 +229,74 @@ class CombatSystem {
         // 6. Применить выбранное действие игрока (способность или предмет)
         if (this.playerAction && player.getStats().health > 0) {
             if (this.playerAction.type === 'ability') {
-                const ability = this.playerAction.data; // исправлено: было ability, теперь data
+                const ability = this.playerAction.data;
                 const target = enemies[0]; // цель всегда первый враг
                 
                 if (target && target.getStats().health > 0) {
                     const abilityResult = ability.use(player, target);
-                    results.playerAction = {
-                        type: 'ability',
-                        name: ability.name,
-                        target: target.id,
-                        result: abilityResult
-                    };
                     
-                    // Лог использования способности
-                    if (abilityResult.message) {
-                        logMessages.push({ message: abilityResult.message, type: 'battle' });
-                    }
-                    if (abilityResult.damage > 0) {
-                        logMessages.push({ 
-                            message: `${ability.name} наносит ${abilityResult.damage} урона ${target.name}`, 
-                            type: 'battle' 
-                        });
-                    }
-                    
-                    if (target.getStats().health <= 0) {
-                        results.deaths.push(target.id);
-                        logMessages.push({ 
-                            message: `🎊 ${target.name} побежден!`, 
-                            type: 'victory' 
-                        });
+                    if (abilityResult.success) {
+                        // ===== ПРИМЕНИТЬ УРОН К ЦЕЛИ =====
+                        if (abilityResult.damage > 0) {
+                            target.takeDamage(abilityResult.damage, {
+                                damageType: 'magical', // или physical, зависит от типа способности
+                                isCritical: false
+                            });
+                        }
+                        
+                        results.playerAction = {
+                            type: 'ability',
+                            name: ability.name,
+                            target: target.id,
+                            result: abilityResult
+                        };
+                        
+                        // Лог использования способности
+                        if (abilityResult.message) {
+                            logMessages.push({ message: abilityResult.message, type: 'battle' });
+                        }
+                        if (abilityResult.damage > 0) {
+                            logMessages.push({ 
+                                message: `${ability.name} наносит ${abilityResult.damage} урона ${target.name}`, 
+                                type: 'battle' 
+                            });
+                        }
+                        
+                        if (target.getStats().health <= 0) {
+                            results.deaths.push(target.id);
+                            logMessages.push({ 
+                                message: `🎊 ${target.name} побежден!`, 
+                                type: 'victory' 
+                            });
+                        }
+                    } else {
+                        // Если способность не сработала
+                        if (abilityResult.message) {
+                            logMessages.push({ message: abilityResult.message, type: 'error' });
+                        }
                     }
                 }
             } else if (this.playerAction.type === 'item') {
                 // Использование предмета из пояса
                 const item = this.playerAction.data;
                 const useResult = item.use(player);
-                results.playerAction = {
-                    type: 'item',
-                    name: item.name,
-                    result: useResult
-                };
                 
-                if (useResult.effects) {
-                    useResult.effects.forEach(effect => {
-                        logMessages.push({ message: effect, type: 'success' });
-                    });
+                if (useResult.success) {
+                    results.playerAction = {
+                        type: 'item',
+                        name: item.name,
+                        result: useResult
+                    };
+                    
+                    if (useResult.effects) {
+                        useResult.effects.forEach(effect => {
+                            logMessages.push({ message: effect, type: 'success' });
+                        });
+                    }
+                } else {
+                    if (useResult.message) {
+                        logMessages.push({ message: useResult.message, type: 'error' });
+                    }
                 }
             }
             
@@ -274,7 +316,7 @@ class CombatSystem {
                 }
             }
         }
-        
+        this.lastResults = results; // для отладки
         // 8. Обновление кулдаунов
         if (window.game?.abilityService) {
             window.game.abilityService.updateCooldowns();
@@ -306,7 +348,6 @@ class CombatSystem {
             }))
         };
     }
-    
     /**
      * Проверить идет ли бой
      */
@@ -314,5 +355,4 @@ class CombatSystem {
         return !!this.currentBattle;
     }
 }
-
 export { CombatSystem };

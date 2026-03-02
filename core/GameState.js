@@ -15,8 +15,6 @@ class GameState {
       name: "Герой",
       level: 1,
       exp: 0,
-      expToNext: 100,
-      potions: 2,
       equipment: {
         head: null,
         neck1: null,
@@ -154,10 +152,6 @@ class GameState {
     timeSystem.registerCustom('gameState', (tick, gameTime) => {
       this.progress.gameTime = tick;
     });
-    
-    timeSystem.registerCustom('resource_regeneration', (tick, gameTime) => {
-      this.regenerateResources();
-    });
   }
   
   updateConditionsOverTime() {
@@ -168,38 +162,7 @@ class GameState {
       if (!this.conditions.thirsty) this.conditions.thirsty = true;
       this.applyConditionEffects();
     }
-  }
-
-  regenerateResources() {
-    const stats = this.statManager.getFinalStats();
-    
-    if (stats.healthRegen > 0) {
-      const currentHealth = this.statManager.getResource('health');
-      if (currentHealth > 0 && currentHealth < stats.maxHealth) {
-        const newHealth = Math.min(currentHealth + stats.healthRegen, stats.maxHealth);
-        this.statManager.setResource('health', newHealth);
-        this.eventBus.emit('player:statsChanged', this.getPlayer());
-      }
-    }
-    
-    if (stats.manaRegen > 0) {
-      const currentMana = this.statManager.getResource('mana');
-      if (currentMana < stats.maxMana) {
-        const newMana = Math.min(currentMana + stats.manaRegen, stats.maxMana);
-        this.statManager.setResource('mana', newMana);
-        this.eventBus.emit('player:statsChanged', this.getPlayer());
-      }
-    }
-    
-    if (stats.staminaRegen > 0) {
-      const currentStamina = this.statManager.getResource('stamina');
-      if (currentStamina < stats.maxStamina) {
-        const newStamina = Math.min(currentStamina + stats.staminaRegen, stats.maxStamina);
-        this.statManager.setResource('stamina', newStamina);
-        this.eventBus.emit('player:statsChanged', this.getPlayer());
-      }
-    }
-  }    
+  }   
   
   removeEffect(effectId) {
     const index = this.player.activeEffects.findIndex(e => e.id === effectId);
@@ -249,8 +212,8 @@ class GameState {
       // === БАЗОВАЯ ИНФОРМАЦИЯ ===
       name: this.player.name || "Герой",
       level: window.game?.player?.level || this.player.level || 1,
-      exp: this.player.exp || 0,
-      expToNext: this.player.getExpForNextLevel ? this.player.getExpForNextLevel() : 100,
+      exp: window.game?.player?.exp || 0,
+      expToNext: window.game?.player?.getExpForNextLevel ? window.game.player.getExpForNextLevel() : 100,
       gold: this.player.gold || 0,
       
       // === РЕСУРСЫ ===

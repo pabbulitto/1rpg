@@ -25,6 +25,7 @@ class InventoryUI {
         this.subscribeToEvents();
         this.bindEvents();
         document.addEventListener('click', (e) => this.handleOutsideClick(e));
+        this.eventBus.emit('inventory:request');
         return this;
     }
     

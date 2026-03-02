@@ -230,41 +230,46 @@ class BeltUI {
         const beltInfo = this.beltSystem.getBeltInfo();
         const activeSlots = beltInfo.activeSlots;
         
-        let html = `<div class="belt-slots-container">`;
+        let html = `<div style="width:200px; height:auto; min-height:auto; display:flex; flex-direction:column; background:#2f1239;">`;
+        // Верхняя полоса 200×50 со спрайтом пояса
+        html += `<div style="width:200px; height:50px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #444;">`;
+        html += `<img src="assets/sprites/ui/belt.png" style="max-width:190px; max-height:40px; object-fit:contain;">`;
+        html += `</div>`;
+        // Сетка слотов 2×4
+        html += `<div style="display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:1px; padding:4px; height:100px;">`;
         
         for (let i = 0; i < 8; i++) {
             const isActive = i < activeSlots;
             const slotData = beltInfo.slots[i];
             const hasItem = slotData && slotData.item;
             
-            html += `<div class="belt-slot ${isActive ? 'active' : 'locked'}" data-slot-index="${i}">`;
+            // Затемнение для неактивных слотов
+            const opacity = isActive ? 1 : 0.5;
+            
+            html += `<div class="belt-slot ${isActive ? 'active' : ''}" data-slot-index="${i}" style="width:100%; aspect-ratio:1; border:1px solid #666; border-radius:4px; display:flex; align-items:center; justify-content:center; background:#1a1a1a; opacity:${opacity};">`;
             
             if (isActive) {
                 if (hasItem) {
                     const item = slotData.item;
-                    const iconClass = this.getItemIcon(item.id);
-                    
                     html += `
-                        <div class="belt-item">
-                            <i class="${iconClass}"></i>
-                            ${item.count > 1 ? `<div class="belt-item-count">${item.count}</div>` : ''}
-                            <div class="belt-tooltip">${this.getItemTooltip(item)}</div>
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; position:relative;">
+                            <img src="${item.icon}" style="width:40px; height:40px; object-fit:contain;">
+                            <div class="belt-tooltip" style="display:none;">${this.getItemTooltip(item)}</div>
                         </div>
                     `;
                 } else {
-                    html += `<div class="belt-empty">+</div>`;
+                    html += `<span style="color:#777; font-size:20px;">+</span>`;
                 }
-            } else {
-                html += `<div class="belt-locked"><i class="fas fa-lock"></i></div>`;
             }
             
             html += `</div>`;
         }
         
         html += `</div>`;
+        html += `</div>`;
+        
         this.container.innerHTML = html;
     }
-    
     setupEventListeners() {
         this.container.addEventListener('click', (e) => {
             const slotElement = e.target.closest('.belt-slot.active');

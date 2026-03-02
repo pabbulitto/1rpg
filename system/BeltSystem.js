@@ -122,32 +122,35 @@ class BeltSystem {
             return { success: false, reason: 'Слот уже занят' };
         }
         
-        // ИСПРАВЛЕНО: используем playerContainer.removeItem вместо inventorySystem
-        let itemToAdd;
+        let itemForBelt;
+        
+        // Если предмет стакаемый и количество > 1
         if (item.stackable && item.count > 1) {
-            itemToAdd = new Item(item.id, item.count);
-            // Удаляем через контейнер
-            const removedItem = this.gameState.playerContainer.removeItem(inventoryIndex);
-            if (!removedItem) {
-                return { success: false, reason: 'Не удалось взять предмет из инвентаря' };
-            }
+            // Уменьшаем количество в инвентаре на 1
+            item.count--;
+            this.gameState.playerContainer._markDirty();
+            
+            // Создаем новый предмет для пояса (count = 1)
+            itemForBelt = new Item(item.id, 1);
         } else {
+            // Удаляем предмет из инвентаря полностью
             const removedItem = this.gameState.playerContainer.removeItem(inventoryIndex);
             if (!removedItem) {
                 return { success: false, reason: 'Не удалось взять предмет из инвентаря' };
             }
-            itemToAdd = removedItem;
+            itemForBelt = removedItem;
+            itemForBelt.count = 1;
         }
         
         this.beltSlots[targetSlot] = {
-            item: itemToAdd,
+            item: itemForBelt,
             inventoryIndex: -1,
             isFromStack: false
         };
         
         this.eventBus.emit('belt:itemAdded', {
             slotIndex: targetSlot,
-            item: itemToAdd.getInfo(),
+            item: itemForBelt.getInfo(),
             beltState: this.getBeltInfo()
         });
         
@@ -158,8 +161,7 @@ class BeltSystem {
             slotIndex: targetSlot,
             message: `Предмет добавлен в слот ${targetSlot + 1}`
         };
-    }
-        
+    } 
     /**
      * Удалить предмет из пояса (возвращает в инвентарь)
      * @param {number} slotIndex - индекс слота
@@ -214,11 +216,11 @@ class BeltSystem {
         
         const battleState = this.gameState.getBattleState();
         if (battleState.inBattle) {
-            if (this.battleOrchestrator) {  // ← изменено
-                this.battleOrchestrator.useItemInBattle(slotIndex, true);  // ← изменено
+            if (this.battleOrchestrator) {
+                this.battleOrchestrator.useItemInBattle(slotIndex, true);
                 return { success: true, message: 'Предмет используется в бою' };
             }
-            return { success: false, reason: 'BattleOrchestrator не найден' };  // ← изменено
+            return { success: false, reason: 'BattleOrchestrator не найден' };
         }
         
         const { item } = beltData;
@@ -234,21 +236,13 @@ class BeltSystem {
         const useResult = item.use(player);
         
         if (useResult.success) {
-            item.count--;
+            // Удаляем предмет из пояса (не уменьшаем count, сразу удаляем)
+            this.beltSlots[slotIndex] = null;
             
-            if (item.count <= 0) {
-                this.beltSlots[slotIndex] = null;
-                this.eventBus.emit('belt:itemRemoved', {
-                    slotIndex: slotIndex,
-                    item: item.getInfo()
-                });
-            } else {
-                this.eventBus.emit('belt:itemUpdated', {
-                    slotIndex: slotIndex,
-                    count: item.count,
-                    item: item.getInfo()
-                });
-            }
+            this.eventBus.emit('belt:itemRemoved', {
+                slotIndex: slotIndex,
+                item: item.getInfo()
+            });
             
             this.eventBus.emit('belt:itemUsed', {
                 slotIndex: slotIndex,

@@ -37,6 +37,7 @@ class ItemData {
         /** @type {number} Количество в стаке */
         this.count = count;
         
+        this.icon = template?.icon || null;
         // ===== ХАРАКТЕРИСТИКИ =====
         /** @type {Object} Бонусы к характеристикам (кроме defense/armor) */
         this.stats = template?.stats ? { ...template.stats } : {};
@@ -136,6 +137,7 @@ class ItemData {
             instanceId: this.instanceId,
             id: this.id,
             name: this.name,
+            icon: this.icon,
             type: this.type,
             slot: this.slot,
             stats: { ...this.stats },

@@ -266,16 +266,25 @@ class ZoneManager {
    * Обработать регенерацию всех живых сущностей в мире.
    * @param {number} currentTick - текущий тик
    */
-  processRegeneration(currentTick) {
-      for (const room of this.rooms.values()) {
-          for (const entity of room.entities.values()) {
-              // Регенерируем только живых
-              if (entity.isAlive && entity.isAlive()) {
-                  this._applyRegenToEntity(entity);
-              }
-          }
-      }
-  }
+    processRegeneration(currentTick) {
+        // Регенерируем только каждый 3-й тик
+        if (currentTick % 3 !== 0) {
+            return; 
+        }
+        
+        for (const room of this.rooms.values()) {
+            for (const entity of room.entities.values()) {
+                // Регенерируем только живых
+                if (entity.isAlive && entity.isAlive()) {
+                    this._applyRegenToEntity(entity);
+                }
+            }
+        }
+            // Всегда обновляем UI игрока после регенерации
+        if (window.game?.player && this.gameState?.eventBus) {
+            this.gameState.eventBus.emit('player:statsChanged', this.gameState.getPlayer());
+        }
+    }
 
   /**
    * Применить регенерацию к одной сущности.
@@ -305,7 +314,6 @@ class ZoneManager {
           statManager.setResource('stamina', newStamina);
       }
   }
-  // ===== ВРЕМЕННЫЕ МЕТОДЫ ДЛЯ СОВМЕСТИМОСТИ =====
   
   /**
    * @deprecated Используйте getCorpses(roomId)

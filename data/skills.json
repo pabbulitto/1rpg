@@ -3,12 +3,13 @@
   "kick": {
     "name": "Пнуть",
     "type": "skill",
+    "isBattle": true,
     "description": "Мощный пинок, урон зависит от силы и веса обуви.",
     "icon": "assets/sprites/abilities/kick.jpg",
     "staminaCost": 7,
-    "damageFormula": "floor(bootWeight/2)d4",
+    "damageFormula": "1d4 + floor(strengthMod-4) + floor(bootWeight/2)",
     "requirements": { 
-      "strength": 11,
+      "strength": 12,
       "level": 1
     },
     "target": "enemy",

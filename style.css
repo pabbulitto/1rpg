@@ -309,41 +309,29 @@ body {
   color: #333;
 }
 
-/* Бой */
+/* Кто в комнате */
 .battle-card {
   width: 195px !important;
   max-width: 195px;
   min-width: 195px;
-  overflow: hidden;
   background: rgba(139, 0, 0, 0.2);
-  border: 1px solid #ff4444;
+  border: 1px solid #141415;
+}
+.room-entity-item {
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold; /* жирный */
 }
 
-.enemy-info {
-  text-align: center;
-  margin: 15px 0;
+.room-entity-item.player-name {
+    color: #05ea9e; /* яркий бирюзовый */
+    background: rgba(78, 205, 196, 0.15);
 }
 
-.enemy-info h3 {
-  font-size: 20px;
-  color: #ff6b6b;
-  margin-bottom: 8px;
-}
-
-.enemy-health {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ff4444;
-}
-
-.battle-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.battle-actions .btn {
-  width: 100%;
+.room-entity-item.enemy-name {
+    color: #fb4949; /* яркий красный */
+    background: rgba(255, 107, 107, 0.15);
 }
 
 /* Вкладки */

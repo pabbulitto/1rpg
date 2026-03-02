@@ -86,7 +86,10 @@ class AbilityService {
             this.availableAbilities.get(characterId).delete(abilityId);
         }
     }
-    
+    getCharacterBattleAbilities(characterId) {
+        const allAbilities = this.getCharacterAbilities(characterId);
+        return allAbilities.filter(ability => ability.isBattle === true);
+    }
     /**
      * Получить доступные способности персонажа
      * @param {string} characterId 

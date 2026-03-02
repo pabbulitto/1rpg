@@ -6,7 +6,7 @@
   },
   "professions": {
     "strongman": {
-      "name": "Здоровяк",
+      "name": "Громила",
       "sprite": "assets/sprites/player/strongman.png",
       "portrait": "assets/portraits/strongman.jpg",
       "expMultiplier": 1.0,

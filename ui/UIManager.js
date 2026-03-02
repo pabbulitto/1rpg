@@ -34,6 +34,7 @@ class UIManager {
         this.bindGlobalEvents();
         this.setupEventSubscriptions();
         this.updateAll();
+        this.updateRoomEntitiesList();
         this.initComponentsSync();
             // Инициализация графического движка, если он есть
             if (this.graphicsEngine && !this.graphicsEngine.isInitialized) {
@@ -63,8 +64,8 @@ class UIManager {
             playerAttack: document.getElementById('player-attack'),
             playerDefense: document.getElementById('player-defense'),
             healthBar: document.getElementById('health-bar'),
-            playerHeader: document.getElementById('player-header'),
-            
+            playerName: document.getElementById('player-name'),
+            playerLevel: document.getElementById('player-level'),
             // Элементы для маны и выносливости
             playerMana: document.getElementById('player-mana'),
             playerStamina: document.getElementById('player-stamina'),
@@ -236,7 +237,10 @@ class UIManager {
         
         // Комната обновлена
         this.eventBus.on('room:updated', (roomInfo) => this.updateRoomInfo(roomInfo));
-        
+
+        this.eventBus.on('room:entitiesUpdated', () => {
+            this.updateRoomEntitiesList();
+        });
         // Победа в бою 
         this.eventBus.on('victory:show', (result) => {
             if (result.log) {
@@ -259,7 +263,7 @@ class UIManager {
             else if (data.entityState === 'corpse') {
                 this.showCorpseLootModal(data.entityId);
             }
-            // Живые враги
+                        // Живые враги
             else if (data.entityState === 'alive') {
                 this.showEnemyModal(data.entityId);
             }
@@ -327,13 +331,8 @@ class UIManager {
     
     updatePlayerStats(stats) {
         if (!stats) return;
-        
-        // ТЕПЕРЬ stats УЖЕ ПЛОСКИЙ ОБЪЕКТ от GameState.getPlayer()
-        // 1. Заголовок (имя и уровень)
-        if (this.containers.playerHeader) {
-            this.containers.playerHeader.textContent = `${stats.name || 'Герой'} [Ур. ${stats.level || 1}]`;
-        }
-        
+        // Имя в заголовке
+        if (this.containers.playerName) {this.containers.playerName.textContent = stats.name || 'Герой';}
         // 2. Ресурсы (текст)
         if (this.containers.playerHealth) {
             this.containers.playerHealth.textContent = `${stats.health || 0}/${stats.maxHealth || 0}`;
@@ -344,7 +343,6 @@ class UIManager {
         if (this.containers.playerStamina) {
             this.containers.playerStamina.textContent = `${stats.stamina || 0}/${stats.maxStamina || 0}`;
         }
-        
         // 3. Полоски ресурсов
         if (this.containers.healthBar) {
             const healthPercent = stats.maxHealth > 0 ? (stats.health / stats.maxHealth) * 100 : 0;
@@ -366,24 +364,14 @@ class UIManager {
             this.containers.staminaBar.style.background = staminaPercent < 20 ? '#ff4444' : 
                                                         'linear-gradient(90deg, #44ff44, #aaff44)';
         }
+       // Уровень в отдельной строке
+        if (this.containers.playerLevel) {this.containers.playerLevel.textContent = stats.level || 1;}
         
-        // 4. Остальная информация
-        if (this.containers.playerExp) {
-            this.containers.playerExp.textContent = `${stats.exp || 0}/${stats.expToNext || 100}`;
-        }
         if (this.containers.playerGold) {
             const items = this.game.gameState.playerContainer.getAllItems();
             const goldItem = items.find(item => item.id === 'gold');
             const goldAmount = goldItem ? goldItem.count : 0;
             this.containers.playerGold.textContent = goldAmount;
-        }
-        if (this.containers.playerAttack) {
-            this.containers.playerAttack.textContent = stats.attack || 0;
-        }
-        if (this.containers.playerDefense) {
-            // Показываем значение брони (% поглощения)
-            const armorText = stats.armorValue ? `${stats.armorValue}ед (${stats.damageReduction || 0}%)` : '0ед (0%)';
-            this.containers.playerDefense.textContent = armorText;
         }
     }
     /**
@@ -874,6 +862,29 @@ class UIManager {
                 }
             });
         }, 10);
+    }
+
+    updateRoomEntitiesList() {
+        const container = document.getElementById('battle-ui');
+        if (!container) return;
+        
+        const roomId = this.game.gameState.getPosition().room;
+        const entities = this.game.zoneManager?.getRoomEntities(roomId) || [];
+        
+        // Фильтруем только живые сущности (state = 'alive')
+        const aliveEntities = entities.filter(e => e.isAlive && e.isAlive());
+        
+        let html = '<h2><i class="fas fa-users"></i> Кто в комнате</h2>';
+        html += '<div class="room-entities-list">';
+        
+        aliveEntities.forEach(entity => {
+            const isPlayer = entity.type === 'player';
+            const nameClass = isPlayer ? 'player-name' : 'enemy-name';
+            html += `<div class="room-entity-item ${nameClass}">${entity.name}</div>`;
+        });
+        
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     destroy() {

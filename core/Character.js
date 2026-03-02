@@ -102,7 +102,16 @@ class Character {
      */
     die() {
         if (this.state !== 'alive') return false;
-        
+            // Перед смертью перемещаем всю экипировку в инвентарь
+        if (this.container) {
+            const equipment = this.container.getAllEquipment();
+            for (const [slot, item] of Object.entries(equipment)) {
+                if (item) {
+                    this.container.unequip(slot); 
+                }
+            }
+        }
+        this.originalSprite = this.sprite;
         // Меняем состояние на труп
         this.state = 'corpse';
         // Меняем спрайт на труп
