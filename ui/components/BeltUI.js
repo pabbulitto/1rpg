@@ -1,6 +1,7 @@
 // ui/components/BeltUI.js
 /**
  * BeltUI - компонент пояса быстрого доступа (горизонтальный) с улучшенными тултипами
+ * Адаптирован для работы с новой архитектурой пояса (только ссылки на предметы в инвентаре)
  */
 class BeltUI {
     constructor(container, eventBus, beltSystem) {
@@ -9,7 +10,7 @@ class BeltUI {
         this.beltSystem = beltSystem;
         this.isInitialized = false;
         this.currentBeltModal = null;
-        this.handleBeltModalOutsideClick = this.handleBeltModalOutsideClick.bind(this);
+        this.outsideClickHandler = null;
     }
     
     init() {
@@ -105,7 +106,6 @@ class BeltUI {
                 text-align: center;
             }
             
-            /* ТУЛТИП - ИСПРАВЛЕНА ВИДИМОСТЬ */
             .belt-tooltip {
                 position: absolute;
                 bottom: calc(100% + 5px);
@@ -143,6 +143,72 @@ class BeltUI {
             .belt-slot.active:hover .belt-tooltip {
                 opacity: 1;
             }
+            
+            /* Модальное окно для предметов пояса */
+            .belt-item-modal {
+                position: absolute;
+                z-index: 1000;
+                background: #2a2a2a;
+                border: 2px solid #666;
+                border-radius: 8px;
+                padding: 10px;
+                min-width: 200px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            }
+            
+            .belt-modal-header {
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid #444;
+            }
+            
+            .belt-modal-header h4 {
+                margin: 0 0 5px 0;
+                color: #ffaa44;
+                font-size: 16px;
+            }
+            
+            .belt-modal-count {
+                color: #ccc;
+                font-size: 12px;
+            }
+            
+            .belt-modal-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .belt-modal-btn {
+                padding: 8px 12px;
+                background: transparent;
+                border: 1px solid #4ecdc4;
+                color: #4ecdc4;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: bold;
+                transition: all 0.2s;
+            }
+            
+            .belt-modal-btn:hover {
+                background: rgba(78, 205, 196, 0.1);
+            }
+            
+            .belt-modal-btn.use-btn {
+                border-color: #4caf50;
+                color: #4caf50;
+            }
+            
+            .belt-modal-btn.remove-btn {
+                border-color: #ff6b6b;
+                color: #ff6b6b;
+            }
+            
+            .belt-modal-btn.close-btn {
+                border-color: #888;
+                color: #888;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -169,15 +235,6 @@ class BeltUI {
         
         let tooltip = `<strong>${item.name}</strong>`;
         
-        // Определяем тип предмета по ID или свойствам
-        const isHealthPotion = item.id.includes('health');
-        const isManaPotion = item.id.includes('mana');
-        const isStaminaPotion = item.id.includes('stamina');
-        const isBomb = item.id.includes('bomb');
-        const isScroll = item.id.includes('scroll');
-        const isKey = item.id.includes('key');
-        
-        // Эффекты из stats
         if (item.stats) {
             if (item.stats.health) {
                 tooltip += `<span>Восстанавливает ${item.stats.health} здоровья</span>`;
@@ -188,37 +245,8 @@ class BeltUI {
             if (item.stats.stamina) {
                 tooltip += `<span>Восстанавливает ${item.stats.stamina} выносливости</span>`;
             }
-            if (item.stats.attack) {
-                tooltip += `<span>+${item.stats.attack} атаки на 10 ходов</span>`;
-            }
-            if (item.stats.defense) {
-                tooltip += `<span>+${item.stats.defense} защиты на 10 ходов</span>`;
-            }
         }
         
-        // Тип предмета
-        if (isHealthPotion) {
-            tooltip += `<span>Зелье лечения</span>`;
-        } else if (isManaPotion) {
-            tooltip += `<span>Зелье маны</span>`;
-        } else if (isStaminaPotion) {
-            tooltip += `<span>Зелье выносливости</span>`;
-        } else if (isBomb) {
-            tooltip += `<span>Взрывчатка</span>`;
-        } else if (isScroll) {
-            tooltip += `<span>Магический свиток</span>`;
-        } else if (isKey) {
-            tooltip += `<span>Ключ</span>`;
-        }
-        
-        // Размер/качество
-        if (item.id.includes('large') || item.id.includes('big')) {
-            tooltip += `<span>Большой размер</span>`;
-        } else if (item.id.includes('small') || item.id.includes('minor')) {
-            tooltip += `<span>Малый размер</span>`;
-        }
-        
-        // Счетчик
         if (item.count > 1) {
             tooltip += `<span>Количество: ${item.count}</span>`;
         }
@@ -270,6 +298,7 @@ class BeltUI {
         
         this.container.innerHTML = html;
     }
+    
     setupEventListeners() {
         this.container.addEventListener('click', (e) => {
             const slotElement = e.target.closest('.belt-slot.active');
@@ -286,28 +315,25 @@ class BeltUI {
         this.eventBus.on('belt:itemUsed', () => this.render());
         this.eventBus.on('belt:slotsUpdated', () => this.render());
         this.eventBus.on('player:levelUp', () => this.render());
+        this.eventBus.on('inventory:updated', () => this.render());
     }
     
     useItem(slotIndex) {
-        const beltData = this.beltSystem.beltSlots[slotIndex];
-        if (!beltData || !beltData.item) return;
-        // Показываем модалку выбора вместо автоматического использования
-        this.showBeltItemModal(slotIndex, beltData.item);
+        const beltInfo = this.beltSystem.getBeltInfo();
+        const slotData = beltInfo.slots[slotIndex];
+        if (!slotData || !slotData.item) return;
+        
+        this.showBeltItemModal(slotIndex, slotData.item);
     }
 
     showBeltItemModal(slotIndex, item) {
         // Закрываем предыдущую модалку
         this.closeBeltModal();
-        // Создаем модалку аналогичную инвентарной
+        
+        // Создаем модалку
         const modal = document.createElement('div');
         modal.className = 'belt-item-modal';
-        modal.style.position = 'absolute';
-        modal.style.zIndex = '1000';
-        modal.style.background = '#2a2a2a';
-        modal.style.border = '2px solid #666';
-        modal.style.borderRadius = '8px';
-        modal.style.padding = '10px';
-        modal.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+        
         // Позиционируем рядом со слотом
         const slotElement = document.querySelector(`.belt-slot[data-slot-index="${slotIndex}"]`);
         if (slotElement) {
@@ -325,16 +351,18 @@ class BeltUI {
             </div>
             <div class="belt-modal-actions">
                 ${itemInfo.type === 'consumable' ? 
-                    `<button class="belt-modal-btn use-btn" data-action="use">🧪 Использовать (1 шт.)</button>` : ''}
-                <button class="belt-modal-btn remove-btn" data-action="remove">📦 Снять (все)</button>
+                    `<button class="belt-modal-btn use-btn" data-action="use">🧪 Использовать</button>` : ''}
+                <button class="belt-modal-btn remove-btn" data-action="remove">📦 Снять с пояса</button>
                 <button class="belt-modal-btn close-btn" data-action="close">✕ Закрыть</button>
             </div>
         `;
         
         document.body.appendChild(modal);
         this.currentBeltModal = { modal, slotIndex };
-        // Обработчики
-        modal.querySelector('.use-btn')?.addEventListener('click', () => {
+        
+        // Обработчики кнопок
+        modal.querySelector('.use-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             const result = this.beltSystem.useBeltItem(slotIndex);
             if (result.message) {
                 this.eventBus.emit('log:add', {
@@ -342,16 +370,11 @@ class BeltUI {
                     type: result.success ? 'success' : 'error'
                 });
             }
-            if (result.success) {
-                // Обновить интерфейс принудительно
-                this.eventBus.emit('player:statsUpdated');
-                this.eventBus.emit('inventory:updated');
-                this.render(); // перерисовать пояс
-            }
             this.closeBeltModal();
         });
         
-        modal.querySelector('.remove-btn')?.addEventListener('click', () => {
+        modal.querySelector('.remove-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             const result = this.beltSystem.removeFromBelt(slotIndex);
             if (result.success) {
                 this.eventBus.emit('log:add', {
@@ -362,10 +385,22 @@ class BeltUI {
             this.closeBeltModal();
         });
         
-        modal.querySelector('.close-btn').addEventListener('click', () => this.closeBeltModal());
-        // Закрытие при клике вне модалки
+        modal.querySelector('.close-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.closeBeltModal();
+        });
+        
+        // Обработчик клика вне модалки
+        this.outsideClickHandler = (e) => {
+            if (this.currentBeltModal && 
+                !this.currentBeltModal.modal.contains(e.target) &&
+                !e.target.closest(`.belt-slot[data-slot-index="${this.currentBeltModal.slotIndex}"]`)) {
+                this.closeBeltModal();
+            }
+        };
+        
         setTimeout(() => {
-            document.addEventListener('click', this.handleBeltModalOutsideClick);
+            document.addEventListener('click', this.outsideClickHandler);
         }, 10);
     }
 
@@ -374,16 +409,13 @@ class BeltUI {
             if (this.currentBeltModal.modal.parentNode) {
                 this.currentBeltModal.modal.parentNode.removeChild(this.currentBeltModal.modal);
             }
-            document.removeEventListener('click', this.handleBeltModalOutsideClick);
+            
+            if (this.outsideClickHandler) {
+                document.removeEventListener('click', this.outsideClickHandler);
+                this.outsideClickHandler = null;
+            }
+            
             this.currentBeltModal = null;
-        }
-    }
-
-    handleBeltModalOutsideClick = (e) => {
-        if (this.currentBeltModal && 
-            !this.currentBeltModal.modal.contains(e.target) &&
-            !e.target.closest(`.belt-slot[data-slot-index="${this.currentBeltModal.slotIndex}"]`)) {
-            this.closeBeltModal();
         }
     }
 
@@ -392,6 +424,7 @@ class BeltUI {
     }
     
     destroy() {
+        this.closeBeltModal();
         this.container.innerHTML = '';
     }
 }

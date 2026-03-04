@@ -190,7 +190,7 @@ class StatsUI {
                 left: 0;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 font-size: 17px;
-                color: #edebf8;
+                color: #ffaa44;
                 font-weight: bold;
                 line-height: 1.5;
                 box-sizing: border-box;                

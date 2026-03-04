@@ -10,34 +10,17 @@ class GameState {
     this.eventBus = new EventBus();
     window.EventBus = this.eventBus;
     
-    // === ИГРОК (старые поля - пока оставляем для совместимости) ===
+    // === ИГРОК (только данные, не дублируем экипировку) ===
     this.player = {
       name: "Герой",
       level: 1,
       exp: 0,
-      equipment: {
-        head: null,
-        neck1: null,
-        neck2: null,
-        arms: null,
-        hands: null,
-        ring1: null,
-        ring2: null,
-        body: null,
-        belt: null,
-        legs: null,
-        feet: null,
-        right_hand: null,
-        left_hand: null
-      },
       activeEffects: []
     };
     
     // === НОВОЕ: КОНТЕЙНЕР ИГРОКА ===
     /** @type {EntityContainer} */
-    this.playerContainer = new EntityContainer({
-      equipment: { ...this.player.equipment } // копируем начальную экипировку
-    });
+    this.playerContainer = new EntityContainer();
     
     this.statManager = new StatManager({
       strength: 17,
@@ -59,12 +42,6 @@ class GameState {
       zone: 'village',
       room: 'village_square',
       visitedRooms: new Set(['village:village_square'])
-    };
-    
-    // === ИНВЕНТАРЬ (старый - пока оставляем для совместимости) ===
-    this.inventory = {
-      items: [],  // Здесь будут предметы, но мы будем их дублировать в playerContainer
-      capacity: 30
     };
     
     // === БОЙ ===
@@ -103,37 +80,8 @@ class GameState {
     this.setupTimeListeners();
 
     this.itemsData = null;
-    
-    // Синхронизируем старый инвентарь с новым контейнером
-    this._syncInventoryFromContainer();
   }
   
-  // === НОВЫЙ МЕТОД: синхронизация старого инвентаря с контейнером ===
-  _syncInventoryFromContainer() {
-      // Просто передаём ссылки на предметы из контейнера
-      this.inventory.items = this.playerContainer.getAllItems();
-      
-      console.log(`📊 Синхронизация завершена: всего предметов ${this.inventory.items.length}`);
-  }
-    
-  // === НОВЫЙ МЕТОД: синхронизация контейнера со старым инвентарем ===
-  _syncContainerFromInventory() {
-    // Очищаем контейнер
-    this.playerContainer.items = [];
-    
-    // Копируем все предметы из старого инвентаря в контейнер
-    this.inventory.items.forEach(item => {
-      this.playerContainer.addItem(item);
-    });
-    
-    // Копируем экипировку
-    Object.entries(this.player.equipment).forEach(([slot, item]) => {
-      if (item) {
-        this.playerContainer.equipment[slot] = item;
-      }
-    });
-  }
-   
   setItemsData(itemsData) {
     this.itemsData = itemsData;
   }
@@ -203,11 +151,7 @@ class GameState {
     // 2. Получаем данные из контейнера
     const containerInfo = this.playerContainer.getInfo();
     
-    // 3. Синхронизируем старые поля для обратной совместимости
-    this.player.equipment = containerInfo.equipment;
-    this.inventory.items = containerInfo.items;
-    
-    // 4. Создаем плоский объект для UI
+    // 3. Создаем плоский объект для UI
     const playerData = {
       // === БАЗОВАЯ ИНФОРМАЦИЯ ===
       name: this.player.name || "Герой",
@@ -279,8 +223,8 @@ class GameState {
       manaPerLevel: finalStats.manaPerLevel || 3,
       
       // === СИСТЕМНЫЕ ДАННЫЕ ===
-      equipment: { ...this.player.equipment },
-      inventory: this.inventory.items.map(item => item.getInfo ? item.getInfo() : item),
+      equipment: containerInfo.equipment,
+      inventory: containerInfo.items,
       activeEffects: this.getActiveEffects().map(effect => 
         effect.getInfo ? effect.getInfo() : effect
       ),
@@ -334,22 +278,23 @@ class GameState {
           return null;
       }
   }  
-  // === СТАРЫЕ МЕТОДЫ (оставляем для совместимости, но внутри используем контейнер) ===
+  
+  // === МЕТОДЫ РАБОТЫ С ИНВЕНТАРЕМ (теперь только через контейнер) ===
   
   getInventory() {
     return { 
-      items: [...this.inventory.items],
-      equipment: { ...this.player.equipment },
-      capacity: this.inventory.capacity
+      items: this.playerContainer.getAllItems(),
+      equipment: this.playerContainer.getAllEquipment(),
+      capacity: 30 // TODO: вынести в конфиг
     };
   }
 
   getInventoryItems() {
-      return this.inventory.items;
+      return this.playerContainer.getAllItems();
   }
   
   getEquipment() {
-    return { ...this.player.equipment };
+    return this.playerContainer.getAllEquipment();
   }
   
   getShopState() {
@@ -460,69 +405,63 @@ class GameState {
     }
   }
   
-  // === ИЗМЕНЕННЫЕ МЕТОДЫ РАБОТЫ С ИНВЕНТАРЕМ ===
+  // === МЕТОДЫ РАБОТЫ С ИНВЕНТАРЕМ (без синхронизации) ===
   
   addInventoryItem(item) {
     // Добавляем в контейнер
     const result = this.playerContainer.addItem(item);
     
-    // Синхронизируем старый инвентарь
     if (result) {
-      this._syncInventoryFromContainer();
       this.eventBus.emit('inventory:updated', this.getInventory());
     }
     
     return result;
   }
 
-  removeInventoryItem(index) {
-    if (index < 0 || index >= this.inventory.items.length) return null;
-    
-    // Удаляем из контейнера (по индексу в старом массиве)
-    const item = this.playerContainer.removeItem(index);
-    
-    if (item) {
-      // Синхронизируем старый инвентарь
-      this._syncInventoryFromContainer();
-      this.eventBus.emit('inventory:updated', this.getInventory());
-    }
-    
-    return item;
+  removeInventoryItem(instanceId) {
+      if (!instanceId) return null;
+      
+      // Удаляем из контейнера по instanceId
+      const item = this.playerContainer.removeItemById(instanceId);
+      
+      if (item) {
+          this.eventBus.emit('inventory:updated', this.getInventory());
+      }
+      
+      return item;
   }
   
   updateEquipment(slot, item) {
-    // Обновляем в контейнере
-    if (item) {
-      // Сначала снимаем старый предмет, если есть
-      const oldItem = this.playerContainer.equipment[slot];
-      if (oldItem) {
-        this.playerContainer.addItem(oldItem);
+      // Обновляем в контейнере
+      if (item) {
+          // Сначала снимаем старый предмет, если есть
+          const oldItem = this.playerContainer.equipment[slot];
+          if (oldItem) {
+              this.playerContainer.addItem(oldItem);
+          }
+          
+          // Надеваем новый предмет
+          this.playerContainer.equipment[slot] = item;
+          
+          // Удаляем предмет из инвентаря по его instanceId
+          const removed = this.playerContainer.removeItemById(item.instanceId);
+          if (!removed) {
+              console.warn(`GameState.updateEquipment: не удалось удалить предмет ${item.instanceId} из инвентаря`);
+          }
+      } else {
+          // Снимаем предмет
+          const oldItem = this.playerContainer.equipment[slot];
+          if (oldItem) {
+              this.playerContainer.addItem(oldItem);
+              this.playerContainer.equipment[slot] = null;
+          }
       }
-      this.playerContainer.equipment[slot] = item;
       
-      // Удаляем предмет из инвентаря, если он там был
-      const itemIndex = this.playerContainer.findItemIndex(item.id);
-      if (itemIndex !== -1) {
-        this.playerContainer.removeItem(itemIndex);
-      }
-    } else {
-      // Снимаем предмет
-      const oldItem = this.playerContainer.equipment[slot];
-      if (oldItem) {
-        this.playerContainer.addItem(oldItem);
-        this.playerContainer.equipment[slot] = null;
-      }
-    }
-    
-    // Синхронизируем старые поля
-    this._syncInventoryFromContainer();
-    this.player.equipment = this.playerContainer.getAllEquipment();
-    
-    this.eventBus.emit('player:equipmentChanged', { slot, item });
-    this.eventBus.emit('player:statsChanged', this.getPlayer());
-    this.eventBus.emit('inventory:updated', this.getInventory());
+      this.eventBus.emit('player:equipmentChanged', { slot, item });
+      this.eventBus.emit('player:statsChanged', this.getPlayer());
+      this.eventBus.emit('inventory:updated', this.getInventory());
   }
-  
+    
   /**
    * Добавить опыт игроку
    * @param {number} amount - количество опыта
@@ -530,7 +469,7 @@ class GameState {
    */
   addExp(amount) {
       if (!this.player) return 0;
-            const result = this.player.gainExp(amount);
+      const result = this.player.gainExp(amount);
       // Обновляем UI
       this.eventBus.emit('player:statsChanged', this.getPlayer());
       
@@ -587,13 +526,12 @@ class GameState {
         ...this.player,
         activeEffects: savedEffects
       },
-      // Сохраняем контейнер
+      // Сохраняем только контейнер (единый источник правды)
       playerContainer: this.playerContainer.toJSON(),
       position: {
         ...this.position,
         visitedRooms: Array.from(this.position.visitedRooms)
       },
-      inventory: this.inventory,
       battle: {
         inBattle: this.battle.inBattle,
         currentEnemyId: this.battle.currentEnemyId,
@@ -611,7 +549,7 @@ class GameState {
   fromJSON(data) {
       this.player = data.player || this.player;
       
-      // Загружаем контейнер, если есть
+      // Загружаем контейнер (единый источник правды)
       if (data.playerContainer) {
           this.playerContainer = EntityContainer.fromJSON(data.playerContainer);
       }
@@ -620,21 +558,6 @@ class GameState {
           ...data.position,
           visitedRooms: new Set(data.position.visitedRooms || [])
       };
-      
-      // ===== ИСПРАВЛЕНО: используем фабрику для восстановления предметов =====
-      if (data.inventory && data.inventory.items) {
-          this.inventory.items = data.inventory.items.map(itemData => {
-              try {
-                  // Используем фабрику для создания из сохранения
-                  return itemFactory.createFromSave(itemData);
-              } catch (e) {
-                  console.warn('Не удалось восстановить предмет:', itemData, e);
-                  return null;
-              }
-          }).filter(item => item !== null);
-      } else {
-          this.inventory.items = [];
-      }
       
       this.battle = data.battle || {
           inBattle: false,
@@ -675,10 +598,6 @@ class GameState {
       if (data.player?.activeEffects) {
           this.player.activeEffects = data.player.activeEffects;
       }
-      
-      // Синхронизируем старые поля с контейнером
-      this._syncInventoryFromContainer();
-      this.player.equipment = this.playerContainer.getAllEquipment();
       
       setTimeout(() => {
           if (this.timeSystem && !this.timeSystem.isRunning) {

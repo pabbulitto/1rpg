@@ -159,13 +159,13 @@ class ShopUI {
             const countText = item.count > 1 ? ` ×${item.count}` : '';
             
             html += `
-                <div class="sell-item" data-item-index="${index}">
+                <div class="sell-item" data-instance-id="${item.instanceId || ''}">
                     <div class="sell-item-header">
                         <span class="item-name">${item.name}${countText}</span>
                         <span class="item-sell-price">${sellPrice} <i class="fas fa-coins"></i></span>
                     </div>
                     <div class="item-type">${item.type || 'предмет'}</div>
-                    <button class="btn-sell" data-item-index="${index}">
+                    <button class="btn-sell" data-instance-id="${item.instanceId || ''}">
                         <i class="fas fa-coins"></i> Продать
                     </button>
                 </div>

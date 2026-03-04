@@ -183,6 +183,7 @@ class Game {
         // Применяем финальные статы
         this.player.applyFinalStats(finalStats);
         
+        this.player.container.owner = this.player;
         // Добавляем стартовые предметы из класса
         const classData = this.dataService.getProfessionData(classId);
         if (classData?.startingItems) {

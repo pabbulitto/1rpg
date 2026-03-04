@@ -351,21 +351,23 @@ class Character {
     }
     
     /**
-     * Удалить предмет из инвентаря
-     * @param {number} index
+     * Удалить предмет из инвентаря по instanceId
+     * @param {string} instanceId
      * @returns {Item|null}
      */
-    removeItem(index) {
-        return this.container ? this.container.removeItem(index) : null;
+    removeItem(instanceId) {
+        return this.container ? this.container.removeItemById(instanceId) : null;
     }
-    
+
     /**
-     * Получить предмет из инвентаря
-     * @param {number} index
+     * Получить предмет из инвентаря по instanceId
+     * @param {string} instanceId
      * @returns {Item|null}
      */
-    getItem(index) {
-        return this.container ? this.container.getItem(index) : null;
+    getItem(instanceId) {
+        if (!instanceId || !this.container) return null;
+        const items = this.container.getAllItems();
+        return items.find(item => item && item.instanceId === instanceId) || null;
     }
     
     /**

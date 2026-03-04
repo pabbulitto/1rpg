@@ -170,21 +170,28 @@ class ItemData {
         
         return info;
     }
-
     /**
      * Проверить, можно ли стакаться с другим предметом
      * @param {ItemData} otherItem
      * @returns {boolean}
      */
     canStackWith(otherItem) {
+        // Базовые проверки
         if (!this.stackable || !otherItem?.stackable) return false;
         if (this.id !== otherItem.id) return false;
-        if (this.durability !== otherItem.durability) return false;
-        if (this.socketCount !== otherItem.socketCount) return false;
         if (this.isLimited || otherItem.isLimited) return false;
+        
+        // Проверка прочности: оба предмета должны иметь одинаковую прочность
+        // или оба не иметь прочности (null/undefined)
+        const thisDurability = this.durability ?? null;
+        const otherDurability = otherItem.durability ?? null;
+        if (thisDurability !== otherDurability) return false;
+        
+        // Проверка сокетов
+        if (this.socketCount !== otherItem.socketCount) return false;
+        
         return true;
     }
-    
     /**
      * Использовать предмет
      * @param {Object} player - игрок

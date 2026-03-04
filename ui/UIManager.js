@@ -13,15 +13,15 @@ class UIManager {
         this.components = {};
         
         this.callbacks = {
-            onItemUse: (index) => this.onItemUse(index),
+            onItemUse: (instanceId) => this.onItemUse(instanceId),
             onUnequip: (slot) => this.onUnequip(slot),
             onAttack: () => this.onAttack(),
             onDefense: () => this.onDefense(),
             onEscape: () => this.onEscape(),
             onBuyItem: (itemId) => this.onBuyItem(itemId),
-            onSellItem: (itemIndex) => this.onSellItem(itemIndex),
-            onAddToBelt: (index) => this.onAddToBelt(index),
-            onItemDrop: (index) => this.onItemDrop(index),
+            onSellItem: (instanceId) => this.onSellItem(instanceId),
+            onAddToBelt: (instanceId) => this.onAddToBelt(instanceId),
+            onItemDrop: (instanceId) => this.onItemDrop(instanceId),
             onEquip: (item, slot) => this.onEquip(item, slot)
         };
         
@@ -110,14 +110,12 @@ class UIManager {
                 this.containers.inventory,
                 this.eventBus,
                 () => this.game.gameState.playerContainer.getInfo(),
-                this.callbacks.onItemUse,
-                this.callbacks.onItemEquip,
-                this.callbacks.onAddToBelt,
-                this.callbacks.onItemDrop 
+                this.callbacks.onItemUse,      // use
+                this.callbacks.onAddToBelt,    // belt
+                this.callbacks.onItemDrop      // drop
             );
             this.components.inventory.init();
         }
-        
         // EquipmentUI
         if (this.containers.equipment) {
             this.components.equipment = new this.uiComponents.EquipmentUI(
@@ -469,9 +467,12 @@ class UIManager {
         this.addToLog(`ОШИБКА: ${message}`, 'error');
     }
     
-    // Callbacks
-    onItemUse(index) {
-        const result = this.game.player.useItem(index);
+    /**
+     * Обработчик использования предмета по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     */
+    onItemUse(instanceId) {
+        const result = this.game.player.useItem(instanceId);
         if (result.message) {
             this.addToLog(result.message, result.success ? 'success' : 'error');
         }
@@ -493,25 +494,31 @@ class UIManager {
     onBuyItem(itemId) {
         this.game.gameManager.buyItemFromShop(itemId);
     }
-    
-    onSellItem(itemIndex) {
-        this.game.gameManager.sellItemToShop(itemIndex);
+    onSellItem(instanceId) {
+        this.game.gameManager.sellItemToShop(instanceId);
     }
 
-    onAddToBelt(index) {
+    /**
+     * Обработчик добавления предмета на пояс по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     */
+    onAddToBelt(instanceId) {
         if (!this.game.beltSystem) {
             this.addToLog("Система пояса не найдена", "error");
             return;
         }
         
-        const result = this.game.beltSystem.addToBeltFromInventory(index);
+        const result = this.game.beltSystem.addToBeltFromInventory(instanceId);
         if (result.message) {
             this.addToLog(result.message, result.success ? 'success' : 'error');
         }
     }
-    
-    onItemDrop(index) {
-        const result = this.game.player.dropItem(index);
+    /**
+     * Обработчик выбрасывания предмета по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     */
+    onItemDrop(instanceId) {
+        const result = this.game.player.dropItem(instanceId);
         if (result.message) {
             this.addToLog(result.message, result.success ? 'success' : 'error');
         }
@@ -539,11 +546,11 @@ class UIManager {
             <div class="modal-content">
                 ${items.length === 0 ? '<p>Мешок пуст</p>' : ''}
                 <div class="bag-items-list">
-                    ${items.map((item, index) => `
-                        <div class="bag-item-row" data-item-index="${index}">
+                    ${items.map(item => `
+                        <div class="bag-item-row" data-instance-id="${item.instanceId}">
                             <span class="item-name">${item.name}</span>
                             ${item.count > 1 ? `<span class="item-count">×${item.count}</span>` : ''}
-                            <button class="take-item-btn" data-item-index="${index}">Взять</button>
+                            <button class="take-item-btn" data-instance-id="${item.instanceId}">Взять</button>
                         </div>
                     `).join('')}
                 </div>
@@ -560,8 +567,8 @@ class UIManager {
         
         modal.querySelectorAll('.take-item-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const index = parseInt(btn.dataset.itemIndex);
-                this.takeItemFromBag(bagId, index);
+                const instanceId = btn.dataset.instanceId;
+                this.takeItemFromBag(bagId, instanceId);
                 modal.remove();
             });
         });
@@ -584,17 +591,16 @@ class UIManager {
             });
         }, 10);
     }
-
     /**
-     * Взять предмет из мешка
+     * Взять предмет из мешка по instanceId
      * @param {string} bagId - ID мешка
-     * @param {number} itemIndex - индекс предмета
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      */
-    takeItemFromBag(bagId, itemIndex) {
+    takeItemFromBag(bagId, instanceId) {
         const bag = this.game.zoneManager?.getEntityById(bagId);
         if (!bag) return;
         
-        const item = bag.removeItem(itemIndex);
+        const item = bag.removeItem(instanceId);
         if (!item) return;
         
         const added = this.game.player.addItem(item);
@@ -636,7 +642,7 @@ class UIManager {
     showCorpseLootModal(corpseId) {
         const corpse = this.game.zoneManager?.getEntityById(corpseId);
         if (!corpse || corpse.state !== 'corpse') {
-        return;
+            return;
         }
         const corpseInfo = corpse.getInfo();
         const items = corpseInfo.inventory || [];
@@ -651,18 +657,18 @@ class UIManager {
             <div class="modal-content">
                 ${items.length === 0 ? '<p>В трупе ничего нет</p>' : ''}
                 <div class="bag-items-list">
-                    ${items.map((item, index) => `
-                        <div class="bag-item-row" data-item-index="${index}">
+                    ${items.map(item => `
+                        <div class="bag-item-row" data-instance-id="${item.instanceId}">
                             <span class="item-name">${item.name}</span>
                             ${item.count > 1 ? `<span class="item-count">×${item.count}</span>` : ''}
-                            <button class="take-item-btn" data-item-index="${index}">Взять</button>
+                            <button class="take-item-btn" data-instance-id="${item.instanceId}">Взять</button>
                         </div>
                     `).join('')}
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     ${items.length > 0 ? '<button class="take-all-btn" style="flex: 1;">Взять всё</button>' : ''}
-                    <button class="pickup-corpse-btn" style="flex: 1;">🎒 Поднять труп</button>
-                    <button class="use-corpse-btn" style="flex: 1;">✨ Использовать</button>
+                    <button class="pickup-corpse-btn">🎒 Поднять труп</button>
+                    <button class="use-corpse-btn">✨ Использовать</button>
                 </div>
             </div>
         `;
@@ -676,8 +682,8 @@ class UIManager {
         
         modal.querySelectorAll('.take-item-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const index = parseInt(btn.dataset.itemIndex);
-                this.takeItemFromCorpse(corpseId, index);
+                const instanceId = btn.dataset.instanceId;
+                this.takeItemFromCorpse(corpseId, instanceId);
                 modal.remove();
             });
         });
@@ -716,17 +722,16 @@ class UIManager {
             });
         }, 10);
     }
-
     /**
-     * Взять предмет из трупа
+     * Взять предмет из трупа по instanceId
      * @param {string} corpseId - ID трупа
-     * @param {number} itemIndex - индекс предмета
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      */
-    takeItemFromCorpse(corpseId, itemIndex) {
+    takeItemFromCorpse(corpseId, instanceId) {
         const corpse = this.game.zoneManager?.getEntityById(corpseId);
         if (!corpse || corpse.state !== 'corpse') return;
         
-        const item = corpse.lootItem ? corpse.lootItem(itemIndex) : null;
+        const item = corpse.lootItem ? corpse.lootItem(instanceId) : null;
         if (!item) return;
         
         const added = this.game.player.addItem(item);
@@ -748,7 +753,6 @@ class UIManager {
             entities: this.game.zoneManager?.getRoomEntitiesInfo(this.game.gameState.getPosition().room)
         });
     }
-
     /**
      * Взять все предметы из трупа
      * @param {string} corpseId - ID трупа

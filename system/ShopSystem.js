@@ -282,63 +282,78 @@ class ShopSystem {
       return true;
   }
 
-  sellItem(itemIndex, player) {
-      const items = this.gameState.playerContainer.getAllItems();
-      
-      if (itemIndex < 0 || itemIndex >= items.length) {
-          return { success: false, message: "Предмет не найден" };
-      }
-      
-      const item = items[itemIndex];
-      if (!item) {
-          return { success: false, message: "Предмет не найден" };
-      }
-      
-      const sellPrice = this.getSellPrice(item);
-      
-      // Продажа из стека
-      if (item.stackable && item.count > 1) {
-          item.count--;
-          this.gameState.playerContainer._markDirty();
-          
-          // ===== ИСПРАВЛЕНО: добавляем золото в инвентарь =====
-          this._addGoldToInventory(sellPrice);
-          
-          this.gameState.eventBus.emit('inventory:updated', 
-              this.gameState.playerContainer.getInfo());
-          this.gameState.eventBus.emit('player:statsChanged', 
-              this.gameState.getPlayer());
-          
-          return { 
-              success: true, 
-              message: `Продано: ${item.name} за ${sellPrice} золота`,
-              goldReceived: sellPrice,
-              item: item.getInfo()
-          };
-      } 
-      // Продажа всего предмета
-      else {
-          const removedItem = this.gameState.playerContainer.removeItem(itemIndex);
-          if (removedItem) {
-              // ===== ИСПРАВЛЕНО: добавляем золото в инвентарь =====
-              this._addGoldToInventory(sellPrice);
-              
-              this.gameState.eventBus.emit('inventory:updated', 
-                  this.gameState.playerContainer.getInfo());
-              this.gameState.eventBus.emit('player:statsChanged', 
-                  this.gameState.getPlayer());
-              
-              return { 
-                  success: true, 
-                  message: `Продано: ${item.name} за ${sellPrice} золота`,
-                  goldReceived: sellPrice,
-                  item: item.getInfo()
-              };
-          }
-      }
-      
-      return { success: false, message: "Не удалось продать предмет" };
-  } 
+    /**
+     * Продать предмет по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     * @param {Object} player - игрок
+     * @returns {Object} результат продажи
+     */
+    sellItem(instanceId, player) {
+        if (!instanceId) {
+            return { success: false, message: "Не указан ID предмета" };
+        }
+        
+        const items = this.gameState.playerContainer.getAllItems();
+        
+        // Находим предмет по instanceId и его индекс
+        let itemIndex = -1;
+        let item = null;
+        
+        for (let i = 0; i < items.length; i++) {
+            if (items[i] && items[i].instanceId === instanceId) {
+                itemIndex = i;
+                item = items[i];
+                break;
+            }
+        }
+        
+        if (itemIndex === -1 || !item) {
+            return { success: false, message: "Предмет не найден" };
+        }
+        
+        const sellPrice = this.getSellPrice(item);
+        
+        // Продажа из стека
+        if (item.stackable && item.count > 1) {
+            item.count--;
+            this.gameState.playerContainer._markDirty();
+            
+            this._addGoldToInventory(sellPrice);
+            
+            this.gameState.eventBus.emit('inventory:updated', 
+                this.gameState.playerContainer.getInfo());
+            this.gameState.eventBus.emit('player:statsChanged', 
+                this.gameState.getPlayer());
+            
+            return { 
+                success: true, 
+                message: `Продано: ${item.name} за ${sellPrice} золота`,
+                goldReceived: sellPrice,
+                item: item.getInfo()
+            };
+        } 
+        // Продажа всего предмета
+        else {
+            const removedItem = this.gameState.playerContainer.removeItemById(instanceId);
+            if (removedItem) {
+                this._addGoldToInventory(sellPrice);
+                
+                this.gameState.eventBus.emit('inventory:updated', 
+                    this.gameState.playerContainer.getInfo());
+                this.gameState.eventBus.emit('player:statsChanged', 
+                    this.gameState.getPlayer());
+                
+                return { 
+                    success: true, 
+                    message: `Продано: ${item.name} за ${sellPrice} золота`,
+                    goldReceived: sellPrice,
+                    item: item.getInfo()
+                };
+            }
+        }
+        
+        return { success: false, message: "Не удалось продать предмет" };
+    }
   /**
    * Обновить запасы магазина (вызывать каждый тик)
    * @param {number} currentTick 

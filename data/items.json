@@ -35,8 +35,7 @@
     },
     "flags": [],
     "stats": {
-      "defense": 2,
-      "strength": 2
+      "defense": 2
     }
   },
 
@@ -178,7 +177,7 @@
     "renta_equipped": 3,
     "material": "leather",
     "maxDurability": 120,
-    "defense": 0,
+    "defense": 1,
     "armor": 0,
     "flags": [],
     "stats": {

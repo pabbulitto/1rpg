@@ -1,9 +1,12 @@
 /**
  * BeltSystem - система быстрого пояса для предметов
  * Управляет слотами, ограничениями по уровню, использованием в бою
- * Полностью совместим с существующей архитектурой проекта
+ * 
+ * Архитектура: предметы физически перемещаются в пояс при добавлении
+ * и возвращаются в инвентарь при снятии
  */
 import { Item } from '../core/Item.js';
+import { itemFactory } from '../core/ItemFactory.js';
 
 class BeltSystem {
     constructor(gameState, battleOrchestrator = null, player = null) {
@@ -12,6 +15,7 @@ class BeltSystem {
         this.player = player;
         this.eventBus = gameState.getEventBus();
         
+        // Пояс: индекс слота -> { item: Item, count: number }
         this.beltSlots = new Array(8).fill(null);
         this.activeSlots = 3;
         this.allowedTypes = ['consumable', 'tool'];
@@ -31,7 +35,6 @@ class BeltSystem {
         });
     }
     
-    
     /**
      * Обновить количество активных слотов по уровню
      * @param {number} playerLevel - текущий уровень игрока
@@ -41,8 +44,6 @@ class BeltSystem {
         
         if (playerLevel >= 15) newActiveSlots = 4;
         if (playerLevel >= 23) newActiveSlots = 5;
-        
-        // TODO: Добавить проверку умения "Пояса" через skillsSystem
         
         if (newActiveSlots !== this.activeSlots) {
             this.activeSlots = newActiveSlots;
@@ -67,6 +68,14 @@ class BeltSystem {
         if (item.type !== 'consumable' && item.type !== 'tool') {
             return { success: false, reason: 'Только расходники и инструменты можно поместить в пояс' };
         }
+        
+        // Проверка, не занят ли уже этот предмет в другом слоте
+        for (let i = 0; i < this.activeSlots; i++) {
+            if (this.beltSlots[i] && this.beltSlots[i].item === item) {
+                return { success: false, reason: 'Этот предмет уже на поясе' };
+            }
+        }
+        
         // Поиск свободного слота
         const freeSlot = this.findFreeSlot();
         if (freeSlot === -1) {
@@ -94,20 +103,25 @@ class BeltSystem {
     }
     
     /**
-     * Добавить предмет в пояс из инвентаря
-     * @param {number} inventoryIndex - индекс в инвентаре
+     * Добавить предмет в пояс из инвентаря по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      * @param {number} slotIndex - индекс в поясе (опционально)
      * @returns {Object} результат операции
      */
-    addToBeltFromInventory(inventoryIndex, slotIndex = null) {
-        const items = this.gameState.getInventoryItems();
-        if (inventoryIndex < 0 || inventoryIndex >= items.length) {
+    addToBeltFromInventory(instanceId, slotIndex = null) {
+        if (!instanceId) {
+            return { success: false, reason: 'Не указан ID предмета' };
+        }
+        
+        // Получаем предмет из инвентаря
+        const inventory = this.gameState.playerContainer.getAllItems();
+        const item = inventory.find(i => i && i.instanceId === instanceId);
+        if (!item) {
             return { success: false, reason: 'Предмет не найден в инвентаре' };
         }
         
-        const item = items[inventoryIndex];
+        // Проверяем возможность добавления
         const validation = this.canAddToBelt(item);
-        
         if (!validation.success) {
             return validation;
         }
@@ -126,26 +140,39 @@ class BeltSystem {
         
         // Если предмет стакаемый и количество > 1
         if (item.stackable && item.count > 1) {
-            // Уменьшаем количество в инвентаре на 1
-            item.count--;
-            this.gameState.playerContainer._markDirty();
+            // Удаляем оригинал из инвентаря
+            const originalItem = this.gameState.playerContainer.removeItemById(instanceId);
+            if (!originalItem) {
+                return { success: false, reason: 'Не удалось взять предмет из инвентаря' };
+            }
             
-            // Создаем новый предмет для пояса (count = 1)
-            itemForBelt = new Item(item.id, 1);
+            // Создаем новый предмет для инвентаря с оставшимся количеством
+            const remainingItem = itemFactory.create(originalItem.id, originalItem.count - 1, {
+                durability: originalItem.durability,
+                sockets: originalItem.sockets ? [...originalItem.sockets] : []
+            });
+            
+            // Добавляем новый предмет обратно в инвентарь
+            if (remainingItem) {
+                this.gameState.playerContainer.addItem(remainingItem);
+            }
+            
+            // Оригинал (с count=1) идет в пояс
+            originalItem.count = 1;
+            itemForBelt = originalItem;
         } else {
-            // Удаляем предмет из инвентаря полностью
-            const removedItem = this.gameState.playerContainer.removeItem(inventoryIndex);
+            // Нестакаемый или последний в стеке - просто перемещаем
+            const removedItem = this.gameState.playerContainer.removeItemById(instanceId);
             if (!removedItem) {
                 return { success: false, reason: 'Не удалось взять предмет из инвентаря' };
             }
             itemForBelt = removedItem;
-            itemForBelt.count = 1;
         }
         
+        // Сохраняем в пояс (целый предмет)
         this.beltSlots[targetSlot] = {
             item: itemForBelt,
-            inventoryIndex: -1,
-            isFromStack: false
+            count: 1
         };
         
         this.eventBus.emit('belt:itemAdded', {
@@ -161,9 +188,10 @@ class BeltSystem {
             slotIndex: targetSlot,
             message: `Предмет добавлен в слот ${targetSlot + 1}`
         };
-    } 
+    }
+    
     /**
-     * Удалить предмет из пояса (возвращает в инвентарь)
+     * Удалить предмет из пояса (вернуть в инвентарь)
      * @param {number} slotIndex - индекс слота
      * @returns {Object} результат операции
      */
@@ -172,30 +200,29 @@ class BeltSystem {
             return { success: false, reason: 'Неверный индекс слота' };
         }
         
-        const beltData = this.beltSlots[slotIndex];
-        if (!beltData) {
+        const slotData = this.beltSlots[slotIndex];
+        if (!slotData) {
             return { success: false, reason: 'Слот пуст' };
         }
         
-        const { item, isFromStack, inventoryIndex } = beltData;
+        const { item } = slotData;
         
-        if (isFromStack && inventoryIndex >= 0) {
-            this.eventBus.emit('belt:itemRemoved', { slotIndex });
-        } else {
-            // ИСПРАВЛЕНО: используем playerContainer.addItem вместо inventorySystem
-            const added = this.gameState.playerContainer.addItem(item);
-            if (!added) {
-                return { success: false, reason: 'Не удалось вернуть предмет в инвентарь' };
-            }
-            this.eventBus.emit('belt:itemRemoved', { 
-                slotIndex,
-                item: item.getInfo()
-            });
-            
-            this.eventBus.emit('inventory:updated', this.gameState.playerContainer.getInfo());
+        // Возвращаем предмет в инвентарь
+        const added = this.gameState.playerContainer.addItem(item);
+        if (!added) {
+            return { success: false, reason: 'Не удалось вернуть предмет в инвентарь' };
         }
         
+        // Очищаем слот
         this.beltSlots[slotIndex] = null;
+        
+        this.eventBus.emit('belt:itemRemoved', { 
+            slotIndex,
+            item: item.getInfo()
+        });
+        
+        this.eventBus.emit('inventory:updated', this.gameState.playerContainer.getInfo());
+        
         return { success: true, message: 'Предмет снят с пояса' };
     }
     
@@ -209,12 +236,12 @@ class BeltSystem {
             return { success: false, reason: 'Неверный слот' };
         }
         
-        const beltData = this.beltSlots[slotIndex];
-        if (!beltData) {
+        const slotData = this.beltSlots[slotIndex];
+        if (!slotData) {
             return { success: false, reason: 'Слот пуст' };
         }
         
-        const { item } = beltData;
+        const { item } = slotData;
         
         // Проверка типа предмета
         if (item.type !== "consumable") {
@@ -226,6 +253,7 @@ class BeltSystem {
             return { success: false, reason: 'Игрок не найден' };
         }
         
+        // Используем предмет (прямо из пояса)
         const useResult = item.use(player);
         
         if (useResult && useResult.success) {
@@ -233,6 +261,7 @@ class BeltSystem {
             item.count--;
             
             if (item.count <= 0) {
+                // Предмет закончился - очищаем слот
                 this.beltSlots[slotIndex] = null;
                 this.eventBus.emit('belt:itemRemoved', {
                     slotIndex: slotIndex,
@@ -246,31 +275,33 @@ class BeltSystem {
                 });
             }
             
-            // События обновления
             this.eventBus.emit('belt:itemUsed', {
                 slotIndex: slotIndex,
                 item: item.getInfo(),
                 result: useResult
             });
             
-            this.gameState.eventBus.emit('inventory:updated', 
-                this.gameState.playerContainer.getInfo());
-            this.gameState.eventBus.emit('player:statsChanged', 
-                this.gameState.getPlayer());
+            // Обновляем UI
+            this.eventBus.emit('player:statsChanged', this.gameState.getPlayer());
         }
         
         return useResult; 
     }
     
     /**
-     * Очистить весь пояс
+     * Очистить весь пояс (предметы возвращаются в инвентарь)
      */
     clearBelt() {
         for (let i = 0; i < this.beltSlots.length; i++) {
-            if (this.beltSlots[i]) {
-                this.removeFromBelt(i);
+            const slotData = this.beltSlots[i];
+            if (slotData) {
+                // Возвращаем предмет в инвентарь
+                this.gameState.playerContainer.addItem(slotData.item);
+                this.beltSlots[i] = null;
             }
         }
+        this.eventBus.emit('belt:cleared');
+        this.eventBus.emit('inventory:updated', this.gameState.playerContainer.getInfo());
     }
     
     /**
@@ -291,18 +322,17 @@ class BeltSystem {
     }
     
     /**
-     * Получить данные для сохранения (совместимо с GameState)
+     * Получить данные для сохранения
      */
     getSaveData() {
         const saveData = [];
         for (let i = 0; i < this.beltSlots.length; i++) {
             const slot = this.beltSlots[i];
-            if (slot && slot.item) {
+            if (slot) {
                 saveData.push({
                     slotIndex: i,
-                    itemId: slot.item.id,
-                    count: slot.item.count || 1,
-                    isFromStack: slot.isFromStack || false
+                    item: slot.item.toJSON(), // сохраняем данные предмета
+                    count: slot.count
                 });
             } else {
                 saveData.push(null);
@@ -320,18 +350,20 @@ class BeltSystem {
         this.beltSlots.fill(null);
         
         for (const slotData of saveData) {
-        if (slotData && slotData.itemId) {
-            try {
-            const item = new Item(slotData.itemId, slotData.count || 1, this.gameState);
-            this.beltSlots[slotData.slotIndex] = {
-                item: item,
-                inventoryIndex: -1,
-                isFromStack: slotData.isFromStack || false
-            };
-            } catch (error) {
-            console.warn('Не удалось загрузить предмет пояса:', slotData, error);
+            if (slotData && slotData.item) {
+                try {
+                    // Восстанавливаем предмет из сохранения
+                    const item = itemFactory.createFromSave(slotData.item);
+                    if (item) {
+                        this.beltSlots[slotData.slotIndex] = {
+                            item: item,
+                            count: slotData.count || 1
+                        };
+                    }
+                } catch (error) {
+                    console.warn('Не удалось загрузить предмет пояса:', slotData, error);
+                }
             }
-        }
         }
         
         this.eventBus.emit('belt:loaded', this.getBeltInfo());

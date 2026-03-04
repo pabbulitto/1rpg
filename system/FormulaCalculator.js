@@ -157,7 +157,7 @@ class FormulaCalculator {
      * @returns {number} грузоподъемность
      */
     calculateCarryCapacity(strengthMod, dexterityMod) {
-        return 10 + strengthMod * 5 + dexterityMod * 2;
+        return 250 + strengthMod * 5 + dexterityMod * 2;
     }
     
     /**

@@ -22,7 +22,7 @@ class NonPlayerCharacter extends Character {
         
         // Контейнер для инвентаря и экипировки
         this.container = new EntityContainer();
-        
+        this.container.owner = this
         // Данные из конфига
         this.type = 'creature';
         this.race = null;
@@ -268,12 +268,12 @@ class NonPlayerCharacter extends Character {
         this.width = config.width || 68;
         this.height = config.height || 68;
         
-// Загружаем базовые статы как есть (без умножения)
-if (config.baseStats) {
-    this.statManager.baseStats = {
-        ...this.statManager.baseStats,
-        ...config.baseStats
-    };
+    // Загружаем базовые статы как есть (без умножения)
+    if (config.baseStats) {
+        this.statManager.baseStats = {
+            ...this.statManager.baseStats,
+            ...config.baseStats
+        };
             // Добавляем прирост за уровень
             const levelBonus = level - (config.baseLevel || 1);
             if (levelBonus > 0) {
@@ -286,6 +286,9 @@ if (config.baseStats) {
                 // Сохраняем damageMod для использования в атаке
                 this.damageModPerLevel = config.damageModPerLevel || 0;
                 this.hitrollPerLevel = config.hitrollPerLevel || 0;
+            }
+            if (config.experienceReward) {
+                this.expReward = Math.floor(config.experienceReward * Math.pow(1.13, level - 1));
             }
             
             this.statManager.needsRecalculation = true;
@@ -404,17 +407,33 @@ if (config.baseStats) {
     addItem(item) {
         return this.container ? this.container.addItem(item) : false;
     }
-    
     /**
-     * Удалить предмет из инвентаря
+     * Удалить предмет из инвентаря по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     * @returns {Item|null} удаленный предмет
      */
-    removeItem(index) {
-        return this.container ? this.container.removeItem(index) : null;
+    removeItem(instanceId) {
+        if (!instanceId) return null;
+        
+        // Находим индекс предмета по instanceId
+        const items = this.container.getAllItems();
+        let foundIndex = -1;
+        
+        for (let i = 0; i < items.length; i++) {
+            if (items[i] && items[i].instanceId === instanceId) {
+                foundIndex = i;
+                break;
+            }
+        }
+        
+        if (foundIndex === -1) return null;
+        
+        // Используем существующий метод контейнера
+        return this.container ? this.container.removeItem(foundIndex) : null;
     }
     
-    /**
-     * Получить инвентарь
-     */
+    // Получить инвентарь
+    
     getInventoryItems() {
         return this.container ? this.container.getAllItems() : [];
     }
@@ -434,7 +453,22 @@ if (config.baseStats) {
         
         // Очищаем труп
         this.container.clear();
-        
+        // Дерегистрируем предметы в глобальном реестре
+        if (window.itemRegistry) {
+            // Для предметов из инвентаря
+            items.forEach(item => {
+                if (item && item.instanceId) {
+                    window.itemRegistry.unregisterItem(item.instanceId);
+                }
+            });
+            
+            // Для предметов из экипировки
+            Object.values(equipment).forEach(item => {
+                if (item && item.instanceId) {
+                    window.itemRegistry.unregisterItem(item.instanceId);
+                }
+            });
+        }
         // Оповещаем UI об изменении
         if (window.game?.gameState?.eventBus && this.roomId) {
             const entities = window.game.zoneManager.getRoomEntitiesInfo(this.roomId);
@@ -447,19 +481,39 @@ if (config.baseStats) {
         return { items, equipment };
     }
     /**
-     * Забрать конкретный предмет из инвентаря трупа
-     * @param {number} index - индекс предмета
+     * Забрать конкретный предмет из инвентаря трупа по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      * @returns {Item|null} предмет или null
      */
-    lootItem(index) {
+    lootItem(instanceId) {
         if (this.state !== 'corpse') {
             console.warn('NonPlayerCharacter: попытка лутать живого персонажа');
             return null;
         }
         
-        const item = this.container.removeItem(index);
+        // Находим предмет по instanceId
+        const items = this.container.getAllItems();
+        let foundIndex = -1;
+        let foundItem = null;
+        
+        for (let i = 0; i < items.length; i++) {
+            if (items[i] && items[i].instanceId === instanceId) {
+                foundIndex = i;
+                foundItem = items[i];
+                break;
+            }
+        }
+        
+        if (foundIndex === -1 || !foundItem) return null;
+        
+        const item = this.container.removeItem(foundIndex);
         
         if (item && window.game?.gameState?.eventBus) {
+            // Дерегистрируем предмет в глобальном реестре
+            if (window.itemRegistry && item.instanceId) {
+                window.itemRegistry.unregisterItem(item.instanceId);
+            }
+            
             window.game.gameState.eventBus.emit('inventory:updated', this.container.getInfo());
         }
         
@@ -479,6 +533,11 @@ if (config.baseStats) {
         const item = this.container.unequip(slot);
         
         if (item && window.game?.gameState?.eventBus) {
+            // Дерегистрируем предмет в глобальном реестре
+            if (window.itemRegistry && item.instanceId) {
+                window.itemRegistry.unregisterItem(item.instanceId);
+            }
+            
             window.game.gameState.eventBus.emit('inventory:updated', this.container.getInfo());
             window.game.gameState.eventBus.emit('player:equipmentChanged', { slot, item: null });
         }
@@ -508,10 +567,7 @@ if (config.baseStats) {
             console.error('NonPlayerCharacter: не удалось создать предмет-труп');
             return null;
         }
-        
-        // Удаляем труп из комнаты (будет вызвано извне)
-        // this.remove() — не вызываем здесь, пусть вызывает ZoneManager
-        
+    
         return corpseItem;
     }
 }

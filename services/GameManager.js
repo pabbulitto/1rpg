@@ -159,12 +159,31 @@ class GameManager {
         }
     }
     
-    sellItemToShop(itemIndex) {
-        const result = this.game.shopSystem.sellItem(itemIndex, this.game.player);
+    /**
+     * Продать предмет в магазине по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     */
+    sellItemToShop(instanceId) {
+        if (!instanceId) {
+            this.eventBus.emit('log:add', { 
+                message: "Не указан ID предмета", 
+                type: "error" 
+            });
+            return;
+        }
+        
+        const result = this.game.shopSystem.sellItem(instanceId, this.game.player);
+        
         if (result.success) {
-            this.eventBus.emit('log:add', { message: result.message, type: 'success' });
+            this.eventBus.emit('log:add', { 
+                message: result.message, 
+                type: 'success' 
+            });
         } else {
-            this.eventBus.emit('log:add', { message: result.message, type: 'error' });
+            this.eventBus.emit('log:add', { 
+                message: result.message, 
+                type: 'error' 
+            });
         }
     }
 }

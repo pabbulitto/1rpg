@@ -57,7 +57,7 @@ class PlayerCharacter extends Character {
         // === КОНТЕЙНЕР ИЗ GAMESTATE ===
         /** @type {EntityContainer} Контейнер с инвентарем и экипировкой */
         this.container = gameState ? gameState.getPlayerContainer() : new EntityContainer();
-        
+        this.container.owner = this
         // === БОЕВЫЕ ПАРАМЕТРЫ ===
         this.battleSystem = dependencies.battleSystem || null;
         this.selectedAbility = null;
@@ -328,23 +328,34 @@ class PlayerCharacter extends Character {
     }
     
     /**
-     * Удалить предмет из инвентаря
-     * @param {number} index - индекс предмета
-     * @returns {Item|null} удаленный предмет
+     * Удалить предмет из инвентаря по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     * @returns {Item|null} удаленный предмет или null
      */
-    removeItem(index) {
-        return this.container ? this.container.removeItem(index) : null;
+    removeItem(instanceId) {
+        if (!instanceId) return null;
+        // Используем новый метод контейнера
+        const item = this.container.removeItemById(instanceId);
+        
+        if (item) {
+            this.gameState.eventBus.emit('inventory:updated', 
+                this.container.getInfo());
+        }
+        
+        return item;
     }
     
     /**
-     * Получить предмет из инвентаря
-     * @param {number} index - индекс предмета
-     * @returns {Item|null} предмет
+     * Получить предмет из инвентаря по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     * @returns {Item|null} предмет или null
      */
-    getItem(index) {
-        return this.container ? this.container.getItem(index) : null;
+    getItem(instanceId) {
+        if (!instanceId) return null;
+        
+        const items = this.container.getAllItems();
+        return items.find(item => item && item.instanceId === instanceId) || null;
     }
-    
     /**
      * Получить все предметы инвентаря
      * @returns {Item[]} массив предметов
@@ -423,51 +434,59 @@ class PlayerCharacter extends Character {
         
         return item;
     }
-
     /**
      * Использовать предмет из инвентаря
      * @param {number} index - индекс предмета
      * @returns {Object} результат использования
      */
-    useItem(index) {
-        const items = this.gameState.playerContainer.getAllItems();
-        if (index < 0 || index >= items.length) {
-            return { success: false, message: "Предмет не найден" };
+    useItem(instanceId) {
+        if (!instanceId) {
+            return { success: false, message: "Не указан ID предмета" };
         }
         
-        const item = items[index];
-        const useResult = item.use(this);
+        // Используем новый метод контейнера
+        const result = this.container.useItem(instanceId, this);
         
-        if (useResult.success) {
-            if (item.stackable && item.count > 1) {
-                item.count--;
-            } else {
-                this.gameState.playerContainer.removeItem(index);
-            }
-            
+        if (result.success) {
+            // Эмитим события для обновления UI
             this.gameState.eventBus.emit('inventory:updated', 
-                this.gameState.playerContainer.getInfo());
-            this.gameState.eventBus.emit('player:statsChanged', this.gameState.getPlayer());
+                this.container.getInfo());
+            this.gameState.eventBus.emit('player:statsChanged', 
+                this.gameState.getPlayer());
+            
+            return {
+                success: true,
+                message: result.useResult?.message || "Предмет использован",
+                ...result
+            };
         }
         
-        return useResult;
+        return {
+            success: false,
+            message: result.useResult?.message || "Не удалось использовать предмет",
+            ...result
+        };
     }
     /**
-     * Бросить предмет на землю (в мешок)
-     * @param {number} index - индекс предмета в инвентаре
+     * Бросить предмет на землю (в мешок) по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      * @returns {Object} результат операции
      */
-    dropItem(index) {
-        const items = this.gameState.playerContainer.getAllItems();
-        if (index < 0 || index >= items.length) {
+    dropItem(instanceId) {
+        if (!instanceId) {
+            return { success: false, message: "Не указан ID предмета" };
+        }
+        
+        // Находим предмет по instanceId
+        const item = this.getItem(instanceId);
+        if (!item) {
             return { success: false, message: "Предмет не найден" };
         }
         
-        const item = items[index];
-            // Проверяем, является ли предмет трупом
+        // Проверяем, является ли предмет трупом
         if (item.type === 'corpse') {
             // Удаляем предмет из инвентаря
-            const removedItem = this.gameState.playerContainer.removeItem(index);
+            const removedItem = this.container.removeItemById(instanceId);
             if (!removedItem) {
                 return { success: false, message: "Не удалось удалить предмет" };
             }
@@ -475,7 +494,7 @@ class PlayerCharacter extends Character {
             // Создаем труп в комнате через ZoneManager
             const zoneManager = window.game?.zoneManager;
             if (!zoneManager) {
-                this.gameState.playerContainer.addItem(removedItem);
+                this.container.addItem(removedItem);
                 return { success: false, message: "Ошибка: не удалось найти менеджер зон" };
             }
             
@@ -488,7 +507,7 @@ class PlayerCharacter extends Character {
             
             if (!corpse) {
                 // Если не удалось создать труп (нет места) - возвращаем предмет
-                this.gameState.playerContainer.addItem(removedItem);
+                this.container.addItem(removedItem);
                 return { 
                     success: false, 
                     message: "Нет места для трупа в этой комнате" 
@@ -497,7 +516,7 @@ class PlayerCharacter extends Character {
             
             // Обновляем UI
             this.gameState.eventBus.emit('inventory:updated', 
-                this.gameState.playerContainer.getInfo());
+                this.container.getInfo());
             this.gameState.eventBus.emit('player:statsChanged', this.gameState.getPlayer());
             
             return { 
@@ -505,8 +524,10 @@ class PlayerCharacter extends Character {
                 message: `Вы бросили ${item.name} на землю`
             };
         }
+        
+        // Обычный предмет (не труп)
         // Удаляем предмет из инвентаря
-        const removedItem = this.gameState.playerContainer.removeItem(index);
+        const removedItem = this.container.removeItemById(instanceId);
         if (!removedItem) {
             return { success: false, message: "Не удалось удалить предмет" };
         }
@@ -517,7 +538,7 @@ class PlayerCharacter extends Character {
         
         if (!zoneManager) {
             // Если нет ZoneManager - возвращаем предмет обратно
-            this.gameState.playerContainer.addItem(removedItem);
+            this.container.addItem(removedItem);
             return { success: false, message: "Ошибка: не удалось найти менеджер зон" };
         }
         
@@ -526,7 +547,7 @@ class PlayerCharacter extends Character {
         
         if (!bag) {
             // Если не удалось создать мешок (нет места) - возвращаем предмет
-            this.gameState.playerContainer.addItem(removedItem);
+            this.container.addItem(removedItem);
             return { 
                 success: false, 
                 message: "Нет места для мешка в этой комнате" 
@@ -537,14 +558,14 @@ class PlayerCharacter extends Character {
         const added = bag.addItem(removedItem);
         
         if (!added) {
-            // Если не влезло в мешок  - возвращаем предмет
-            this.gameState.playerContainer.addItem(removedItem);
+            // Если не влезло в мешок - возвращаем предмет
+            this.container.addItem(removedItem);
             return { success: false, message: "Не удалось положить предмет в мешок" };
         }
         
         // Обновляем UI
         this.gameState.eventBus.emit('inventory:updated', 
-            this.gameState.playerContainer.getInfo());
+            this.container.getInfo());
         this.gameState.eventBus.emit('player:statsChanged', this.gameState.getPlayer());
         this.gameState.eventBus.emit('bag:updated', {
             bagId: bag.id,
@@ -556,18 +577,23 @@ class PlayerCharacter extends Character {
             message: `Вы бросили ${item.name} на землю`
         };
     }
-
     /**
-     * Экипировать предмет из инвентаря
-     * @param {number} index - индекс предмета
+     * Экипировать предмет из инвентаря по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      * @returns {Object} результат операции
      */
-    equipItemFromInventory(index) {
-        const items = this.gameState.playerContainer.getAllItems();
-        if (index < 0 || index >= items.length) {
+    equipItemFromInventory(instanceId) {
+        if (!instanceId) {
+            return { success: false, message: "Не указан ID предмета" };
+        }
+        
+        // Находим предмет по instanceId
+        const item = this.getItem(instanceId);
+        if (!item) {
             return { success: false, message: "Предмет не найден" };
         }
-        const item = items[index];
+        
+        // Вызываем существующий метод equipItem с найденным предметом
         return this.equipItem(item);
     }
     /**
@@ -745,15 +771,15 @@ class PlayerCharacter extends Character {
         
         return { items, equipment };
     }
-
     /**
-     * Забрать конкретный предмет из инвентаря трупа
+     * Забрать конкретный предмет из инвентаря трупа по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
+     * @returns {Item|null} предмет или null
      */
-    lootItem(index) {
+    lootItem(instanceId) {
         if (this.state !== 'corpse') return null;
-        return this.container.removeItem(index);
+        return this.container.removeItemById(instanceId);
     }
-
     /**
      * Снять предмет экипировки с трупа
      */

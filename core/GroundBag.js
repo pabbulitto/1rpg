@@ -77,14 +77,28 @@ class GroundBag extends Entity {
         
         return result;
     }
-    
     /**
-     * Удалить предмет из мешка по индексу
-     * @param {number} index - индекс предмета
+     * Удалить предмет из мешка по instanceId
+     * @param {string} instanceId - уникальный ID экземпляра предмета
      * @returns {Item|null} удаленный предмет
      */
-    removeItem(index) {
-        const item = this.container.removeItem(index);
+    removeItem(instanceId) {
+        if (!instanceId) return null;
+        
+        // Находим индекс предмета по instanceId
+        const items = this.container.getAllItems();
+        let foundIndex = -1;
+        
+        for (let i = 0; i < items.length; i++) {
+            if (items[i] && items[i].instanceId === instanceId) {
+                foundIndex = i;
+                break;
+            }
+        }
+        
+        if (foundIndex === -1) return null;
+        
+        const item = this.container.removeItem(foundIndex);
         
         if (item && this.gameState?.eventBus) {
             this.gameState.eventBus.emit('bag:updated', {
@@ -98,7 +112,6 @@ class GroundBag extends Entity {
                 entities: window.game?.zoneManager?.getRoomEntitiesInfo(this.roomId)
             });
             
-            // Принудительный рендер
             if (window.game?.graphicsEngine) {
                 window.game.graphicsEngine.render();
             }
@@ -162,10 +175,7 @@ class GroundBag extends Entity {
         
         // Удаляем взятые предметы из мешка
         for (const item of taken) {
-            const index = this.container.findItemIndex(item.id);
-            if (index !== -1) {
-                this.container.removeItem(index);
-            }
+            this.container.removeItemById(item.instanceId);
         }
         
         if (this.gameState?.eventBus) {
