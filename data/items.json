@@ -114,7 +114,7 @@
     "name": "Деревянный посох",
     "type": "weapon",
     "slot": "hand",
-    "damage": "1d6",
+    "damage": "1d8",
     "weaponType": "staff",
     "weight": 3,
     "price": 10,
@@ -131,7 +131,8 @@
     },
     "flags": [],
     "stats": {
-      "defense": 10
+      "defense": 10,
+      "manaRegen": 3
     }
   },
 
@@ -388,3 +389,4 @@
     "price": 150
   }
 }
+
