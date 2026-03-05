@@ -1,277 +1,308 @@
 {
   "name": "Заброшенный дом",
-    "old_house": {
+  "rooms": {
+    "х1у1z0": {
       "name": "Заброшенный дом",
       "description": "Заброшенный дом",
+      "background": "assets/backgrounds/abandoned_house/х1у1z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "east": "porch",
-        "west": "southwest_village:r12c7"
+        "east": "х2у1z0",
+        "west": "southwest_village:х7у12z0"
       }
     },
-    "porch": {
+    "х2у1z0": {
       "name": "На крыльце",
       "description": "На крыльце",
+      "background": "assets/backgrounds/abandoned_house/х2у1z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "west": "old_house",
-        "east": "entryway_a"
-      }
+        "west": "х1у1z0",
+        "east": "х3у1z0"
+      },
+      "enemies": [
+        { "type": "Крылохлоп", "level": 1, "gridX": 6, "gridY": 3 },
+        { "type": "Тараканище", "level": 1, "gridX": 7, "gridY": 4 }
+      ]
     },
-    "entryway_a": {
+    "х3у1z0": {
       "name": "В сенях",
       "description": "В сенях",
+      "background": "assets/backgrounds/abandoned_house/х3у1z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "west": "porch",
-        "east": "entryway_b"
+        "west": "х2у1z0",
+        "east": "х4у1z0"
       },
       "enemies": [
-        { "type": "Прыгун", "level": 1 },
-        { "type": "Мышь", "level": 1 }
+        { "type": "Прыгун", "level": 1, "gridX": 6, "gridY": 1 },
+        { "type": "Мышь", "level": 1, "gridX": 3, "gridY": 3 }
       ]
     },
-    "entryway_b": {
+    "х4у1z0": {
       "name": "В сенях",
       "description": "В сенях",
+      "background": "assets/backgrounds/abandoned_house/х4у1z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "west": "entryway_a",
-        "south": "izba_a"
+        "west": "х3у1z0",
+        "south": "х4у2z0"
       },
       "enemies": [
-        { "type": "Крылохлоп", "level": 1 },
-        { "type": "Крылохлоп", "level": 1 }
+        { "type": "Крылохлоп", "level": 1, "gridX": 5, "gridY": 4 },
+        { "type": "Крылохлоп", "level": 1, "gridX": 6, "gridY": 1 }
       ]
     },
-    "izba_a": {
+    "х4у2z0": {
       "name": "В избе",
       "description": "В избе",
+      "background": "assets/backgrounds/abandoned_house/х4у2z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "entryway_b",
-        "south": "oven"
+        "north": "х4у1z0",
+        "south": "х4у3z0"
       },
       "enemies": [
-        { "type": "Большой Комар", "level": 1 },
-        { "type": "Крылохлоп", "level": 1 },
-        { "type": "Тараканище", "level": 1 }
+        { "type": "Большой Комар", "level": 1, "gridX": 5, "gridY": 1 },
+        { "type": "Крылохлоп", "level": 1, "gridX": 4, "gridY": 3 },
+        { "type": "Тараканище", "level": 1, "gridX": 6, "gridY": 4 }
       ]
     },
-    "izba_b": {
-      "name": "В избе",
-      "description": "В избе",
-      "terrain": "dungeon",
-      "npcs": [],
-      "objects": [],
-      "items": [],
-      "directions": {
-        "east": "izba_c",
-        "south": "hayloft_1"
-      },
-      "enemies": [
-        { "type": "Плоскоспин", "level": 1 }
-      ]
-    },
-    "izba_c": {
-      "name": "В избе",
-      "description": "В избе",
-      "terrain": "dungeon",
-      "npcs": [],
-      "objects": [],
-      "items": [],
-      "directions": {
-        "west": "izba_b",
-        "east": "oven"
-      },
-      "enemies": [
-        { "type": "Ночной огонек", "level": 1 },
-        { "type": "Тараканище", "level": 1 }
-      ]
-    },
-    "oven": {
+    "х4у3z0": {
       "name": "У печи",
       "description": "У печи",
-      "terrain": "dungedungeon",
+      "background": "assets/backgrounds/abandoned_house/х4у3z0.jpg",
+      "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "izba_a",
-        "east": "kitchen",
-        "west": "izba_c" 
+        "north": "х4у2z0",
+        "east": "х5у3z0",
+        "west": "х3у3z0" 
       },
       "enemies": [
-        { "type": "Пылекрыл", "level": 1 },
-        { "type": "Плоскоспин", "level": 1 }
+        { "type": "Пылекрыл", "level": 1, "gridX": 5, "gridY": 1 },
+        { "type": "Плоскоспин", "level": 1, "gridX": 6, "gridY": 3 }
       ]
     },
-    "kitchen": {
+    "х5у3z0": {
       "name": "На кухне",
       "description": "На кухне",
+      "background": "assets/backgrounds/abandoned_house/х5у3z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "west": "oven",
-        "down": "cellar_1"
+        "west": "х4у3z0",
+        "down": "х1у1z-1"
       },
       "enemies": [
-        { "type": "Большой Комар", "level": 1 }
+        { "type": "Большой Комар", "level": 1, "gridX": 7, "gridY": 1 },
+        { "type": "Крылохлоп", "level": 1, "gridX": 4, "gridY": 3 }
       ]
     },
-    "hayloft_1": {
+    "х3у3z0": {
+      "name": "В избе",
+      "description": "В избе",
+      "background": "assets/backgrounds/abandoned_house/х3у3z0.jpg",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "east": "х4у3z0",
+        "south": "х3у4z0"
+      },
+      "enemies": [
+        { "type": "Ночной огонек", "level": 1, "gridX": 6, "gridY": 2 },
+        { "type": "Тараканище", "level": 1, "gridX": 4, "gridY": 4 }
+      ]
+    },
+    "х2у3z0": {
+      "name": "В кладовке",
+      "description": "В избе",
+      "background": "assets/backgrounds/abandoned_house/х2у3z0.jpg",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "south": "х2у4z0"
+      },
+      "enemies": [
+        { "type": "Плоскоспин", "level": 1, "gridX": 6, "gridY": 2 }
+      ]
+    },
+    "х2у4z0": {
       "name": "На сеновале",
       "description": "На сеновале",
+      "background": "assets/backgrounds/abandoned_house/х2у4z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "izba_b",
-        "east": "hayloft_2",
-        "south": "hayloft_4"
+        "north": "х2у3z0",
+        "east": "х3у4z0",
+        "south": "х2у5z0"
       },
-      "enemies": []
+      "enemies": [
+        { "type": "Мышь", "level": 3, "gridX": 4, "gridY": 3 }
+      ]
     },
-    "hayloft_2": {
+    "х2у5z0": {
       "name": "На сеновале",
       "description": "На сеновале",
+      "background": "assets/backgrounds/abandoned_house/х2у5z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "west": "hayloft_1",
-        "south": "hayloft_3"
+        "north": "х2у4z0",
+        "east": "х3у5z0"
       },
       "enemies": [
-        { "type": "Мышь", "level": 1 }
+        { "type": "Мышь", "level": 1, "gridX": 6, "gridY": 2 },
+        { "type": "Прыгун", "level": 3, "gridX": 2, "gridY": 4 }
       ]
     },
-    "hayloft_3": {
+    "х3у5z0": {
       "name": "На сеновале",
       "description": "На сеновале",
+      "background": "assets/backgrounds/abandoned_house/х3у5z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "hayloft_2",
-        "west": "hayloft_4"
+        "north": "х3у4z0",
+        "west": "х2у5z0"
       },
       "enemies": [
-        { "type": "Тараканище", "level": 1 }
+        { "type": "Мышь", "level": 2, "gridX": 7, "gridY": 3 },
+        { "type": "Тараканище", "level": 1, "gridX": 5, "gridY": 2 }
       ]
     },
-    "hayloft_4": {
+    "х3у4z0": {
       "name": "На сеновале",
       "description": "На сеновале",
+      "background": "assets/backgrounds/abandoned_house/х3у4z0.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "hayloft_1",
-        "east": "hayloft_3"
-      },
-      "enemies": []
-    },
-    "cellar_1": {
-      "name": "В подвале",
-      "description": "В подвале",
-      "terrain": "dungeon",
-      "npcs": [],
-      "objects": [],
-      "items": [],
-      "directions": {
-        "up": "kitchen",
-        "east": "cellar_2",
-        "south": "cellar_4"
+        "west": "х2у4z0",
+        "south": "х3у5z0",
+        "north": "х3у3z0"
       },
       "enemies": [
-        { "type": "Прыгун", "level": 1 },
-        { "type": "Жужалица", "level": 2 },
-        { "type": "Плоскоспин", "level": 1 }
+        { "type": "Мышь", "level": 2, "gridX": 5, "gridY": 2 }
       ]
     },
-    "cellar_2": {
+    "х1у1z-1": {
       "name": "В подвале",
       "description": "В подвале",
+      "background": "assets/backgrounds/abandoned_house/х1у1z-1.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "west": "cellar_1",
-        "south": "cellar_3"
+        "up": "х5у3z0",
+        "east": "х2у1z-1",
+        "south": "х1у2z-1"
       },
       "enemies": [
-        { "type": "Большой Комар", "level": 1 },
-        { "type": "Пылекрыл", "level": 1 }
+        { "type": "Прыгун", "level": 3, "gridX": 2, "gridY": 4 },
+        { "type": "Жужалица", "level": 2, "gridX": 5, "gridY": 2 },
+        { "type": "Плоскоспин", "level": 3, "gridX": 7, "gridY": 3 }
       ]
     },
-    "cellar_3": {
+    "х2у1z-1": {
       "name": "В подвале",
       "description": "В подвале",
+      "background": "assets/backgrounds/abandoned_house/х2у1z-1.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "cellar_2",
-        "west": "cellar_4"
+        "west": "х1у1z-1",
+        "south": "х2у2z-1"
       },
       "enemies": [
-        { "type": "Тараканище", "level": 1 },
-        { "type": "Плоскоспин", "level": 1 }
+        { "type": "Большой Комар", "level": 3, "gridX": 3, "gridY": 4 },
+        { "type": "Пылекрыл", "level": 4, "gridX": 5, "gridY": 2 }
       ]
     },
-    "cellar_4": {
+    "х2у2z-1": {
       "name": "В подвале",
       "description": "В подвале",
+      "background": "assets/backgrounds/abandoned_house/х2у2z-1.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "cellar_1",
-        "east": "cellar_3",
-        "south": "dead_end"
+        "north": "х2у1z-1",
+        "west": "х1у2z-1"
       },
       "enemies": [
-        { "type": "Мышь", "level": 1 },
-        { "type": "Прыгун", "level": 1 }
+        { "type": "Тараканище", "level": 3, "gridX": 5, "gridY": 2 },
+        { "type": "Плоскоспин", "level": 4, "gridX": 4, "gridY": 3 }
       ]
     },
-    "dead_end": {
+    "х1у2z-1": {
+      "name": "В подвале",
+      "description": "В подвале",
+      "background": "assets/backgrounds/abandoned_house/х1у2z-1.jpg",
+      "terrain": "dungeon",
+      "npcs": [],
+      "objects": [],
+      "items": [],
+      "directions": {
+        "north": "х1у1z-1",
+        "east": "х2у2z-1",
+        "south": "х1у3z-1"
+      },
+      "enemies": [
+        { "type": "Мышь", "level": 3, "gridX": 6, "gridY": 3 },
+        { "type": "Прыгун", "level": 2, "gridX": 4, "gridY": 1 }
+      ]
+    },
+    "х1у3z-1": {
       "name": "Глухой угол",
       "description": "Глухой угол",
+      "background": "assets/backgrounds/abandoned_house/х1у3z-1.jpg",
       "terrain": "dungeon",
       "npcs": [],
       "objects": [],
       "items": [],
       "directions": {
-        "north": "cellar_4"
+        "north": "х1у2z-1"
       },
       "enemies": [
-        { "type": "Старая крыса", "level": 3 }
+        { "type": "Старая крыса", "level": 2, "gridX": 5, "gridY": 2}
       ]
     }
+  }
 }

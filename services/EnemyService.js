@@ -71,6 +71,7 @@ class EnemyService {
         });
         
         enemy.loadFromConfig(config, level, enemyType);
+        
         return enemy;
     }
     

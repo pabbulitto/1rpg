@@ -338,7 +338,7 @@
   "Жужалица": {
     "name": "Жужалица",
     "description": "Огромный жук с массивным панцирем, угрожающе жужжит крыльями",
-    "sprite": "assets/sprites/creatures/forest_spider.png",
+    "sprite": "assets/sprites/creatures/buzzer.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -389,6 +389,7 @@
   "Старая крыса": {
     "name": "Старая крыса",
     "description": "Огромная матерая крыса с красными глазами, чувствуется сила и злоба",
+    "sprite": "assets/sprites/creatures/old_rat.png",
     "class": "beast",
     "race": "rodent",
     "profession": null,
@@ -439,6 +440,7 @@
   "Прыгун": {
     "name": "Прыгун",
     "description": "Мелкий кровососущий паразит, быстро прыгает и больно кусается",
+    "sprite": "assets/sprites/creatures/jumper.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -486,6 +488,7 @@
   "Крылохлоп": {
     "name": "Крылохлоп",
     "description": "Надоедливое летающее насекомое, вечно жужжит под ухом",
+    "sprite": "assets/sprites/creatures/wingflapper.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -533,6 +536,7 @@
   "Тараканище": {
     "name": "Тараканище",
     "description": "Крупный усатый таракан, быстро бегает по углам",
+    "sprite": "assets/sprites/creatures/big_cockroach.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -580,6 +584,7 @@
   "Большой Комар": {
     "name": "Большой Комар",
     "description": "Здоровенный комар с длинным жалом, ищет чем бы поживиться",
+    "sprite": "assets/sprites/creatures/big_mosquito.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -627,6 +632,7 @@
   "Ночной огонек": {
     "name": "Ночной огонек",
     "description": "Мелкое светящееся насекомое, безобидное, но красивое",
+    "sprite": "assets/sprites/creatures/night_light.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -674,6 +680,7 @@
   "Пылекрыл": {
     "name": "Пылекрыл",
     "description": "Мелкая моль, портит одежду и продукты",
+    "sprite": "assets/sprites/creatures/dustwing.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -721,6 +728,7 @@
   "Плоскоспин": {
     "name": "Плоскоспин",
     "description": "Мелкий клоп с противным запахом",
+    "sprite": "assets/sprites/creatures/flatback.png",
     "class": "beast",
     "race": "insect",
     "profession": null,
@@ -768,6 +776,7 @@
   "Мышь": {
     "name": "Мышь",
     "description": "Серая мышь, шуршит в углах",
+    "sprite": "assets/sprites/creatures/mouse.png",
     "class": "beast",
     "race": "rodent",
     "profession": null,

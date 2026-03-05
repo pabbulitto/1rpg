@@ -21,8 +21,13 @@ class GameManager {
         }
         
         const roomInfo = this.game.zoneManager.getCurrentRoomInfo();
-        this.eventBus.emit('room:updated', roomInfo);
+        if (!roomInfo) {
+            console.error('GameManager: roomInfo is null');
+            this.eventBus.emit('log:add', { message: "Ошибка загрузки комнаты", type: "error" });
+            return;
+        }
         
+        this.eventBus.emit('room:updated', roomInfo);
         this.eventBus.emit('log:add', { message: `📍 Вы в ${roomInfo.name}`, type: "info" });
         
         // Обновляем список врагов в комнате
@@ -72,12 +77,12 @@ class GameManager {
             return;
         }
 
-        // 4. Пытаемся переместиться (передаем ID игрока для мультиплеера)
+        // 4. Пытаемся переместиться
         const result = await this.game.zoneManager.move(direction);
 
         if (result.success) {
             // 5. Тратим выносливость
-            const staminaResult = player.takeStamina(staminaCost);
+            player.takeStamina(staminaCost);
             
             // 6. Логируем успех
             this.eventBus.emit('log:add', { 
@@ -85,14 +90,25 @@ class GameManager {
                 type: "info" 
             });
             
-            // 7. Обновляем окружение
-            this.explore();
+            // 7. Обновляем интерфейс
+            const newRoomInfo = this.game.zoneManager.getCurrentRoomInfo();
+            if (newRoomInfo) {
+                this.eventBus.emit('room:updated', newRoomInfo);
+            }
+            this.eventBus.emit('player:statsChanged', this.game.player.getStats());
+            
+            // 8. Обновляем список сущностей в комнате
+            const roomId = this.game.gameState.getPosition().room;
+            const entities = this.game.zoneManager?.getRoomEntitiesInfo(roomId) || [];
+            this.eventBus.emit('room:entitiesUpdated', {
+                roomId: roomId,
+                entities: entities
+            });
         } else {
-            // 9. Если перемещение не удалось (например, нет выхода)
+            // 9. Если перемещение не удалось
             this.eventBus.emit('log:add', { message: result.message, type: "error" });
         }
     }
-
     getRoomEnemies() {
         const enemyConfigs = this.game.zoneManager.getRoomEnemies();
         if (!enemyConfigs || enemyConfigs.length === 0) {

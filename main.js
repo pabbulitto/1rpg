@@ -30,6 +30,7 @@ import { TimeUI } from './ui/components/TimeUI.js';
 import { LogUI } from './ui/components/LogUI.js';
 import { ShopUI } from './ui/components/ShopUI.js';
 import { BeltUI } from './ui/components/BeltUI.js';
+import { MapUI } from './ui/components/MapUI.js';
 
 
 
@@ -102,7 +103,8 @@ class Game {
       TimeUI,
       LogUI,
       ShopUI,
-      BeltUI
+      BeltUI,
+      MapUI
     };
     
     this.uiManager = new UIManager(this, uiComponents, this.graphicsEngine, this.battleCanvas);
@@ -212,16 +214,34 @@ class Game {
             
             // Обновляем позицию в GameState
             this.gameState.updatePosition(raceData.startZone, raceData.startRoom);
+            
+        // ЗАГРУЖАЕМ ЗОНУ И ДОБАВЛЯЕМ ИГРОКА
+            await this.zoneManager.loadZone(raceData.startZone);
+            this.zoneManager._initRoom(raceData.startRoom);
+            // УСТАНАВЛИВАЕМ НАЧАЛЬНЫЕ КООРДИНАТЫ
+            this.player.gridX = 4;
+            this.player.gridY = 2;
+            this.zoneManager.addEntity(raceData.startRoom, this.player);
+            
+            // ПРИНУДИТЕЛЬНО ОБНОВЛЯЕМ GRAPHICS ENGINE
+            const roomEntities = this.zoneManager.getRoomEntities(raceData.startRoom);
+            this.graphicsEngine.entities = roomEntities.map(entity => ({
+                id: entity.id,
+                type: entity.type,
+                sprite: entity.sprite,
+                gridX: entity.gridX,
+                gridY: entity.gridY,
+                width: entity.width || 68,
+                height: entity.height || 68,
+                state: entity.state,
+                data: entity.getInfo ? entity.getInfo() : entity
+            }));
+            this.graphicsEngine.render();
         }
-            // ЗАГРУЖАЕМ НОВУЮ ЗОНУ
-        await this.zoneManager.loadZone(raceData.startZone);
-        
-        // Обновляем комнату в ZoneManager
-        this.zoneManager._initRoom(raceData.startRoom);
-        this.zoneManager.addEntity(raceData.startRoom, this.player);
+
         // Очищаем контейнер UI
         creationContainer.innerHTML = '';
-        
+  
         this.uiManager.addToLog(`🏰 Добро пожаловать, ${name}! 🏰`);
         this.uiManager.addToLog("Нажмите 'Исследовать', чтобы начать.");
         
@@ -238,6 +258,7 @@ class Game {
       console.error('Ошибка инициализации:', error);
       this.uiManager.showError("Не удалось загрузить игру");
     }
+    
   }
 
   saveGame() {

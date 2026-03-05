@@ -477,27 +477,24 @@ class BattleCanvas {
         const roomInfo = this.game.zoneManager?.getCurrentRoomInfo();
         if (!roomInfo) return null;
         
-        const terrain = roomInfo.terrain || 'road';
-        const key = `battle_${terrain}`;
+        const backgroundPath = roomInfo.background;
+        if (!backgroundPath) return null;
         
-        if (this.backgrounds.has(key)) return this.backgrounds.get(key);
-        
-        const src = `assets/backgrounds/battle/${terrain}.jpg`;
+        if (this.backgrounds.has(backgroundPath)) return this.backgrounds.get(backgroundPath);
         
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
-                this.backgrounds.set(key, img);
+                this.backgrounds.set(backgroundPath, img);
                 resolve(img);
             };
             img.onerror = () => {
-                console.warn(`BattleCanvas: фон для ${terrain} не найден`);
+                console.warn(`BattleCanvas: фон не найден ${backgroundPath}`);
                 resolve(null);
             };
-            img.src = src;
+            img.src = backgroundPath;
         });
     }
-    
     async loadSprite(src) {
         if (!src) return null;
         if (this.sprites.has(src)) return this.sprites.get(src);

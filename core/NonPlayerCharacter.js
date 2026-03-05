@@ -385,7 +385,6 @@ class NonPlayerCharacter extends Character {
         this.damageFormula = config.damageFormula || this.damageFormula;
         
         // Награды (опыт и золото теперь только для информации, золото в инвентаре)
-        this.expReward = config.experienceReward || 10;
         this.goldReward = 0; // золото теперь в инвентаре
         
         // AI и поведение

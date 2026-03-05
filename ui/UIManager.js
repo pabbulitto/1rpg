@@ -98,6 +98,8 @@ class UIManager {
     }
     
     initComponentsSync() {
+        // MapUI (не вкладка, а модальное окно)
+        this.components.map = new this.uiComponents.MapUI(null, this.eventBus, this.game);
         // StatsUI
         if (this.containers.stats) {
             this.components.stats = new this.uiComponents.StatsUI('stats-content');
@@ -183,11 +185,16 @@ class UIManager {
         // Табы
         document.querySelectorAll('.tab-button').forEach(tab => {
             tab.addEventListener('click', () => {
+                // Проверка - идет ли бой
+                if (this.game.combatSystem?.isInCombat()) {
+                    this.addToLog('Нельзя переключать вкладки во время боя!', 'warning');
+                    return;
+                }
+                
                 const tabName = tab.dataset.tab;
                 this.switchTab(tabName);
             });
-        });    
-  
+        });
     }
     
     setupEventSubscriptions() {
@@ -239,6 +246,14 @@ class UIManager {
         this.eventBus.on('room:entitiesUpdated', () => {
             this.updateRoomEntitiesList();
         });
+        // Показать карту
+        this.eventBus.on('ui:showMap', () => {
+            this.showMap();
+        });
+        // Движение
+        this.eventBus.on('move:direction', (data) => {
+            this.game.gameManager.move(data.direction);
+        });
         // Победа в бою 
         this.eventBus.on('victory:show', (result) => {
             if (result.log) {
@@ -273,10 +288,6 @@ class UIManager {
             else if (data.entityType === 'player') {
                 // this.showPlayerModal();
             }
-        });
-        // В setupEventSubscriptions() добавить:
-        this.eventBus.on('move:direction', (data) => {
-            this.game.gameManager.move(data.direction);
         });
         // Начало боя - переключаем канвасы
         this.eventBus.on('battle:start', () => {
@@ -466,7 +477,11 @@ class UIManager {
     showError(message) {
         this.addToLog(`ОШИБКА: ${message}`, 'error');
     }
-    
+    showMap() {
+        if (this.components.map) {
+            this.components.map.show();
+        }
+    }    
     /**
      * Обработчик использования предмета по instanceId
      * @param {string} instanceId - уникальный ID экземпляра предмета

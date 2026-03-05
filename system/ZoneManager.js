@@ -70,7 +70,7 @@ class ZoneManager {
   async _loadEnemiesForRoom(roomId) {
       const position = this.gameState.getPosition();
       const zoneData = this.loadedZones.get(position.zone);
-      const roomData = zoneData?.[roomId];
+      const roomData = zoneData?.rooms?.[roomId];
       
       if (!roomData || !roomData.enemies || roomData.enemies.length === 0) {
           return;
@@ -358,28 +358,28 @@ class ZoneManager {
     }
   }
   
-  getCurrentRoomInfo() {
-    const position = this.gameState.getPosition();
-    
-    if (!position.zone || !position.room) {
-      return null;
+    getCurrentRoomInfo() {
+        const position = this.gameState.getPosition();
+        
+        if (!position.zone || !position.room) {
+            return null;
+        }
+        
+        const zoneData = this.loadedZones.get(position.zone);
+        if (!zoneData) return null;
+        
+        // Получаем данные комнаты из zoneData.rooms
+        const roomData = zoneData.rooms?.[position.room];
+        if (!roomData) return null;
+        
+        return {
+            ...roomData,
+            zoneId: position.zone,
+            roomId: position.room,
+            fullId: `${position.zone}:${position.room}`,
+            entities: this.getRoomEntitiesInfo(position.room)
+        };
     }
-    
-    const zoneData = this.loadedZones.get(position.zone);
-    if (!zoneData || !zoneData[position.room]) {
-      return null;
-    }
-    
-    const roomData = zoneData[position.room];
-    
-    return {
-      ...roomData,
-      zoneId: position.zone,
-      roomId: position.room,
-      fullId: `${position.zone}:${position.room}`,
-      entities: this.getRoomEntitiesInfo(position.room)
-    };
-  }
   /**
    * Найти первую свободную клетку в комнате по спирали от стартовой точки
    * @param {number} startX - начальная координата X
@@ -549,116 +549,147 @@ class ZoneManager {
    * @param {string} targetRoom - ID целевой комнаты
    * @returns {Object} результат перемещения
    */
-  moveInsideZone(targetRoom) {
-      const position = this.gameState.getPosition();
-      const zoneData = this.loadedZones.get(position.zone);
-      
-      if (!zoneData || !zoneData[targetRoom]) {
-          return {
-              success: false,
-              message: `Комната ${targetRoom} не найдена в зоне ${position.zone}`
-          };
-      }
-          // Инициализируем новую комнату, если её нет
-      this._initRoom(targetRoom);
-          // Находим свободную клетку для игрока
-      const spawnPos = this.findFreeCell(4, 2, targetRoom, [window.game.player.id]);
-      if (!spawnPos) {
-          return {
-              success: false,
-              message: 'Комната переполнена, невозможно войти'
-          };
-      }
-      
-      // Устанавливаем координаты игроку
-      window.game.player.gridX = spawnPos.gridX;
-      window.game.player.gridY = spawnPos.gridY;
-      const oldRoom = position.room;
-      const newRoomData = zoneData[targetRoom];
-      
-      // Удаляем игрока из старой комнаты
-      this.removeEntity(window.game.player.id);  
-      
-      // Обновляем позицию в GameState
-      this.gameState.updatePosition(position.zone, targetRoom);
-      // Добавляем игрока в новую комнату
-      this.addEntity(targetRoom, window.game.player); 
-      // Загружаем врагов для новой комнаты
-      this._loadEnemiesForRoom(targetRoom);
-      // Отправляем событие обновления комнаты
-      this.gameState.eventBus.emit('room:updated', this.getCurrentRoomInfo());
-      
-      return {
-          success: true,
-          message: `Вы перешли в ${newRoomData.name}`,
-          from: { zone: position.zone, room: oldRoom },
-          to: { zone: position.zone, room: targetRoom }
-      };
-  }
+    moveInsideZone(targetRoom) {
+        const position = this.gameState.getPosition();
+        const zoneData = this.loadedZones.get(position.zone);
+        
+        // Исправлено: ищем в zoneData.rooms
+        if (!zoneData || !zoneData.rooms || !zoneData.rooms[targetRoom]) {
+            return {
+                success: false,
+                message: `Комната ${targetRoom} не найдена в зоне ${position.zone}`
+            };
+        }
+        
+        // Инициализируем новую комнату, если её нет
+        this._initRoom(targetRoom);
+        
+        // Находим свободную клетку для игрока
+        const spawnPos = this.findFreeCell(4, 2, targetRoom, [window.game.player.id]);
+        if (!spawnPos) {
+            return {
+                success: false,
+                message: 'Комната переполнена, невозможно войти'
+            };
+        }
+        
+        // Устанавливаем координаты игроку
+        window.game.player.gridX = spawnPos.gridX;
+        window.game.player.gridY = spawnPos.gridY;
+        const oldRoom = position.room;
+        const newRoomData = zoneData.rooms[targetRoom];  // Исправлено
+        
+        // Удаляем игрока из старой комнаты
+        this.removeEntity(window.game.player.id);  
+        
+        // Обновляем позицию в GameState
+        this.gameState.updatePosition(position.zone, targetRoom);
+        
+        // Добавляем игрока в новую комнату
+        this.addEntity(targetRoom, window.game.player); 
+        
+        // Загружаем врагов для новой комнаты
+        this._loadEnemiesForRoom(targetRoom);
+        
+        // Отправляем событие обновления комнаты
+        const roomInfo = this.getCurrentRoomInfo();
+        if (roomInfo) {
+            this.gameState.eventBus.emit('room:updated', roomInfo);
+        } else {
+            console.error('ZoneManager: не удалось получить roomInfo после перемещения в', targetRoom);
+            // Отправляем хотя бы базовую информацию
+            this.gameState.eventBus.emit('room:updated', {
+                roomId: targetRoom,
+                name: newRoomData?.name || targetRoom,
+                zoneId: position.zone,
+                directions: newRoomData?.directions || {}
+            });
+        }
+
+        return {
+            success: true,
+            message: `Вы перешли в ${newRoomData.name}`,
+            from: { zone: position.zone, room: oldRoom },
+            to: { zone: position.zone, room: targetRoom }
+        };
+    }
   /**
    * Переместить игрока в другую зону
    * @param {string} target - строка вида "зона:комната"
    * @returns {Object} результат перемещения
    */
-  async moveToOtherZone(target) {
-      const [targetZone, targetRoom] = target.split(':');
-      
-      try {
-          const zoneData = await this.loadZone(targetZone);
-          
-          if (!zoneData) {
-              throw new Error(`Не удалось загрузить зону ${targetZone}`);
-          }
-          
-          if (!zoneData[targetRoom]) {
-              throw new Error(`Комната ${targetRoom} не найдена в зоне ${targetZone}`);
-          }
-          // Инициализируем новую комнату
-          this._initRoom(targetRoom);
-          
-          const spawnPos = this.findFreeCell(4, 2, targetRoom, [window.game.player.id]);
-          if (!spawnPos) {
-              return {
-                  success: false,
-                  message: 'Комната переполнена, невозможно войти'
-              };
-          }
-          window.game.player.gridX = spawnPos.gridX;
-          window.game.player.gridY = spawnPos.gridY;
+    async moveToOtherZone(target) {
+        const [targetZone, targetRoom] = target.split(':');
+        
+        try {
+            const zoneData = await this.loadZone(targetZone);
+            
+            if (!zoneData) {
+                throw new Error(`Не удалось загрузить зону ${targetZone}`);
+            }
+            
+            // Исправлено: проверяем через zoneData.rooms
+            if (!zoneData.rooms || !zoneData.rooms[targetRoom]) {
+                throw new Error(`Комната ${targetRoom} не найдена в зоне ${targetZone}`);
+            }
+            
+            // Инициализируем новую комнату
+            this._initRoom(targetRoom);
+            
+            const spawnPos = this.findFreeCell(4, 2, targetRoom, [window.game.player.id]);
+            if (!spawnPos) {
+                return {
+                    success: false,
+                    message: 'Комната переполнена, невозможно войти'
+                };
+            }
+            
+            window.game.player.gridX = spawnPos.gridX;
+            window.game.player.gridY = spawnPos.gridY;
 
-          const oldZone = this.gameState.getPosition().zone;
-          const oldRoom = this.gameState.getPosition().room;
-          const player = window.game.player;  // ← получаем игрока глобально
-          
-          // Удаляем игрока из старой комнаты
-          this.removeEntity(player.id);
-          
-          // Обновляем позицию в GameState
-          this.gameState.updatePosition(targetZone, targetRoom);
-          
-          // Добавляем игрока в новую комнату
-          this.addEntity(targetRoom, player);
-          
-          // Загружаем врагов для новой комнаты
-          this._loadEnemiesForRoom(targetRoom);
+            const oldZone = this.gameState.getPosition().zone;
+            const oldRoom = this.gameState.getPosition().room;
+            const player = window.game.player;
+            
+            // Удаляем игрока из старой комнаты
+            this.removeEntity(player.id);
+            
+            // Обновляем позицию в GameState
+            this.gameState.updatePosition(targetZone, targetRoom);
+            
+            // Добавляем игрока в новую комнату
+            this.addEntity(targetRoom, player);
+            
+            // Загружаем врагов для новой комнаты
+            this._loadEnemiesForRoom(targetRoom);
 
-          // Отправляем событие обновления комнаты
-          this.gameState.eventBus.emit('room:updated', this.getCurrentRoomInfo());
-          
-          return {
-              success: true,
-              message: `Вы перешли в ${zoneData[targetRoom].name}`,
-              from: { zone: oldZone, room: oldRoom },
-              to: { zone: targetZone, room: targetRoom }
-          };
-      } catch (error) {
-          console.error('Ошибка перехода между зонами:', error);
-          return {
-              success: false,
-              message: `Ошибка перехода: ${error.message}`
-          };
-      }
-  }
+            // Отправляем событие обновления комнаты
+            const roomInfo = this.getCurrentRoomInfo();
+            if (roomInfo) {
+                this.gameState.eventBus.emit('room:updated', roomInfo);
+            } else {
+                this.gameState.eventBus.emit('room:updated', {
+                    roomId: targetRoom,
+                    name: zoneData.rooms[targetRoom].name,
+                    zoneId: targetZone,
+                    directions: zoneData.rooms[targetRoom].directions || {}
+                });
+            }
+            
+            return {
+                success: true,
+                message: `Вы перешли в ${zoneData.rooms[targetRoom].name}`, // Исправлено
+                from: { zone: oldZone, room: oldRoom },
+                to: { zone: targetZone, room: targetRoom }
+            };
+        } catch (error) {
+            console.error('Ошибка перехода между зонами:', error);
+            return {
+                success: false,
+                message: `Ошибка перехода: ${error.message}`
+            };
+        }
+    }
   
   isCurrentRoomShop() {
     const roomInfo = this.getCurrentRoomInfo();

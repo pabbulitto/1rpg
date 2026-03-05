@@ -1,7 +1,7 @@
 {
   "village": {
     "name": "Тихая деревня",
-    "startRoom": "village_square",
+    "startRoom": "х3у2z-1",
     "theme": "village",
     "unlockedByDefault": true,
     "depthRange": [0, 0]
@@ -15,7 +15,7 @@
   },
     "southwest_village": {
     "name": "Деревушка на юго-западе",
-    "startRoom": "r16c4",
+    "startRoom": "х4у3z0",
     "theme": "village",
     "unlockedByDefault": false,
     "depthRange": [0, 0]

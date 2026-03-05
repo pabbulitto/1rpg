@@ -92,7 +92,6 @@ class GraphicsEngine {
             this.handleRoomUpdate(roomInfo);
         }
         
-        console.log('GraphicsEngine: инициализирован');
         this.isInitialized = true;
         return this;
     }
@@ -259,22 +258,26 @@ class GraphicsEngine {
         if (roomId.includes(':')) {
             const [zoneId, targetRoom] = roomId.split(':');
             const zoneData = this.zoneManager?.loadedZones.get(zoneId);
-            return zoneData?.[targetRoom]?.name || targetRoom;
+            return zoneData?.rooms?.[targetRoom]?.name || targetRoom;
         } else {
             // Внутри текущей зоны
             const zoneData = this.zoneManager?.loadedZones.get(currentZoneId);
-            return zoneData?.[roomId]?.name || roomId;
+            return zoneData?.rooms?.[roomId]?.name || roomId;
         }
-    } 
+    }
 
     drawDirectionButtons() {
         const roomInfo = this.zoneManager?.getCurrentRoomInfo();
-        if (!roomInfo || !roomInfo.directions) return;
+        if (!roomInfo) {
+            return;
+        }
         
+        
+        // directions теперь в roomInfo.directions
+        const directions = roomInfo.directions || {};
         this.buttonAreas = [];
         const ctx = this.ctx;
         
-        // Функция для измерения ширины текста (обычный шрифт, не жирный)
         const getTextWidth = (text) => {
             ctx.font = '14px "Segoe UI", sans-serif';
             return ctx.measureText(text).width;
@@ -285,15 +288,15 @@ class GraphicsEngine {
         ctx.textBaseline = 'middle';
         
         // Север
-        if (roomInfo.directions.north) {
-            const targetName = this.getRoomName(roomInfo.directions.north, roomInfo.zoneId);
+        if (directions.north) {
+            const targetName = this.getRoomName(directions.north, roomInfo.zoneId);
             const text = `⬆️ ${targetName}`;
             const width = getTextWidth(text) + 20;
             const height = 36;
             const x = 450;
             const y = 18;
             
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.beginPath();
             ctx.roundRect(x - width/2, y - height/2, width, height, 8);
             ctx.fill();
@@ -305,15 +308,15 @@ class GraphicsEngine {
         }
         
         // Юг
-        if (roomInfo.directions.south) {
-            const targetName = this.getRoomName(roomInfo.directions.south, roomInfo.zoneId);
+        if (directions.south) {
+            const targetName = this.getRoomName(directions.south, roomInfo.zoneId);
             const text = `⬇️ ${targetName}`;
             const width = getTextWidth(text) + 20;
             const height = 36;
             const x = 450;
             const y = 507 - 18;
             
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.beginPath();
             ctx.roundRect(x - width/2, y - height/2, width, height, 8);
             ctx.fill();
@@ -324,21 +327,21 @@ class GraphicsEngine {
             this.buttonAreas.push({ x: x - width/2, y: y - height/2, width, height, direction: 'south' });
         }
         
-        // Запад (вертикальная кнопка)
-        if (roomInfo.directions.west) {
-            const targetName = this.getRoomName(roomInfo.directions.west, roomInfo.zoneId);
+        // Запад
+        if (directions.west) {
+            const targetName = this.getRoomName(directions.west, roomInfo.zoneId);
             const text = `⬆️ ${targetName}`;
             const textWidth = getTextWidth(text) + 20;
-            const buttonWidth = 36;  // ширина кнопки (бывшая высота)
-            const buttonHeight = textWidth;  // высота кнопки (бывшая ширина)
-            const x = 18;  // центр кнопки у левого края
+            const buttonWidth = 36;
+            const buttonHeight = textWidth;
+            const x = 18;
             const y = 253;
             
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(-Math.PI / 2);
             
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.beginPath();
             ctx.roundRect(-buttonHeight/2, -buttonWidth/2, buttonHeight, buttonWidth, 8);
             ctx.fill();
@@ -348,7 +351,6 @@ class GraphicsEngine {
             
             ctx.restore();
             
-            // Область клика (вертикальный прямоугольник)
             this.buttonAreas.push({
                 x: 0,
                 y: y - buttonHeight/2,
@@ -358,9 +360,9 @@ class GraphicsEngine {
             });
         }
         
-        // Восток (вертикальная кнопка)
-        if (roomInfo.directions.east) {
-            const targetName = this.getRoomName(roomInfo.directions.east, roomInfo.zoneId);
+        // Восток
+        if (directions.east) {
+            const targetName = this.getRoomName(directions.east, roomInfo.zoneId);
             const text = `⬆️ ${targetName}`;
             const textWidth = getTextWidth(text) + 20;
             const buttonWidth = 36;
@@ -372,7 +374,7 @@ class GraphicsEngine {
             ctx.translate(x, y);
             ctx.rotate(Math.PI / 2);
             
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.beginPath();
             ctx.roundRect(-buttonHeight/2, -buttonWidth/2, buttonHeight, buttonWidth, 8);
             ctx.fill();
@@ -392,15 +394,15 @@ class GraphicsEngine {
         }
         
         // Вверх
-        if (roomInfo.directions.up) {
-            const targetName = this.getRoomName(roomInfo.directions.up, roomInfo.zoneId);
+        if (directions.up) {
+            const targetName = this.getRoomName(directions.up, roomInfo.zoneId);
             const text = `🪜 ${targetName}`;
             const width = getTextWidth(text) + 20;
             const height = 36;
             const x = 900 - width/2 - 10;
             const y = 18;
             
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.beginPath();
             ctx.roundRect(x - width/2, y - height/2, width, height, 8);
             ctx.fill();
@@ -412,15 +414,15 @@ class GraphicsEngine {
         }
         
         // Вниз
-        if (roomInfo.directions.down) {
-            const targetName = this.getRoomName(roomInfo.directions.down, roomInfo.zoneId);
+        if (directions.down) {
+            const targetName = this.getRoomName(directions.down, roomInfo.zoneId);
             const text = `🪜 ${targetName}`;
             const width = getTextWidth(text) + 20;
             const height = 36;
             const x = 900 - width/2 - 10;
             const y = 507 - 18;
             
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.beginPath();
             ctx.roundRect(x - width/2, y - height/2, width, height, 8);
             ctx.fill();
@@ -430,6 +432,30 @@ class GraphicsEngine {
             
             this.buttonAreas.push({ x: x - width/2, y: y - height/2, width, height, direction: 'down' });
         }
+        
+        // Кнопка карты
+        const mapText = '🗺️ Карта';
+        const mapWidth = getTextWidth(mapText) + 20;
+        const mapHeight = 36;
+        const mapX = mapWidth/2 + 5;
+        const mapY = 18;
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.beginPath();
+        ctx.roundRect(mapX - mapWidth/2, mapY - mapHeight/2, mapWidth, mapHeight, 8);
+        ctx.fill();
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(mapText, mapX, mapY);
+        
+        this.buttonAreas.push({ 
+            x: mapX - mapWidth/2, 
+            y: mapY - mapHeight/2, 
+            width: mapWidth, 
+            height: mapHeight, 
+            action: 'map'
+        });
+        
     }
     /**
      * Обработчик клика по canvas
@@ -451,10 +477,16 @@ class GraphicsEngine {
         for (const btn of this.buttonAreas) {
             if (canvasX >= btn.x && canvasX <= btn.x + btn.width &&
                 canvasY >= btn.y && canvasY <= btn.y + btn.height) {
+                
+                if (btn.action === 'map') {
+                    this.eventBus?.emit('ui:showMap');
+                    return;
+                }
+                
                 this.eventBus?.emit('move:direction', { direction: btn.direction });
                 return;
             }
-        }        
+        }       
         // Определяем ячейку сетки
         const col = Math.floor(canvasX / this.cellSize);
         const row = Math.floor(canvasY / this.cellSize);
@@ -471,6 +503,7 @@ class GraphicsEngine {
             // Клик по пустой ячейке
             this.eventBus?.emit('cell:click', { col, row });
         }
+        
     }
     
     /**
