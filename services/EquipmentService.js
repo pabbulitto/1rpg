@@ -9,6 +9,8 @@ class EquipmentService {
         this.eventBus = eventBus;
         this.statManager = statManager;
         this.gameState = gameState;
+        this.effectService = window.game?.effectService || null;
+        this.abilityService = window.game?.abilityService || null; 
         // Карта слотов для быстрого доступа
         this.slotMap = {
             // Прямые слоты (1:1)
@@ -27,6 +29,37 @@ class EquipmentService {
             two_handed: ['right_hand', 'left_hand'] // Двуручное занимает оба слота
         };
     }
+
+    /**
+     * Применить или удалить эффекты от предмета
+     * @private
+     * @param {string} slot - слот
+     * @param {Item|null} item - предмет (null если сняли)
+     */
+    _applyItemEffects(slot, item) {
+        const player = window.game?.player;
+        const effectService = window.game?.effectService;
+        
+        // Проверяем, что всё доступно
+        if (!player || !effectService) return;
+        
+        const sourcePrefix = `item_${slot}`;
+        
+        // Удаляем старые эффекты из этого слота
+        effectService.removeEffectsBySource(player.id, sourcePrefix);
+        
+        // Если есть эффекты у предмета — применяем
+        if (item && item.effects && item.effects.length > 0) {
+            item.effects.forEach(effectId => {
+                effectService.applyEffect(
+                    player,
+                    effectId,
+                    `${sourcePrefix}_${item.id}`,
+                    { durationOverride: 0 }
+                );
+            });
+        }
+    }
     
     /**
      * Проверить возможность экипировки предмета
@@ -36,6 +69,19 @@ class EquipmentService {
      * @returns {Object} результат проверки
      */
     canEquip(item, currentEquipment, player = null, requestedSlot = null) {
+            // проверка для массива слотов 
+        if (Array.isArray(item.slot)) {
+            // Если запрошенный слот есть в массиве - можно надеть
+            if (item.slot.includes(requestedSlot)) {
+                return { success: true, targetSlot: requestedSlot, slotsToClear: [] };
+            }
+            // Если нет в массиве - нельзя
+            return { 
+                success: false, 
+                message: "Предмет нельзя надеть в этот слот",
+                errorCode: 'INVALID_SLOT'
+            };
+        }
         if (!item || !item.slot) {
             return { 
                 success: false, 
@@ -360,81 +406,59 @@ class EquipmentService {
         return slots ? [...slots] : [];
     }
     
-    /**
-     * Применить модификаторы экипировки к StatManager
-     * @param {string} slot - слот экипировки
-     * @param {Item|null} item - предмет (null если сняли)
-     */
     applyEquipmentModifiers(slot, item) {
+         console.log('=== applyEquipmentModifiers ===');
+         console.log('this._applyWeaponSkillBonuses:', typeof this._applyWeaponSkillBonuses);
+         console.log('this._applyItemEffects:', typeof this._applyItemEffects);
         const sourceId = `equipment_${slot}`;
         const armorSourceId = `equipment_armor_${slot}`;
         
-        // Всегда удаляем оба модификатора (и основные статы, и броню)
+        // Всегда удаляем оба модификатора
         this.statManager.removeModifier(sourceId);
         this.statManager.removeModifier(armorSourceId);
+        // Удаляем все модификаторы, начинающиеся с 'weapon_skill_'
+        if (this.statManager.modifiers) {
+            const toRemove = this.statManager.modifiers
+                .filter(m => m.source && m.source.startsWith('weapon_skill_'))
+                .map(m => m.source);
+            toRemove.forEach(source => this.statManager.removeModifier(source));
+        }
         
         if (item) {
-            // Применяем основные статы из item.stats
-            if (item.stats && Object.keys(item.stats).length > 0) {
-                const itemStats = { ...item.stats };
-                
-                // Конвертируем health/maxHealth
-                if (itemStats.health !== undefined) {
-                    itemStats.maxHealth = (itemStats.maxHealth || 0) + itemStats.health;
-                    delete itemStats.health;
-                }
-                
-                // Конвертируем stamina/maxStamina
-                if (itemStats.stamina !== undefined) {
-                    itemStats.maxStamina = (itemStats.maxStamina || 0) + itemStats.stamina;
-                    delete itemStats.stamina;
-                }
-                
-                const currentHealth = this.statManager.getResource('health');
-                const currentMana = this.statManager.getResource('mana');
-                const currentStamina = this.statManager.getResource('stamina');
-                
-                this.statManager.addModifier(sourceId, itemStats);
-                
-                const finalStats = this.statManager.getFinalStats();
-                
-                this.statManager.setResource('health', Math.min(currentHealth, finalStats.maxHealth));
-                this.statManager.setResource('mana', Math.min(currentMana, finalStats.maxMana));
-                this.statManager.setResource('stamina', Math.min(currentStamina, finalStats.maxStamina));
+            const itemStats = { ...item.stats };
+            // Конвертируем health/maxHealth
+            if (itemStats.health !== undefined) {
+                itemStats.maxHealth = (itemStats.maxHealth || 0) + itemStats.health;
+                delete itemStats.health;
             }
             
-            // Отдельно применяем defense и armor для брони
-            if (item.type === 'armor') {
-                const armorStats = {};
-                if (item.defense) armorStats.defense = item.defense;
-                if (item.armor) armorStats.armor = item.armor;
-                
-                if (Object.keys(armorStats).length > 0) {
-                    this.statManager.addModifier(armorSourceId, armorStats);
-                }
+            // Конвертируем stamina/maxStamina
+            if (itemStats.stamina !== undefined) {
+                itemStats.maxStamina = (itemStats.maxStamina || 0) + itemStats.stamina;
+                delete itemStats.stamina;
             }
+            
+            // Сохраняем текущие ресурсы
+            const currentHealth = this.statManager.getResource('health');
+            const currentMana = this.statManager.getResource('mana');
+            const currentStamina = this.statManager.getResource('stamina');
+            
+            // Добавляем модификатор со всеми статами
+            this.statManager.addModifier(sourceId, itemStats);
+            
+            // Обрезаем ресурсы если превысили новый максимум
+            const finalStats = this.statManager.getFinalStats();
+            this.statManager.setResource('health', Math.min(currentHealth, finalStats.maxHealth));
+            this.statManager.setResource('mana', Math.min(currentMana, finalStats.maxMana));
+            this.statManager.setResource('stamina', Math.min(currentStamina, finalStats.maxStamina));
+            // Применяем эффекты от предмета
+            this._applyItemEffects(slot, item);
         }
         
-        const playerData = this.gameState ? this.gameState.getPlayer() : this.statManager.getStatsForUI();
-        
-        this.eventBus.emit('player:statsChanged', playerData);
+        // Обновляем UI
+        this.eventBus.emit('player:statsChanged', this.gameState.getPlayer());
         this.eventBus.emit('inventory:updated');
-        
-        if (item) {
-            console.log(`EquipmentService: применены модификаторы для ${item.name} в слот ${slot}`, {
-                slot,
-                item: item.name,
-                stats: item.stats,
-                defense: item.defense,
-                armor: item.armor,
-                sourceId,
-                armorSourceId
-            });
-        } else {
-            console.log(`EquipmentService: снят предмет из слота ${slot}`);
-        }
     }
-    
     /**
      * Обработка снятия предмета (особая логика для двуручного)
      * @param {string} slot - слот

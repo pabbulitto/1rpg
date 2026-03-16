@@ -167,22 +167,23 @@ class EquipmentUI {
                     
                     <!-- Строка 3: Тело и Руки -->
                     <div style="display:flex; justify-content:center; gap:10px;">
-                        ${this.renderSlot('body', 'Тело', equipment)}
                         ${this.renderSlot('arms', 'Руки', equipment)}
+                        ${this.renderSlot('body', 'Тело', equipment)}
                     </div>
                     
                     <!-- Строка 4: Браслет 1, Пояс, Браслет 2 -->
                     <div style="display:flex; justify-content:center; gap:10px;">
-                        ${this.renderSlot('bracelet1', 'Браслет 1', equipment)}
+                        ${this.renderSlot('left_hand', 'Левая рука', equipment)}
                         ${this.renderSlot('belt', 'Пояс', equipment)}
-                        ${this.renderSlot('bracelet2', 'Браслет 2', equipment)}
+                        ${this.renderSlot('right_hand', 'Правая рука', equipment)}
                     </div>
                     
                     <!-- Строка 5: Левая рука, Ноги, Правая рука -->
                     <div style="display:flex; justify-content:center; gap:10px;">
-                        ${this.renderSlot('left_hand', 'Левая рука', equipment)}
+                        ${this.renderSlot('bracelet1', 'Браслет 1', equipment)}
                         ${this.renderSlot('legs', 'Ноги', equipment)}
-                        ${this.renderSlot('right_hand', 'Правая рука', equipment)}
+                        ${this.renderSlot('bracelet2', 'Браслет 2', equipment)}
+
                     </div>
                     
                     <!-- Строка 6: Кольцо 1, Ступни, Кольцо 2 -->

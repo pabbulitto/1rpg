@@ -1,0 +1,73 @@
+{
+  "чувствовать_жизнь": {
+    "name": "Чувствовать жизнь",
+    "description": "Вы ощущаете всех живых существ вокруг.",
+    "duration": 0,
+    "isDebuff": false,
+    "stats": {
+      "detectHidden": 1,
+      "detectCamouflage": 1
+    }
+  },
+  "видение_ночью": {
+    "name": "Видение ночью",
+    "description": "Вы видите в полной темноте.",
+    "duration": 0,
+    "isDebuff": false,
+    "stats": {
+      "nightVision": 1
+    }
+  },
+
+  "полет": {
+    "name": "Полет",
+    "description": "Вы парите над землей, игнорируя препятствия и экономя силы.",
+    "duration": 0,
+    "isDebuff": false,
+    "stats": {
+      "movementCost": 2,
+      "canFly": true
+    }
+  },
+
+  "слепота": {
+    "name": "Слепота",
+    "description": "Персонаж ослеплен: защита ухудшена, шанс попадания снижен. Не видит бой и не реагирует на происходящее вокруг.",
+    "duration": 3,
+    "isDebuff": true,
+    "stats": {
+      "hitroll": -2,
+      "armorClass": -2
+    },
+    "flags": {
+      "isBlind": true
+    }
+  },
+  
+  "сидит": {
+    "name": "Сидит",
+    "description": "Персонаж сидит. Ресурсы восстанавливаются быстрее, но урон по нему увеличен на 50%. Не может двигаться, использовать умения или колдовать.",
+    "duration": 0,
+    "isDebuff": true,
+    "stats": {
+      "incomingDamageMultiplier": 1.5,
+      "healthRegen": 5,
+      "manaRegen": 5,
+      "staminaRegen": 5
+    },
+    "flags": {
+      "isSitting": true
+    }
+  },
+  "спрятался": {
+    "name": "Спрятался",
+    "description": "Персонаж скрывается в тенях, его трудно заметить.",
+    "duration": 0,
+    "isDebuff": false,
+    "flags": {
+        "hidden": true
+    }
+  }
+
+
+}

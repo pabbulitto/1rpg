@@ -9,7 +9,9 @@ class AbilityService {
     constructor(gameState = null) {
         this.gameState = gameState;
         this.abilities = new Map(); // id -> AbilityBase instance
-        this.availableAbilities = new Map(); // player/enemyId -> Set(abilityId)
+        this.availableAbilities = new Map();// player/enemyId -> Set(abilityId)
+        this.characterMastery = new Map(); // characterId -> Map(abilityId -> mastery)
+        this.characterMaxMastery = new Map(); 
         this.loaded = false;
     }
     
@@ -109,7 +111,76 @@ class AbilityService {
         
         return result;
     }
-    
+    /**
+     * Получить мастерство способности для персонажа
+     * @param {string} characterId
+     * @param {string} abilityId
+     * @returns {number}
+     */
+    getMastery(characterId, abilityId) {
+        return this.characterMastery.get(characterId)?.get(abilityId) || 0;
+    }
+
+    /**
+     * Установить мастерство способности для персонажа
+     * @param {string} characterId
+     * @param {string} abilityId
+     * @param {number} value
+     */
+    setMastery(characterId, abilityId, value) {
+        if (!this.characterMastery.has(characterId)) {
+            this.characterMastery.set(characterId, new Map());
+        }
+        this.characterMastery.get(characterId).set(abilityId, value);
+    }
+
+    /**
+     * Добавить опыт к мастерству
+     * @param {string} characterId
+     * @param {string} abilityId
+     * @param {number} amount
+     * @returns {number} сколько реально добавлено
+     */
+    addMastery(characterId, abilityId, amount) {
+        // ПРОВЕРКА: есть ли у персонажа это умение
+        if (!this.availableAbilities.has(characterId) || 
+            !this.availableAbilities.get(characterId).has(abilityId)) {
+            return 0;  // нет умения - нет роста
+        }
+        
+        const current = this.getMastery(characterId, abilityId);
+        const maxMastery = this.getMaxMasteryForCharacter(characterId);
+        const newValue = Math.min(maxMastery, current + amount);
+        
+        if (newValue > current) {
+            this.setMastery(characterId, abilityId, newValue);
+            return newValue - current;
+        }
+        return 0;
+    }
+
+    /**
+     * Получить максимально возможный процент мастерства для персонажа
+     * @param {string} characterId
+     * @returns {number}
+     */
+    getMaxMasteryForCharacter(characterId) {
+        // Если есть сохраненное значение - возвращаем его
+        if (this.characterMaxMastery.has(characterId)) {
+            return this.characterMaxMastery.get(characterId);
+        }
+        
+        // Иначе рассчитываем (по умолчанию 80 + реинкарнации*10)
+        let maxMastery = 80;
+        if (this.gameState?.getPlayer()?.id === characterId) {
+            const player = this.gameState.getPlayer();
+            const reincarnations = player.reincarnations || 0;
+            maxMastery = Math.min(200, 80 + reincarnations * 10);
+        }
+        
+        this.characterMaxMastery.set(characterId, maxMastery);
+        return maxMastery;
+    }
     /**
      * Получить доступные способности с проверкой требований
      * @param {CharacterBase} character - экземпляр персонажа
@@ -151,6 +222,55 @@ class AbilityService {
             totalAbilities: this.abilities.size,
             charactersWithAbilities: this.availableAbilities.size
         };
+    }
+    /**
+     * Получить данные для сохранения
+     * @returns {Object}
+     */
+    getSaveData() {
+        const masteryData = {};
+        for (const [charId, masteryMap] of this.characterMastery.entries()) {
+            masteryData[charId] = Object.fromEntries(masteryMap);
+        }
+        
+        const maxMasteryData = Object.fromEntries(this.characterMaxMastery);
+        
+        return {
+            mastery: masteryData,
+            maxMastery: maxMasteryData,
+            available: Object.fromEntries(
+                Array.from(this.availableAbilities.entries()).map(([k, v]) => [k, Array.from(v)])
+            )
+        };
+    }
+
+    /**
+     * Загрузить данные из сохранения
+     * @param {Object} data
+     */
+    loadSaveData(data) {
+        if (!data) return;
+        
+        // Загружаем мастерство
+        if (data.mastery) {
+            this.characterMastery.clear();
+            for (const [charId, masteryObj] of Object.entries(data.mastery)) {
+                this.characterMastery.set(charId, new Map(Object.entries(masteryObj)));
+            }
+        }
+        
+        // Загружаем максимальное мастерство
+        if (data.maxMastery) {
+            this.characterMaxMastery = new Map(Object.entries(data.maxMastery));
+        }
+        
+        // Загружаем доступные способности
+        if (data.available) {
+            this.availableAbilities.clear();
+            for (const [charId, abilityArray] of Object.entries(data.available)) {
+                this.availableAbilities.set(charId, new Set(abilityArray));
+            }
+        }
     }
 }
 

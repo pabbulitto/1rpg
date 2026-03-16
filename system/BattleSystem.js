@@ -1,6 +1,7 @@
 import { DiceRoller } from './DiceRoller.js';
 import { DamageContextBuilder } from './DamageContextBuilder.js'; 
 import { itemFactory } from '../core/ItemFactory.js';
+import { FormulaParser } from './FormulaParser.js';
 
 class BattleSystem {
     constructor(diceRoller = null) {
@@ -8,6 +9,7 @@ class BattleSystem {
         this.diceRoller = diceRoller || new DiceRoller();
         this.damageContextBuilder = new DamageContextBuilder();
         this.game = null;
+        this.formulaParser = new FormulaParser();
     }
   
     startBattle(player, enemy) {
@@ -87,6 +89,51 @@ class BattleSystem {
                 hits = attackRoll.total >= enemyAC;
             }
             
+            // ПОЛУЧАЕМ БОНУСЫ ОТ УМЕНИЙ ВЛАДЕНИЯ ОРУЖИЕМ (только для обычных атак)
+            let skillHitBonus = 0;
+            let skillDamageBonus = 0;
+            
+            if (!isAbilityAttack && attack.weapon) {
+                const weaponType = attack.weapon.weaponType;
+                if (weaponType) {
+                    const skillId = this._getWeaponSkillId(weaponType);
+                    if (skillId) {
+                        const mastery = window.game?.abilityService?.getMastery(player.id, skillId) || 0;
+                        const skill = window.game?.abilityService?.getAbility(skillId);
+                        
+                        if (skill && skill.scaling) {
+                            // Получаем бонусы из scaling
+                            if (skill.scaling.hitroll) {
+                                const hitFormula = skill.scaling.hitroll.replace(/mastery/g, mastery);
+                                try {
+                                    // Используем FormulaParser вместо new Function
+                                    skillHitBonus = this.formulaParser.evaluate(hitFormula, {}) || 0;
+                                } catch (e) {
+                                    console.warn('Ошибка вычисления hitroll бонуса:', e);
+                                }
+                            }
+                            if (skill.scaling.damroll) {
+                                const dmgFormula = skill.scaling.damroll.replace(/mastery/g, mastery);
+                                try {
+                                    skillDamageBonus = this.formulaParser.evaluate(dmgFormula, {}) || 0;
+                                } catch (e) {
+                                    console.warn('Ошибка вычисления damroll бонуса:', e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Применяем бонус от умения к попаданию
+            if (!isAbilityAttack && skillHitBonus > 0) {
+                const modifiedTotal = attackRoll.total + skillHitBonus;
+                if (!hits && modifiedTotal >= enemyAC) {
+                    hits = true;
+                    totalLog.push(`✨ Бонус умения превратил промах в попадание!`);
+                }
+            }
+            
             if (!hits) {
                 totalLog.push(`🗡️ Вы ударили ${weaponName} но промахнулись`);
                 continue;
@@ -109,9 +156,14 @@ class BattleSystem {
             
             let damage = damageResult.total;
             
-            // Добавляем damroll к урону (только для физических атак)
+            // Добавляем damroll к урону и бонусы от умений (только для физических атак)
             if (!isAbilityAttack) {
                 damage += damroll;
+                
+                // Добавляем бонус от умения к урону
+                if (skillDamageBonus > 0) {
+                    damage += skillDamageBonus;
+                }
             }
             
             if (isCritical && !isAbilityAttack) {
@@ -119,6 +171,11 @@ class BattleSystem {
                 const diceTotal = damageResult.rolls.reduce((sum, roll) => sum + roll, 0);
                 const modifierTotal = damageResult.total - diceTotal;
                 damage = (diceTotal * 2) + modifierTotal + damroll;
+                
+                // При критическом ударе бонус умения тоже удваивается?
+                if (skillDamageBonus > 0) {
+                    damage += skillDamageBonus; // или тоже удвоить? пока оставим как есть
+                }
             }
             
             // 7. Логирование
@@ -154,6 +211,26 @@ class BattleSystem {
             playerDead: playerDead,
             log: totalLog
         };
+    }
+
+    /**
+     * Получить ID умения по типу оружия
+     * @private
+     */
+    _getWeaponSkillId(weaponType) {
+        const mapping = {
+            'длинные_лезвия': 'длинные_лезвия',
+            'короткие_лезвия': 'короткие_лезвия',
+            'топоры': 'топоры',
+            'двуручники': 'двуручники',
+            'посохи_и_дубины': 'посохи_и_дубины',
+            'копья': 'копья',
+            'луки': 'луки',
+            'проникающее_оружие': 'проникающее_оружие',
+            'иное_оружие': 'иное_оружие',
+            'unarmed': 'кулачный_бой'
+        };
+        return mapping[weaponType] || null;
     }
     usePotionInBattle(player, itemId) {
         if (!window.itemsData || !window.itemsData[itemId]) {
@@ -223,7 +300,9 @@ class BattleSystem {
             dropName: null,
             log
         };
+        
     }
+    
 }
 
 export { BattleSystem };

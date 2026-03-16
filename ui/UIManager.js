@@ -133,14 +133,24 @@ class UIManager {
         // SkillsUI
         if (this.containers.skills) {
             this.components.skills = new this.uiComponents.SkillsUI(
-                this.containers.skills,
-                this.eventBus,
-                () => this.game.gameState.getActiveEffects(),
-                () => [] // TODO: доступные умения
+                this.containers.skills,  
+                this.eventBus,            
+                this.game                 
             );
             this.components.skills.init();
         }
-        
+        // PassivesEffectsUI 
+        const passivesContainer = document.getElementById('passives-effects-content');
+        if (passivesContainer) {
+            this.components.passives = new this.uiComponents.PassivesEffectsUI(
+                passivesContainer,
+                this.eventBus,
+                this.game,
+                () => this.game.player?.passiveManager || null,
+                () => this.game.player?.getActiveEffects?.() || []
+            );
+            this.components.passives.init();
+        }
         // TimeUI
         if (this.containers.time) {
             this.components.time = new this.uiComponents.TimeUI(this.containers.time, this.eventBus);
@@ -268,26 +278,23 @@ class UIManager {
         });
 
         this.eventBus.on('entity:click', (data) => {
-            // Мешок
-            if (data.entityType === 'ground_bag') {
+            const entity = this.game.zoneManager?.getEntityById(data.entityId);
+            if (!entity) return;
+            
+            // Мешок - старая модалка
+            if (entity.type === 'ground_bag') {
                 this.showBagLootModal(data.entityId);
-            } 
-            // Трупы (любые сущности с состоянием corpse)
-            else if (data.entityState === 'corpse') {
+                return;
+            }
+            
+            // Труп - старая модалка (она уже будет с новыми кнопками ✨ и 🌀)
+            if (entity.state === 'corpse') {
                 this.showCorpseLootModal(data.entityId);
+                return;
             }
-                        // Живые враги
-            else if (data.entityState === 'alive') {
-                this.showEnemyModal(data.entityId);
-            }
-            // Предметы на земле (TODO)
-            else if (data.entityType === 'item') {
-                // this.showItemModal(data.entityId);
-            }
-            // Игрок
-            else if (data.entityType === 'player') {
-                // this.showPlayerModal();
-            }
+            
+            // Для живых (враги, NPC, игроки) и предметов/объектов - универсальная модалка
+            this.showEntityActionModal(entity);
         });
         // Начало боя - переключаем канвасы
         this.eventBus.on('battle:start', () => {
@@ -325,7 +332,10 @@ class UIManager {
         }
         
         if (tabName === 'skills' && this.components.skills) {
-            this.components.skills.refreshData();
+            this.components.skills.render();
+        }
+        if (tabName === 'passives' && this.components.passives) {
+            this.components.passives.render(); 
         }
     }
     
@@ -680,10 +690,17 @@ class UIManager {
                         </div>
                     `).join('')}
                 </div>
+                
+                <!-- Первая строка кнопок: действия с предметами -->
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     ${items.length > 0 ? '<button class="take-all-btn" style="flex: 1;">Взять всё</button>' : ''}
-                    <button class="pickup-corpse-btn">🎒 Поднять труп</button>
-                    <button class="use-corpse-btn">✨ Использовать</button>
+                    <button class="pickup-corpse-btn" style="flex: 1;">🎒 Поднять труп</button>
+                </div>
+                
+                <!-- Вторая строка кнопок: способности -->
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="corpse-spells-btn" style="flex: 1;">✨ Заклинания</button>
+                    <button class="corpse-skills-btn" style="flex: 1;">🌀 Умения</button>
                 </div>
             </div>
         `;
@@ -719,10 +736,19 @@ class UIManager {
             });
         }
         
-        const useBtn = modal.querySelector('.use-corpse-btn');
-        if (useBtn) {
-            useBtn.addEventListener('click', () => {
-                this.addToLog('Умения для работы с трупами будут добавлены позже', 'info');
+        // Обработчики для заклинаний и умений
+        const spellsBtn = modal.querySelector('.corpse-spells-btn');
+        if (spellsBtn) {
+            spellsBtn.addEventListener('click', () => {
+                this.showAbilitiesForCorpse(corpseId, 'spell');
+                modal.remove();
+            });
+        }
+        
+        const skillsBtn = modal.querySelector('.corpse-skills-btn');
+        if (skillsBtn) {
+            skillsBtn.addEventListener('click', () => {
+                this.showAbilitiesForCorpse(corpseId, 'skill');
                 modal.remove();
             });
         }
@@ -736,6 +762,24 @@ class UIManager {
                 }
             });
         }, 10);
+    }
+    // Новый метод для показа способностей для трупа
+    showAbilitiesForCorpse(corpseId, type) {
+        const corpse = this.game.zoneManager?.getEntityById(corpseId);
+        if (!corpse) return;
+        
+        const modal = new this.uiComponents.EntityActionModal({
+            entityId: corpseId,
+            entityType: 'corpse',
+            entityData: { name: corpse.name },
+            game: this.game,
+            eventBus: this.eventBus,
+            onClose: () => {}
+        });
+        
+        // Принудительно открываем список способностей
+        modal.showAbilities(type);
+        modal.show();
     }
     /**
      * Взять предмет из трупа по instanceId
@@ -843,44 +887,31 @@ class UIManager {
             entities: this.game.zoneManager?.getRoomEntitiesInfo(this.game.gameState.getPosition().room)
         });
     }
-    showEnemyModal(enemyId) {
-        const enemy = this.game.zoneManager?.getEntityById(enemyId);
-        if (!enemy || enemy.state !== 'alive') return;
+
+    showEntityActionModal(entity) {
+        // Определяем тип для модалки
+        let modalType = 'living';
+        if (entity.type === 'item') modalType = 'item';
+        if (entity.type === 'object') modalType = 'object';
         
-        const modal = document.createElement('div');
-        modal.className = 'enemy-modal';
-        modal.innerHTML = `
-            <div class="modal-header">
-                <h3>${enemy.name}</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-content">
-                <p>Уровень: ${enemy.level || 1}</p>
-                <p>Здоровье: ${enemy.getStats().health}/${enemy.getStats().maxHealth}</p>
-                <button class="attack-btn">⚔️ Атаковать</button>
-            </div>
-        `;
+        // Собираем дополнительные данные для живых
+        const entityData = {
+            name: entity.name,
+            level: entity.level || null,
+            health: entity.getStats?.().health || null,
+            maxHealth: entity.getStats?.().maxHealth || null
+        };
         
-        document.body.appendChild(modal);
-        
-        modal.querySelector('.close-modal').addEventListener('click', () => {
-            modal.remove();
+        const modal = new this.uiComponents.EntityActionModal({
+            entityId: entity.id,
+            entityType: modalType,
+            entityData: entityData,  // ← теперь с уровнем и здоровьем
+            game: this.game,
+            eventBus: this.eventBus,
+            onClose: () => {}
         });
         
-        modal.querySelector('.attack-btn').addEventListener('click', () => {
-            this.game.battleOrchestrator.startBattle(enemy);
-            modal.remove();
-        });
-        
-        // Закрытие по клику вне модалки
-        setTimeout(() => {
-            document.addEventListener('click', function closeHandler(e) {
-                if (!modal.contains(e.target)) {
-                    modal.remove();
-                    document.removeEventListener('click', closeHandler);
-                }
-            });
-        }, 10);
+        modal.show();
     }
 
     updateRoomEntitiesList() {
@@ -921,6 +952,9 @@ class UIManager {
         this.graphicsEngine = null;
         if (this.battleCanvas) {
             this.battleCanvas.destroy();
+        }
+        if (this.components.passives) {
+            this.components.passives.destroy();
         }
     }
 }

@@ -59,6 +59,7 @@ class ItemData {
         /** @type {Array} Особые свойства предмета */
         this.flags = template?.flags ? [...template.flags] : [];
         
+        this.effects = template?.effects || [];
         // ===== СТАКИ =====
         /** @type {boolean} Можно ли стакать */
         this.stackable = template?.stackable || false;
@@ -104,7 +105,8 @@ class ItemData {
         // ===== ЛИМИТИРОВАННЫЕ ПРЕДМЕТЫ =====
         /** @type {boolean} Есть ли глобальный лимит */
         this.isLimited = (template?.globalLimit || 0) > 0;
-        
+        // Обучает умению/заклинанию при использовании
+        this.teaches = template?.teaches || null;
         // ===== МЕТАДАННЫЕ =====
         /** @type {number} Время создания */
         this.createdAt = Date.now();
@@ -198,6 +200,68 @@ class ItemData {
      * @returns {Object} результат использования
      */
     use(player) {
+        // НОВОЕ: если предмет обучает умению/заклинанию
+        if (this.teaches) {
+            const abilityService = window.game?.abilityService;
+            if (!abilityService) {
+                return { success: false, message: 'Система способностей не доступна' };
+            }
+            
+            // Проверяем, не изучено ли уже
+            const existingAbilities = abilityService.getCharacterAbilities(player.id, this.teaches.type);
+            const alreadyHas = existingAbilities.some(a => a.id === this.teaches.id);
+            
+            if (alreadyHas) {
+                return { 
+                    success: false, 
+                    message: `Вы уже знаете это ${this.teaches.type === 'spell' ? 'заклинание' : 'умение'}` 
+                };
+            }
+            
+            // Добавляем способность игроку
+            abilityService.addAbilityToCharacter(player.id, this.teaches.id);
+            
+            return { 
+                success: true, 
+                message: `Вы изучили ${this.name}`,
+                effects: [`Новая способность: ${this.name}`]
+            };
+        }
+        
+        // Если предмет дает эффекты
+        if (this.effects && this.effects.length > 0 && window.game?.effectService) {
+            const effectService = window.game.effectService;
+            const appliedEffects = [];
+            
+            for (const effectId of this.effects) {
+                // Длительность эффекта (из предмета или 12 часов по умолчанию)
+                const duration = this.duration || 12;
+                
+                const effect = effectService.applyEffect(
+                    player,
+                    effectId,
+                    `item_${this.id}`,
+                    {
+                        addDuration: duration,
+                        refreshOnReapply: true
+                    }
+                );
+                
+                if (effect) {
+                    appliedEffects.push(effect.name || effectId);
+                }
+            }
+            
+            const result = { success: true, effects: [] };
+            
+            if (appliedEffects.length > 0) {
+                result.effects.push(`Получены эффекты: ${appliedEffects.join(', ')}`);
+            }
+            
+            return result;
+        }
+        
+        // Старый код для расходуемых предметов
         if (this.type !== 'consumable') {
             return { success: false, message: 'Нельзя использовать этот предмет' };
         }
@@ -221,7 +285,6 @@ class ItemData {
         
         return result;
     }
-    
     /**
      * Сериализация для сохранений
      * @returns {Object}

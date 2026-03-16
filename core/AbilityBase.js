@@ -25,13 +25,21 @@ class AbilityBase {
         this.cooldown = data.cooldown || 0;
         this.currentCooldown = 0;
         this.animation = data.animation || null;
-        
+        this.isBattle = data.isBattle || false;
+        this.school = data.school || null;
+        this.mechanic = data.mechanic || null;
+        this.mechanicParams = data.mechanicParams || null;
+
         // Вспомогательные объекты
         this.formulaParser = new FormulaParser();
         this.formulaCalculator = new FormulaCalculator();
         
         // Для модификаторов эффектов (расширение в будущем)
         this.effects = data.effects || [];
+        // Масштабирование от мастерства
+        this.scaling = data.scaling || {};
+        this.baseProjectiles = data.baseProjectiles || 1; // для магической стрелы
+        this.baseDuration = data.baseDuration || 0; // для эффектов
     }
     
     /**
@@ -89,16 +97,62 @@ class AbilityBase {
         // Потратить ресурсы
         this._spendResources(caster);
         
-        // Рассчитать урон
-        let damage = 0;
-        if (this.damageFormula && this.damageFormula !== '0') {
-            damage = this.calculateDamage(caster, target);
+        // ===== ПОЛУЧАЕМ БОНУСЫ ОТ ШКОЛЫ МАГИИ =====
+        let schoolDurationBonus = 0;
+        let schoolDamageMultiplier = 1.0;
+        
+        // Только для заклинаний и если есть школа
+        if (this.type === 'spell' && this.school && window.game?.abilityService) {
+            // Получаем ID умения школы 
+            const schoolSkillId = this._getSchoolSkillId(this.school);
+            if (schoolSkillId) {
+                // Получаем мастерство школы
+                const schoolMastery = window.game.abilityService.getMastery(caster.id, schoolSkillId) || 0;
+                
+                // +1 час длительности за каждые 25% мастерства школы
+                schoolDurationBonus = Math.floor(schoolMastery / 25);
+                
+                // +5% урона за каждые 20% мастерства школы
+                const damageBonusPercent = Math.floor(schoolMastery / 20) * 5;
+                schoolDamageMultiplier = 1 + (damageBonusPercent / 100);
+            }
         }
         
-        // Применить эффекты (если есть)
-        this.applyEffects(caster, target);
+        // ===== ПОЛУЧАЕМ МАСТЕРСТВО САМОГО ЗАКЛИНАНИЯ =====
+        let spellMastery = 0;
+        if (window.game?.abilityService) {
+            spellMastery = window.game.abilityService.getMastery(caster.id, this.id) || 0;
+        }
         
-        // Установить перезарядку
+        // ===== ПРИМЕНЯЕМ МАСШТАБИРОВАНИЕ КОЛИЧЕСТВА СНАРЯДОВ =====
+        let projectiles = this.baseProjectiles || 1;
+        if (this.scaling && this.scaling.projectiles) {
+            projectiles = this.getScaledValue('projectiles', this.baseProjectiles, spellMastery);
+        }
+        
+        // ===== РАССЧИТЫВАЕМ УРОН =====
+        let damage = 0;
+        if (this.damageFormula && this.damageFormula !== '0') {
+            // Урон одного снаряда
+            const baseDamage = this.calculateDamage(caster, target);
+            // Умножаем на количество снарядов
+            damage = baseDamage * projectiles;
+            // Применяем множитель урона от школы
+            damage = Math.floor(damage * schoolDamageMultiplier);
+            // Применяем множитель от пассивок (spellDamageMultiplier)
+            const stats = caster.getStats();
+            const passiveMultiplier = stats.spellDamageMultiplier || 1.0;
+            
+            // Проверяем: множитель активен И цель существует И цель НЕ игрок
+            if (passiveMultiplier !== 1.0 && target && target.type !== 'player') {
+                damage = Math.floor(damage * passiveMultiplier);
+            }
+        }
+        
+        // ===== ПРИМЕНЯЕМ ЭФФЕКТЫ С УЧЕТОМ БОНУСА ДЛИТЕЛЬНОСТИ =====
+        this.applyEffects(caster, target, schoolDurationBonus);
+        
+        // ===== УСТАНАВЛИВАЕМ ПЕРЕЗАРЯДКУ =====
         if (this.cooldown > 0) {
             this.currentCooldown = this.cooldown;
         }
@@ -112,6 +166,19 @@ class AbilityBase {
             caster: caster,
             target: target
         };
+    }
+
+    _getSchoolSkillId(school) {
+        const mapping = {
+            'fire': 'магия_огня',
+            'water': 'магия_воды',
+            'air': 'магия_воздуха',
+            'earth': 'магия_земли',
+            'life': 'магия_жизни',
+            'mind': 'магия_разума',
+            'dark': 'магия_тьмы'
+        };
+        return mapping[school] || null;
     }
         /**
      * Отметить способность как использованную (для кулдаунов и ресурсов)
@@ -183,14 +250,124 @@ class AbilityBase {
         }
     }
     /**
-     * Применить эффекты способности (заглушка для расширения)
+     * Получить масштабированное значение параметра
+     * @param {string} paramName - имя параметра ('projectiles', 'damage', и т.д.)
+     * @param {number} baseValue - базовое значение
+     * @param {number} mastery - текущее мастерство (0-100)
+     * @returns {number}
      */
-    applyEffects(caster, target = null) {
-        // Для будущего расширения (эффекты, баффы, дебаффы)
-        if (this.effects.length > 0) {
-            // Интеграция с BaseEffect.js будет в Фазе 2
+    getScaledValue(paramName, baseValue, mastery) {
+        if (!this.scaling || !this.scaling[paramName]) return baseValue;
+        
+        const formula = this.scaling[paramName];
+        // Заменяем "mastery" на реальное значение
+        let formulaStr = formula.replace(/mastery/g, mastery);
+        
+        // Заменяем математические функции на Math.*
+        formulaStr = formulaStr.replace(/floor/g, 'Math.floor');
+        formulaStr = formulaStr.replace(/ceil/g, 'Math.ceil');
+        formulaStr = formulaStr.replace(/round/g, 'Math.round');
+        formulaStr = formulaStr.replace(/min/g, 'Math.min');
+        formulaStr = formulaStr.replace(/max/g, 'Math.max');
+        
+        try {
+            // Вычисляем формулу
+            const result = eval(formulaStr);
+            return baseValue + result;
+        } catch (e) {
+            console.error(`Ошибка вычисления scaling для ${paramName}:`, e);
+            return baseValue;
         }
-        return [];
+    }
+    /**
+     * Применить эффекты заклинания/умения
+     * @param {Character} caster - кто применяет
+     * @param {Character} target - цель
+     * @param {number} durationBonus - бонус к длительности (от школы магии)
+     * @returns {Array} - примененные эффекты
+     */
+    applyEffects(caster, target = null, durationBonus = 0) {
+        const appliedEffects = [];
+        
+        // Если нет эффектов - выходим
+        if (!this.effects || this.effects.length === 0) {
+            return appliedEffects;
+        }
+        
+        // Определяем цель для эффекта
+        const effectTarget = target || caster;
+        if (!effectTarget) return appliedEffects;
+        
+        // Получаем сервис эффектов
+        const effectService = window.game?.effectService;
+        if (!effectService) {
+            console.warn('EffectService не найден');
+            return appliedEffects;
+        }
+        
+        // Применяем каждый эффект из списка
+        this.effects.forEach(effectId => {
+            // Базовая длительность (из заклинания или 0)
+            let duration = this.effectDuration || 0;
+            
+            // Если есть базовая длительность в заклинании
+            if (this.baseDuration) {
+                duration = this.baseDuration;
+            }
+            
+            // Добавляем бонус от школы магии
+            duration += durationBonus;
+            
+            // ПОЛУЧАЕМ ШАНС СРАБАТЫВАНИЯ ЭФФЕКТА
+            let chance = this.baseEffectChance !== undefined ? this.baseEffectChance : 100;
+            
+            // Если есть масштабирование шанса от мастерства
+            if (this.scaling && this.scaling.effectChance) {
+                const mastery = window.game.abilityService.getMastery(caster.id, this.id) || 0;
+                const bonus = this.getScaledValue('effectChance', 0, mastery);
+                chance += bonus;
+            }
+            
+            // Проверяем шанс
+            if (Math.random() * 100 > chance) {
+                return; // эффект не сработал
+            }
+            
+            // Применяем эффект через EffectService
+            const effect = effectService.applyEffect(
+                effectTarget,
+                effectId,
+                `${this.type}_${this.id}`,
+                {
+                    durationOverride: duration,
+                    stacksOverride: this.effectStacks || 1
+                }
+            );
+            
+            if (effect) {
+                appliedEffects.push(effect);
+                
+                // ЛОГИРОВАНИЕ
+                const targetName = effectTarget.name || effectTarget.id;
+                const effectName = effect.name || effectId;
+                
+                let message = '';
+                if (effectTarget === target && target !== caster) {
+                    message = `✨ ${effectName} наложен на ${targetName}!`;
+                } else if (effectTarget === caster) {
+                    message = `✨ Вы получили эффект ${effectName}!`;
+                }
+                
+                if (message && window.game?.gameState?.eventBus) {
+                    window.game.gameState.eventBus.emit('log:add', {
+                        message: message,
+                        type: effect.isDebuff ? 'warning' : 'success'
+                    });
+                }
+            }
+        });
+        
+        return appliedEffects;
     }
     
     /**

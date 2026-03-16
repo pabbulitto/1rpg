@@ -340,6 +340,17 @@ class NonPlayerCharacter extends Character {
                 });
             }
         }
+        // ===== СТАРТОВЫЕ ЭФФЕКТЫ =====
+        if (config.startingEffects && config.startingEffects.length > 0 && window.game?.effectService) {
+            config.startingEffects.forEach(effectId => {
+                window.game.effectService.applyEffect(
+                    this,
+                    effectId,
+                    'innate',
+                    { durationOverride: 0 }
+                );
+            });
+        }
         // ===== ЭКИПИРОВКА С ШАНСОМ =====
         if (config.equipmentChance) {
             Object.entries(config.equipmentChance).forEach(([slot, equipConfig]) => {

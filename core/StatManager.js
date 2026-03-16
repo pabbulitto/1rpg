@@ -49,7 +49,16 @@ class StatManager {
     
     this.finalStats = this.calculateFinalStats();
   }
-
+  /**
+   * Получить уровень игрока
+   * @returns {number}
+   */
+  getPlayerLevel() {
+      if (this.gameState?.getPlayer) {
+          return this.gameState.getPlayer().level || 1;
+      }
+      return 1;
+  }
   // === МОДИФИКАТОРЫ ===
   addModifier(source, stats) {
     if (!source || typeof source !== 'string') {
@@ -89,93 +98,153 @@ class StatManager {
 
   // === ОСНОВНОЙ РАСЧЁТ ===
   calculateFinalStats() {
-    const result = { ...this.baseStats };
-
-    // Применяем модификаторы
-    for (const modifier of this.modifiers) {
-      for (const [statKey, value] of Object.entries(modifier.stats)) {
-        if (result[statKey] === undefined) result[statKey] = 0;
-        if (typeof value === 'number') {
-          result[statKey] += value;
-        }
+      // 1. Начинаем с базовых статов
+      const result = { ...this.baseStats };
+      
+      // 2. Сохраняем все значения из модификаторов во временный объект
+      //    Это нужно чтобы не потерять бонусы от предметов при перезаписи
+      const modifierValues = {};
+      for (const modifier of this.modifiers) {
+          for (const [statKey, value] of Object.entries(modifier.stats)) {
+              if (modifierValues[statKey] === undefined) modifierValues[statKey] = 0;
+              modifierValues[statKey] += value;
+          }
       }
-    }
+      
+      // 3. Применяем все модификаторы к result (для непротиворечивости)
+      for (const [statKey, value] of Object.entries(modifierValues)) {
+          if (result[statKey] === undefined) result[statKey] = 0;
+          result[statKey] += value;
+      }
 
-    // Суммируем бонусы из модификаторов
-    let healthBonus = 0;
-    let manaBonus = 0;
-    let maxStaminaBonus = 0;
-    let armorBonus = 0;
-    let defenseBonus = 0;
+      // 4. Суммируем специальные бонусы (для обратной совместимости)
+      let healthBonus = 0;
+      let manaBonus = 0;
+      let maxStaminaBonus = 0;
+      let armorBonus = 0;
+      let defenseBonus = 0;
 
-    for (const modifier of this.modifiers) {
-      if (modifier.stats.maxHealth) healthBonus += modifier.stats.maxHealth;
-      if (modifier.stats.maxMana) manaBonus += modifier.stats.maxMana;
-      if (modifier.stats.maxStamina) maxStaminaBonus += modifier.stats.maxStamina;
-      if (modifier.stats.armor) armorBonus += modifier.stats.armor;
-      if (modifier.stats.defense) defenseBonus += modifier.stats.defense;
-    }
+      for (const modifier of this.modifiers) {
+          if (modifier.stats.maxHealth) healthBonus += modifier.stats.maxHealth;
+          if (modifier.stats.maxMana) manaBonus += modifier.stats.maxMana;
+          if (modifier.stats.maxStamina) maxStaminaBonus += modifier.stats.maxStamina;
+          if (modifier.stats.armor) armorBonus += modifier.stats.armor;
+          if (modifier.stats.defense) defenseBonus += modifier.stats.defense;
+      }
 
-    // --- МОДИФИКАТОРЫ ХАРАКТЕРИСТИК ---
-    result.strengthMod = this.formulaCalculator.calculateModifier(result.strength);
-    result.dexterityMod = this.formulaCalculator.calculateModifier(result.dexterity);
-    result.constitutionMod = this.formulaCalculator.calculateModifier(result.constitution);
-    result.intelligenceMod = this.formulaCalculator.calculateModifier(result.intelligence);
-    result.wisdomMod = this.formulaCalculator.calculateModifier(result.wisdom);
-    result.charismaMod = this.formulaCalculator.calculateModifier(result.charisma);
+      // 5. Модификаторы характеристик (зависят только от базовых значений)
+      result.strengthMod = this.formulaCalculator.calculateModifier(result.strength);
+      result.dexterityMod = this.formulaCalculator.calculateModifier(result.dexterity);
+      result.constitutionMod = this.formulaCalculator.calculateModifier(result.constitution);
+      result.intelligenceMod = this.formulaCalculator.calculateModifier(result.intelligence);
+      result.wisdomMod = this.formulaCalculator.calculateModifier(result.wisdom);
+      result.charismaMod = this.formulaCalculator.calculateModifier(result.charisma);
 
-    // --- БОЕВЫЕ ХАРАКТЕРИСТИКИ ---
-    // --- БОНУСЫ АТАКИ И ПОВРЕЖДЕНИЙ ---
-    result.hitroll = this.formulaCalculator.calculateHitroll(result.strength);
-    result.damroll = this.formulaCalculator.calculateDamroll(result.strength);
-    // Класс защиты (AC) теперь учитывает defenseBonus
-    const totalDefense = (result.defense || 0) + defenseBonus;
-    result.armorClass = this.formulaCalculator.calculateArmorClass(result.dexterity, totalDefense);
-    
-    // Поглощение урона и величина брони теперь учитывают armorBonus
-    result.damageReduction = this.formulaCalculator.calculateDamageReduction(armorBonus);
-    result.armorValue = armorBonus;
-    
-    // --- РЕСУРСЫ ---
-    result.maxHealth = this.formulaCalculator.calculateMaxHealth(result.baseHealth, result.constitution, healthBonus);
-    result.healthPerLevel = this.formulaCalculator.calculateHealthPerLevel(result.constitution);
-    result.healthBonus = healthBonus;
+      // 6. БОЕВЫЕ ХАРАКТЕРИСТИКИ
+      // hitroll: базовый + бонусы
+      const baseHitroll = this.formulaCalculator.calculateHitroll(result.strength);
+      result.hitroll = baseHitroll + (modifierValues.hitroll || 0);
+      
+      // damroll: базовый + бонусы
+      const baseDamroll = this.formulaCalculator.calculateDamroll(result.strength);
+      result.damroll = baseDamroll + (modifierValues.damroll || 0);
+      
+      // Класс защиты
+      const totalDefense = (result.defense || 0) + defenseBonus;
+      result.armorClass = this.formulaCalculator.calculateArmorClass(result.dexterity, totalDefense);
+      
+      // Поглощение урона
+      result.damageReduction = this.formulaCalculator.calculateDamageReduction(armorBonus);
+      result.armorValue = armorBonus;
 
-    result.maxMana = this.formulaCalculator.calculateMaxMana(result.baseMana, result.intelligence, result.wisdom, manaBonus);
-    result.manaPerLevel = 3;
-    
-    result.maxStamina = this.formulaCalculator.calculateMaxStamina(result.baseStamina, result.dexterityMod, maxStaminaBonus);
-    
-    // --- РЕГЕНЕРАЦИЯ ---
-    // Используем значения из baseStats (из JSON), если они есть, иначе рассчитываем по формуле
-    result.healthRegen = this.baseStats.healthRegen || this.formulaCalculator.calculateHealthRegen(result.constitution);
-    result.manaRegen = this.baseStats.manaRegen || this.formulaCalculator.calculateManaRegen(result.wisdom);
-    result.staminaRegen = this.baseStats.staminaRegen || this.formulaCalculator.calculateStaminaRegen(result.dexterity);
-    
-    // --- МАГИЯ ---
-    result.spellPower = this.formulaCalculator.calculateSpellPower(result.wisdom);
-    result.magicArmorClass = this.formulaCalculator.calculateMagicArmorClass(result.intelligence);
-    
-    // --- ДОПОЛНИТЕЛЬНЫЕ ХАРАКТЕРИСТИКИ ---
-    result.luckBonus = this.formulaCalculator.calculateLuckBonus(result.charisma);
-    result.initiative = result.dexterity;
-    result.carryCapacity = this.formulaCalculator.calculateCarryCapacity(result.strengthMod, result.dexterityMod);
-    
-    // --- СОПРОТИВЛЕНИЯ ---
-    result.poisonResistance = this.formulaCalculator.calculateResistance(result.constitutionMod);
-    result.diseaseResistance = this.formulaCalculator.calculateResistance(result.constitutionMod);
-    result.spellResistance = this.formulaCalculator.calculateResistance(result.wisdomMod);
-    result.mentalResistance = this.formulaCalculator.calculateResistance(result.wisdomMod, result.charismaMod * 5);
-    result.critResistance = this.formulaCalculator.calculateCritResistance(result.constitution);
-    // --- СОЦИАЛЬНЫЕ ---
-    result.charmChance = this.formulaCalculator.calculateCharmChance(result.charismaMod);
-    result.persuasionDC = this.formulaCalculator.calculatePersuasionDC(result.charisma);
-    
-    result.attack = result.hitroll || 0;
-    
-    this.applyMinimumValues(result);
-    
-    return result;
+      // 7. РЕСУРСЫ (максимумы)
+      result.maxHealth = this.formulaCalculator.calculateMaxHealth(result.baseHealth, result.constitution, healthBonus);
+      result.maxMana = this.formulaCalculator.calculateMaxMana(result.baseMana, result.intelligence, result.wisdom, manaBonus);
+      result.maxStamina = this.formulaCalculator.calculateMaxStamina(result.baseStamina, result.dexterity, maxStaminaBonus);
+      
+      // Сохраняем бонусы для отладки
+      result.healthBonus = healthBonus;
+
+      // 8. РЕГЕНЕРАЦИЯ (базовая + бонусы)
+      const playerLevel = this.getPlayerLevel ? this.getPlayerLevel() : 1;
+      
+      const baseHealthRegen = this.baseStats.healthRegen || this.formulaCalculator.calculateHealthRegen(result.constitution, playerLevel);
+      result.healthRegen = baseHealthRegen + (modifierValues.healthRegen || 0);
+      
+      const baseManaRegen = this.baseStats.manaRegen || this.formulaCalculator.calculateManaRegen(result.wisdom, playerLevel);
+      result.manaRegen = baseManaRegen + (modifierValues.manaRegen || 0);
+      
+      const baseStaminaRegen = this.baseStats.staminaRegen || this.formulaCalculator.calculateStaminaRegen(result.dexterity, playerLevel);
+      result.staminaRegen = baseStaminaRegen + (modifierValues.staminaRegen || 0);
+
+      // 9. ПРИРОСТ ЗА УРОВЕНЬ
+      result.healthPerLevel = this.formulaCalculator.calculateHealthPerLevel(result.constitution);
+      result.manaPerLevel = this.formulaCalculator.calculateManaPerLevel(result.wisdom);
+      result.staminaPerLevel = this.formulaCalculator.calculateStaminaPerLevel(result.dexterity);
+
+      // 10. МАГИЯ
+      const baseSpellPower = this.formulaCalculator.calculateSpellPower(result.wisdom);
+      result.spellPower = baseSpellPower + (modifierValues.spellPower || 0);
+      
+      result.magicArmorClass = this.formulaCalculator.calculateMagicArmorClass(result.intelligence);
+
+      // 11. ДОПОЛНИТЕЛЬНЫЕ ХАРАКТЕРИСТИКИ
+      const baseLuckBonus = this.formulaCalculator.calculateLuckBonus(result.charisma);
+      result.luckBonus = baseLuckBonus + (modifierValues.luckBonus || 0);
+      
+      result.initiative = result.dexterity + (modifierValues.initiative || 0);
+      
+      const baseCarryCapacity = this.formulaCalculator.calculateCarryCapacity(result.strengthMod, result.dexterityMod);
+      result.carryCapacity = baseCarryCapacity + (modifierValues.carryCapacity || 0);
+
+      // 12. СОПРОТИВЛЕНИЯ
+      const basePoisonResistance = this.formulaCalculator.calculateResistance(result.constitutionMod);
+      result.poisonResistance = basePoisonResistance + (modifierValues.poisonResistance || 0);
+      
+      const baseDiseaseResistance = this.formulaCalculator.calculateResistance(result.constitutionMod);
+      result.diseaseResistance = baseDiseaseResistance + (modifierValues.diseaseResistance || 0);
+      
+      const baseSpellResistance = this.formulaCalculator.calculateResistance(result.wisdomMod);
+      result.spellResistance = baseSpellResistance + (modifierValues.spellResistance || 0);
+      
+      const baseMentalResistance = this.formulaCalculator.calculateResistance(result.wisdomMod, result.charismaMod * 5);
+      result.mentalResistance = baseMentalResistance + (modifierValues.mentalResistance || 0);
+      
+      const baseCritResistance = this.formulaCalculator.calculateCritResistance(result.constitution);
+      result.critResistance = baseCritResistance + (modifierValues.critResistance || 0);
+
+      // 13. СОЦИАЛЬНЫЕ
+      const baseCharmChance = this.formulaCalculator.calculateCharmChance(result.charismaMod);
+      result.charmChance = baseCharmChance + (modifierValues.charmChance || 0);
+      
+      const basePersuasionDC = this.formulaCalculator.calculatePersuasionDC(result.charisma);
+      result.persuasionDC = basePersuasionDC + (modifierValues.persuasionDC || 0);
+
+      // 14. АТАКА (производное от hitroll)
+      result.attack = result.hitroll || 0;
+
+      // 15. ПОЛЯ-ЗАГЛУШКИ (для будущего, пока = 0)
+      // Спасброски
+      result.will = 0;
+      result.healthSave = 0;
+      result.fortitude = 0;
+      result.reflex = 0;
+      
+      // Магические сопротивления
+      result.fireResist = 0;
+      result.waterResist = 0;
+      result.earthResist = 0;
+      result.airResist = 0;
+      result.darkResist = 0;
+      result.mindResist = 0;
+      
+      // Тяжёлые раны
+      result.heavyWounds = 0;
+
+      // 16. Минимальные значения
+      this.applyMinimumValues(result);
+      
+      return result;
   }
 
   applyMinimumValues(result) {

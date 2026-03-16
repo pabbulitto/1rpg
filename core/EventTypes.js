@@ -135,7 +135,13 @@ export const EventTypes = {
     EFFECT_REMOVED: 'effect:removed',
     /** Эффект обновлён (тик, стаки) */
     EFFECT_UPDATED: 'effect:updated',
-    
+
+    // ========== ПАССИВНЫЕ СПОСОБНОСТИ ==========
+    PASSIVE_FLAG_CHANGED: 'passive:flagChanged',
+    PASSIVE_LEARNED: 'passive:learned',
+    PASSIVE_INNATE_APPLIED: 'passive:innateApplied',
+    PASSIVE_REINCARNATION: 'passive:reincarnation',
+
     // ========== СИСТЕМНЫЕ ==========
     /** Игра сохранена */
     SYSTEM_SAVED: 'system:saved',
@@ -201,6 +207,10 @@ export const LegacyEvents = {
     'effect:applied': EventTypes.EFFECT_APPLIED,
     'effect:removed': EventTypes.EFFECT_REMOVED,
     'effect:updated': EventTypes.EFFECT_UPDATED,
+    'passive:flagChanged': EventTypes.PASSIVE_FLAG_CHANGED,
+    'passive:learned': EventTypes.PASSIVE_LEARNED,
+    'passive:innateApplied': EventTypes.PASSIVE_INNATE_APPLIED,
+    'passive:reincarnation': EventTypes.PASSIVE_REINCARNATION,
     'system:saved': EventTypes.SYSTEM_SAVED,
     'system:loaded': EventTypes.SYSTEM_LOADED,
     'system:error': EventTypes.SYSTEM_ERROR

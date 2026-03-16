@@ -1,0 +1,149 @@
+{
+    "драчун": {
+        "name": "Драчун",
+        "description": "В уличной драке важна не только сила, но и сноровка. Вы знаете куда бить, чтобы было больнее. Увеличивает попадание и усиливает эффект от каменных рук",
+        "modifiers": {
+            "hitroll": 1,
+            "stoneHandsEffectiveness": 1.3
+        },
+        "conditionFormula": "weaponType == 'unarmed'",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "огромные_кулаки": {
+        "name": "Огромные кулаки",
+        "description": "В бою голыми руками (без оружия) дополнительно +1 повреждение за каждое очко силы выше 25.",
+        "modifiers": {
+            "damroll": "max(0, strength - 25)"
+        },
+        "conditionFormula": "weaponType == 'unarmed'",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "боевое_колдовство": {
+        "name": "Боевое колдовство",
+        "description": "Вы способны без ущерба для успеха заклинаний носить предметы из любых материалов.",
+        "modifiers": {
+            "ignoreArmorPenalty": true
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "ускоренное_заживление": {
+        "name": "Ускоренное заживление",
+        "description": "Ваши раны затягиваются быстрее обычного, словно вы не замечаете полученных ран. Плюс к скорости восстановления жизни.",
+        "modifiers": {
+            "healthRegen": 4
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "грузоподъёмность": {
+        "name": "Грузоподъёмность",
+        "description": "Вы привыкли носить тяжёлую поклажу и не чувствовать дискомфорта.Увеличивает максимальный переносимый вес на 100.",
+        "modifiers": {
+            "carryCapacity": 100
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "неутомимость": {
+        "name": "Неутомимость",
+        "description": "Ваше тело восстанавливается быстрее обычного, а каждый новый уровень добавляет сил. Увеличивает прирост стамины с уровнем и скорость её восстановления.",
+        "modifiers": {
+            "staminaRegen": 3,
+            "staminaPerLevel": 1
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "мощь_колдовства": {
+        "name": "Мощь колдовства",
+        "description": "Вы вкладываете в свои заклинания больше силы, заставляя их бить больнее - на 30% увеличивает урон от заклинаний (не действует на игроков).",
+        "modifiers": {
+            "spellDamageMultiplier": 1.3
+        },
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "магический_поток": {
+        "name": "Магический поток",
+        "description": "Ваша внутренняя энергия восстанавливается быстрее, позволяя чаще использовать заклинания. Ускоряет восстановление манны.",
+        "modifiers": {
+            "manaRegen": 3
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "ночное_зрение": {
+        "name": "Ночное зрение",
+        "description": "Ваши глаза способны видеть в полной темноте, различая детали там, где другие видят лишь черноту.",
+        "grantsEffect": "видение_ночью",
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "отступление": {
+        "name": "Отступление",
+        "description": "Вы умеете вовремя уносить ноги, не теряя при этом ни опыта, ни достоинства.",
+        "modifiers": {
+            "retainExpOnFlee": true
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "хладнокровие": {
+        "name": "Хладнокровие",
+        "description": "В самой опасной ситуации вы сохраняете ясность ума и можете выбрать наиболее безопасный путь для отступления.",
+        "modifiers": {
+            "canChooseEscapeDestination": true
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "тихое_бегство": {
+        "name": "Тихое бегство",
+        "description": "Вы исчезаете так быстро, что никто не успевает заметить, в какую сторону вы направились.",
+        "modifiers": {
+            "hideEscapeDirection": true
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "твердая_рука": {
+        "name": "Твердая рука",
+        "description": "Ваши движения точны и выверены, будь то боевой клинок или обычная кружка. Увеличивает попадание.",
+        "modifiers": {
+            "hitroll": 1
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "воровской_удар": {
+        "name": "Воровской удар",
+        "description": "Вы можете нанести удар в спину даже тем кто постоянно двигается находясь в бою.",
+        "modifiers": {
+            "canBackstabInCombat": true
+        },
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    },
+    "обостренное_чутье": {
+        "name": "Обостренное чутье",
+        "description": "Вы кожей ощущаете всех существ вокруг, даже спрятавшихся.",
+        "grantsEffect": "чувствовать_жизнь",
+        "conditionFormula": "true",
+        "requiredLevel": 1,
+        "exclusive": false
+    }
+}

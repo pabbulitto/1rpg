@@ -1,6 +1,7 @@
 import { BattleSystem } from '../system/BattleSystem.js';
 import { PlayerCharacter } from '../core/PlayerCharacter.js';
 import { EntityContainer } from '../core/EntityContainer.js';
+import { PassiveManager } from '../core/PassiveManager.js';
 /**
  * BattleOrchestrator - центральный координатор боя
  * Содержит ВСЮ бизнес-логику завершения боя
@@ -130,10 +131,28 @@ class BattleOrchestrator {
             abilityService: this.game.abilityService,
             battleSystem: this.game.battleSystem
         });
+        // Копируем способности и их мастерство
         const oldAbilities = this.game.abilityService.getCharacterAbilities(oldPlayer.id);
         oldAbilities.forEach(ability => {
+            const mastery = this.game.abilityService.getMastery(oldPlayer.id, ability.id);
             this.game.abilityService.addAbilityToCharacter(newPlayer.id, ability.id);
+            this.game.abilityService.setMastery(newPlayer.id, ability.id, mastery);
         });
+            // Копируем пассивки 
+        if (oldPlayer.passiveManager) {
+            // Создаем PassiveManager для нового игрока
+            newPlayer.passiveManager = new PassiveManager(
+                newPlayer.id,
+                newPlayer.class,
+                gameState,
+                window.game.passiveAbilityService,
+                window.game.formulaParser,
+                window.game.contextManager
+            );
+            
+            // Копируем данные из старого менеджера
+            newPlayer.passiveManager.fromJSON(oldPlayer.passiveManager.toJSON());
+        }
         // Копируем имя и уровень
         newPlayer.name = oldPlayer.name;
         newPlayer.level = oldPlayer.level;

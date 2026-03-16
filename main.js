@@ -20,17 +20,23 @@ import { itemRegistry } from './core/ItemRegistry.js';
 import { GraphicsEngine } from './ui/GraphicsEngine.js';
 import { BattleCanvas } from './ui/BattleCanvas.js';
 import { GroundBag } from './core/GroundBag.js';
+import { EffectService } from './services/EffectService.js';
+import { PassiveAbilityService } from './services/PassiveAbilityService.js';
+import { FormulaParser } from './system/FormulaParser.js';
+import { ContextManager } from './services/ContextManager.js';  
 // Импорт всех UI компонентов
 import { CharacterCreationUI } from './ui/components/CharacterCreationUI.js';
 import { StatsUI } from './ui/components/StatsUI.js';
 import { InventoryUI } from './ui/components/InventoryUI.js';
 import { EquipmentUI } from './ui/components/EquipmentUI.js';
 import { SkillsUI } from './ui/components/SkillsUI.js';
+import { PassivesEffectsUI } from './ui/components/PassivesEffectsUI.js';
 import { TimeUI } from './ui/components/TimeUI.js';
 import { LogUI } from './ui/components/LogUI.js';
 import { ShopUI } from './ui/components/ShopUI.js';
 import { BeltUI } from './ui/components/BeltUI.js';
 import { MapUI } from './ui/components/MapUI.js';
+import { EntityActionModal } from './ui/components/EntityActionModal.js';
 
 
 
@@ -39,6 +45,20 @@ class Game {
     this.gameState = new GameState();
     this.dataService = new DataService();
     this.abilityService = new AbilityService(this.gameState);
+
+    this.formulaParser = new FormulaParser();
+    this.passiveAbilityService = new PassiveAbilityService(
+      this.gameState.eventBus,
+      this.formulaParser
+    );
+
+    this.effectService = new EffectService(
+      this.gameState.eventBus,
+      this.formulaParser
+    );
+
+    this.contextManager = new ContextManager(this, this.gameState.eventBus);
+    this.contextManager.init();
     // 1. Создаем DiceRoller
     this.diceRoller = new DiceRoller();
     
@@ -68,7 +88,7 @@ class Game {
     // 6. Остальные системы
     this.zoneManager = new ZoneManager(this.gameState);
     this.graphicsEngine = new GraphicsEngine('game-canvas', this);
-    this.battleCanvas = new BattleCanvas('battle-canvas', this, this.beltSystem);;
+    this.battleCanvas = new BattleCanvas('battle-canvas', this, this.beltSystem);
 
     this.equipmentService = new EquipmentService(
       this.gameState.eventBus,
@@ -100,11 +120,13 @@ class Game {
       InventoryUI,
       EquipmentUI,
       SkillsUI,
+      PassivesEffectsUI,  
       TimeUI,
       LogUI,
       ShopUI,
       BeltUI,
-      MapUI
+      MapUI,
+      EntityActionModal
     };
     
     this.uiManager = new UIManager(this, uiComponents, this.graphicsEngine, this.battleCanvas);
@@ -122,10 +144,15 @@ class Game {
   async init() {
     try {
       await this.dataService.loadGameData();
-
       // Инициализация реестра предметов
       itemRegistry.init();
+      // Загружаем пассивные способности
+      const passiveData = await this.dataService.loadJson('data/passive-abilities.json');
+      this.passiveAbilityService.loadPassives(passiveData);
       
+      const effectsData = await this.dataService.loadJson('data/effects.json');
+      this.effectService.loadEffects(effectsData);
+
       this.enemyService.enemiesData = this.dataService.enemiesData;
       
       this.abilityService.loadAbilities(
@@ -140,7 +167,6 @@ class Game {
       this.graphicsEngine.init();
       const currentRoom = this.gameState.getPosition().room;
       this.zoneManager.addEntity(currentRoom, this.player);      
-      this.uiManager.init();
       this.isInitialized = true;
       
       let playerName = "Герой";
@@ -251,6 +277,8 @@ class Game {
         this.player.name = playerName;
         this.loadGame();
       }
+      //инициализируем UI
+      this.uiManager.init();
       
       this.gameManager.explore();
       

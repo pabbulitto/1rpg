@@ -22,7 +22,7 @@ class DataService {
                 this.loadJson('./data/shops.json'),
                 this.loadJson('./data/spells.json'),
                 this.loadJson('./data/skills.json'),
-                this.loadJson('./data/stat-presets.json') 
+                this.loadJson('./data/stat-presets.json'), 
             ]);
             
             this.enemiesData = enemiesData;
@@ -42,6 +42,7 @@ class DataService {
             window.spellsData = spellsData;
             window.skillsData = skillsData;
             window.statPresets = statPresets;
+            
             
             this.loaded = true;
             console.log('DataService: данные игры загружены', {

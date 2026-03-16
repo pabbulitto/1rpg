@@ -468,7 +468,7 @@ class BattleCanvas {
         if (!abilityService) return;
         
         const player = this.game.player;
-        this.abilities = abilityService.getCharacterAbilities(player.id);
+        this.abilities = abilityService.getCharacterBattleAbilities(player.id); 
     }
 
     // ========== ЗАГРУЗКА РЕСУРСОВ ==========

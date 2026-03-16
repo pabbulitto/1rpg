@@ -1,7 +1,7 @@
 {
   "name": "Тихая деревня",
   "rooms": {
-    "х3у2z-1": {
+    "village.х3у2z-1": {
       "name": "Заброшенная площадь",
       "background": "assets/backgrounds/village/village_square.jpg",
       "description": "Сердце небольшой деревни. Вымощенная булыжником площадь окружена уютными домами с соломенными крышами. В центре стоит колодец, а вокруг снуют мирные жители. Отсюда расходятся несколько улочек.",
@@ -10,14 +10,14 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х3у1z-1",
-        "east": "х4у2z-1",
-        "south": "х3у3z-1",
-        "west": "х2у2z-1",
-        "up": "х3у2z0"
+        "north": "village.х3у1z-1",
+        "east": "village.х4у2z-1",
+        "south": "village.х3у3z-1",
+        "west": "village.х2у2z-1",
+        "up": "village.х3у2z0"
       }
     },
-    "х3у1z-1": {
+    "village.х3у1z-1": {
       "name": "Старая таверна",
       "background": "assets/backgrounds/village/tavern.jpg",
       "description": "Теплое, пропахшее элем и жареным мясом помещение. Массивные деревянные столы, за которыми сидят местные жители и редкие путники. За стойкой хмурый трактирщик полирует кружки.",
@@ -26,10 +26,10 @@
       "objects": [],
       "items": [],
       "directions": {
-        "south": "х3у2z-1"
+        "south": "village.х3у2z-1"
       }
     },
-    "х4у2z-1": {
+    "village.х4у2z-1": {
       "name": "Разрушенная кузница",
       "background": "assets/backgrounds/village/blacksmith.jpg",
       "description": "Невыносимо жарко и шумно. Воздух дрожит от ударов молота о наковальню. У горна, озаренного багровым светом раскаленного металла, стоит могучий кузнец. Стены увешаны заготовками оружия и доспехов.",
@@ -38,10 +38,10 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х3у2z-1"
+        "west": "village.х3у2z-1"
       }
     },
-    "х3у3z-1": {
+    "village.х3у3z-1": {
       "name": "Хижина отшельника",
       "background": "assets/backgrounds/village/healer_hut.jpg",
       "description": "Небольшой домик на окраине, утопающий в зарослях лечебных трав. Внутри пахнет сушеными растениями и благовониями. Полки заставлены склянками и сушеными корешками. Пожилая женщина в платке перебирает травы.",
@@ -50,11 +50,11 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х3у2z-1",
-        "east": "х4у3z-1"
+        "north": "village.х3у2z-1",
+        "east": "village.х4у3z-1"
       }
     },
-    "х2у2z-1": {
+    "village.х2у2z-1": {
       "name": "Старая ратуша",
       "background": "assets/backgrounds/village/town_hall.jpg",
       "description": "Самое большое и официальное здание в деревне. Внутри прохладно и просторно. На стенах висят старые карты и указы. За грубым дубовым столом сидит староста, окруженный бумагами.",
@@ -63,10 +63,10 @@
       "objects": [],
       "items": [],
       "directions": {
-        "east": "х3у2z-1"
+        "east": "village.х3у2z-1"
       }
     },
-    "х3у2z0": {
+    "village.х3у2z0": {
       "name": "Распутье",
       "description": "На обветренной вершине холма пересекаются несколько троп.",
       "background": "assets/backgrounds/village/market.jpg",
@@ -75,12 +75,12 @@
       "objects": [],
       "items": [],
       "directions": {
-        "down": "х3у2z-1",
-        "east": "forest:х1у2z0",
-        "north": "southwest_village:х4у15z0"
+        "down": "village.х3у2z-1",
+        "east": "forest:forest.х1у2z0",
+        "north": "southwest_village:southwest_village.х4у16z0"
       }
     },
-    "х4у3z-1": {
+    "village.х4у3z-1": {
       "name": "Колодец",
       "background": "assets/backgrounds/village/well.jpg",
       "description": "Старый каменный колодец с деревянным срубом и воротом. Вода чистая и холодная.",
@@ -89,7 +89,7 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х3у3z-1"
+        "west": "village.х3у3z-1"
       }
     }
   }

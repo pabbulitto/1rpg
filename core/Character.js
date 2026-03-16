@@ -8,6 +8,8 @@
  * Содержит ТОЛЬКО общие для всех поля и методы.
  * НЕ содержит логики "если игрок — делай так, если враг — иначе".
  */
+import { mechanics } from '../system/mechanics.js';
+
 class Character {
     constructor(dependencies = {}) {
         // Инверсия зависимостей — всё передаётся извне
@@ -194,7 +196,7 @@ class Character {
         const rightHand = equipment.right_hand;
         const leftHand = equipment.left_hand;
         
-        // ===== 1. ПРИРОДНОЕ ОРУЖИЕ (когти, клыки, жало) =====
+        //  1. ПРИРОДНОЕ ОРУЖИЕ (когти, клыки, жало)
         // Используется только если нет оружия в правой руке
         if (!rightHand && this.naturalWeapon) {
             attacks.push({
@@ -209,7 +211,7 @@ class Character {
             });
         }
         
-        // ===== 2. АТАКА ПРАВОЙ РУКОЙ (оружие) =====
+        // 2. АТАКА ПРАВОЙ РУКОЙ (оружие)
         if (rightHand && this._isWeapon(rightHand)) {
             attacks.push({
                 hand: 'right',
@@ -220,7 +222,7 @@ class Character {
             });
         }
         
-        // ===== 3. АТАКА ЛЕВОЙ РУКОЙ (оружие) =====
+        // 3. АТАКА ЛЕВОЙ РУКОЙ (оружие) 
         if (leftHand && this._isWeapon(leftHand)) {
             const isTwoHandedInRight = rightHand && rightHand.slot === 'two_handed';
             const isShield = leftHand.type === 'shield' || leftHand.properties?.includes('defensive');
@@ -236,7 +238,7 @@ class Character {
             }
         }
         
-        // ===== 4. ВЫБРАННАЯ СПОСОБНОСТЬ =====
+        //  4. ВЫБРАННАЯ СПОСОБНОСТЬ 
         if (this.selectedAbility && this.selectedAbility.canUse) {
             const canUseResult = this.selectedAbility.canUse(this);
             if (canUseResult.success) {
@@ -253,7 +255,7 @@ class Character {
             }
         }
         
-        // ===== 5. НЕТ ОРУЖИЯ И НЕТ ПРИРОДНОГО ОРУЖИЯ = КУЛАКИ =====
+        //  5. НЕТ ОРУЖИЯ И НЕТ ПРИРОДНОГО ОРУЖИЯ = КУЛАКИ 
         if (attacks.length === 0) {
             attacks.push({
                 hand: 'right',
@@ -265,7 +267,7 @@ class Character {
             });
         }
         
-        // ===== 6. ЕСТЬ СПОСОБНОСТЬ, НО НЕТ ОРУЖИЯ = ДОБАВЛЯЕМ КУЛАК/ПРИРОДНОЕ =====
+        //  6. ЕСТЬ СПОСОБНОСТЬ, НО НЕТ ОРУЖИЯ = ДОБАВЛЯЕМ КУЛАК/ПРИРОДНОЕ 
         else if (attacks.length === 1 && attacks[0].type === 'ability') {
             // Если есть природное оружие — используем его
             if (this.naturalWeapon) {
@@ -290,6 +292,10 @@ class Character {
                     damageFormula: '1d4'
                 });
             }
+        }
+        // 7. УДАР ЛЕВОЙ РУКОЙ через механику
+        if (this.abilityService) {
+            mechanics.leftHandStrike.modifyAttacks(this, attacks, this.abilityService);
         }
         
         return attacks;
@@ -430,18 +436,135 @@ class Character {
         this.selectedAbility = null;
     }
     
-    // --- ЗАГОТОВКИ ДЛЯ БУДУЩЕГО ---
-    
+    /**
+     * Добавить эффект к персонажу
+     * @param {BaseEffect} effect - объект эффекта
+     * @returns {boolean} успех операции
+     */
     addEffect(effect) {
-        // Будет реализовано в Этапе 3
+        if (!effect || !effect.id) return false;
+        
+        // Проверяем, есть ли уже такой эффект
+        const existingIndex = this.activeEffects.findIndex(e => e.id === effect.id);
+        
+        if (existingIndex >= 0) {
+            // Эффект уже есть - обновляем или добавляем стаки
+            const existing = this.activeEffects[existingIndex];
+            if (existing.addStack) {
+                existing.addStack(1);
+            }
+            return false;
+        } else {
+            // Добавляем новый эффект
+            this.activeEffects.push(effect);
+            
+            // Применяем эффект (модификаторы и т.д.)
+            if (effect.apply) {
+                effect.apply(this);
+            }
+            
+            // Уведомляем UI
+            if (this.eventBus) {
+                this.eventBus.emit('effect:applied', {
+                    effect: effect.getInfo ? effect.getInfo() : effect,
+                    target: this.id
+                });
+            }
+            
+            return true;
+        }
     }
-    
+
+    /**
+     * Удалить эффект у персонажа
+     * @param {string} effectId - ID эффекта
+     * @returns {boolean} успех операции
+     */
     removeEffect(effectId) {
-        // Будет реализовано в Этапе 3
+        const index = this.activeEffects.findIndex(e => e.id === effectId);
+        if (index >= 0) {
+            const effect = this.activeEffects[index];
+            
+            // Снимаем эффект
+            if (effect.remove) {
+                effect.remove(this);
+            }
+            
+            // Удаляем из массива
+            this.activeEffects.splice(index, 1);
+            
+            // Уведомляем UI
+            if (this.eventBus) {
+                this.eventBus.emit('effect:removed', {
+                    effectId: effectId,
+                    target: this.id
+                });
+            }
+            
+            return true;
+        }
+        return false;
     }
-    
+
+    /**
+     * Удалить эффект по источнику
+     * @param {string} source - источник эффекта
+     */
+    removeEffectsBySource(source) {
+        const toRemove = [];
+        for (let i = 0; i < this.activeEffects.length; i++) {
+            if (this.activeEffects[i].source === source) {
+                toRemove.push(i);
+            }
+        }
+        
+        // Удаляем с конца, чтобы не сбивать индексы
+        for (let i = toRemove.length - 1; i >= 0; i--) {
+            const effect = this.activeEffects[toRemove[i]];
+            if (effect.remove) effect.remove(this);
+            this.activeEffects.splice(toRemove[i], 1);
+        }
+    }
+
+    /**
+     * Проверить наличие эффекта
+     * @param {string} effectId - ID эффекта
+     * @returns {boolean}
+     */
+    hasEffect(effectId) {
+        return this.activeEffects.some(e => e.id === effectId);
+    }
+
+    /**
+     * Получить все активные эффекты
+     * @returns {Array} массив эффектов
+     */
+    getActiveEffects() {
+        return [...this.activeEffects];
+    }
+
+    /**
+     * Обработать эффекты (вызывается каждый ход)
+     */
     processEffects() {
-        // Будет реализовано в Этапе 3
+        const expired = [];
+        
+        for (let i = 0; i < this.activeEffects.length; i++) {
+            const effect = this.activeEffects[i];
+            if (effect.onTimeTick) {
+                const result = effect.onTimeTick();
+                if (result === 'expired') {
+                    expired.push(i);
+                }
+            }
+        }
+        
+        // Удаляем истекшие эффекты (с конца)
+        for (let i = expired.length - 1; i >= 0; i--) {
+            const effect = this.activeEffects[expired[i]];
+            if (effect.remove) effect.remove(this);
+            this.activeEffects.splice(expired[i], 1);
+        }
     }
 }
 

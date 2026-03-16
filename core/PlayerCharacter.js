@@ -1,6 +1,7 @@
 // core/PlayerCharacter.js
 import { Character } from './Character.js';
 import { EntityContainer } from './EntityContainer.js';
+import { PassiveManager } from './PassiveManager.js';
 
 /**
  * Персонаж игрока
@@ -58,6 +59,8 @@ class PlayerCharacter extends Character {
         /** @type {EntityContainer} Контейнер с инвентарем и экипировкой */
         this.container = gameState ? gameState.getPlayerContainer() : new EntityContainer();
         this.container.owner = this
+
+        this.passiveManager = null;
         // === БОЕВЫЕ ПАРАМЕТРЫ ===
         this.battleSystem = dependencies.battleSystem || null;
         this.selectedAbility = null;
@@ -150,14 +153,13 @@ class PlayerCharacter extends Character {
                     const baseStats = statManager.getBaseStats();
                     
                     const healthPerLevel = currentStats.healthPerLevel || 4;
-                    const newBaseHealth = (baseStats.baseHealth || 20) + healthPerLevel;
-                    
+                    const newBaseHealth = Math.floor((baseStats.baseHealth || 20) + healthPerLevel);
+
                     const manaPerLevel = currentStats.manaPerLevel || 3;
-                    const newBaseMana = (baseStats.baseMana || 20) + manaPerLevel;
-                    
-                    const dexterityMod = currentStats.dexterityMod || 0;
-                    const staminaPerLevel = 5 + dexterityMod;
-                    const newBaseStamina = (baseStats.baseStamina || 25) + staminaPerLevel;
+                    const newBaseMana = Math.floor((baseStats.baseMana || 20) + manaPerLevel);
+
+                    const staminaPerLevel = currentStats.staminaPerLevel || 5;
+                    const newBaseStamina = Math.floor((baseStats.baseStamina || 25) + staminaPerLevel);
                     
                     statManager.baseStats.baseHealth = newBaseHealth;
                     statManager.baseStats.baseMana = newBaseMana;
@@ -211,7 +213,11 @@ class PlayerCharacter extends Character {
             
             statManager.needsRecalculation = true;
         }
-        
+        // Обработка перерождения в менеджере пассивок
+        if (this.passiveManager) {
+            this.passiveManager.onReincarnation(this.reincarnations);
+        }
+
         this.gameState.getEventBus().emit('player:statsChanged', this.getStats());
         this.gameState.getEventBus().emit('log:add', {
             message: `✨ Перевоплощение ${this.reincarnations}! Характеристики +1`,
@@ -393,12 +399,8 @@ class PlayerCharacter extends Character {
         const result = this.container.equip(item, actualSlot, this.equipmentService, this);
         
         if (result.success && this.getStatManager()) {
-            // Применяем модификаторы экипировки
-            this.equipmentService.applyEquipmentModifiers.call({
-                statManager: this.getStatManager(),
-                eventBus: this.eventBus,
-                gameState: this.gameState
-            }, actualSlot, item);
+            // Применяем модификаторы экипировки - УБРАЛ .call()
+            this.equipmentService.applyEquipmentModifiers(actualSlot, item);
             
             this.gameState.getEventBus()?.emit('player:equipmentChanged', { 
                 slot: actualSlot, 
@@ -408,7 +410,7 @@ class PlayerCharacter extends Character {
         
         return result;
     }
-    
+
     /**
      * Снять предмет с экипировки
      * @param {string} slot - слот
@@ -420,11 +422,8 @@ class PlayerCharacter extends Character {
         const item = this.container.unequip(slot);
         
         if (item && this.getStatManager()) {
-            this.equipmentService.applyEquipmentModifiers.call({
-                statManager: this.getStatManager(),
-                eventBus: this.eventBus,
-                gameState: this.gameState
-            }, slot, null);
+            // Применяем модификаторы экипировки - УБРАЛ .call()
+            this.equipmentService.applyEquipmentModifiers(slot, null);
             
             this.gameState.getEventBus()?.emit('player:equipmentChanged', { 
                 slot: slot, 
@@ -624,10 +623,66 @@ class PlayerCharacter extends Character {
         statManager.setResource('health', finalStats.maxHealth);
         statManager.setResource('mana', finalStats.maxMana);
         statManager.setResource('stamina', finalStats.maxStamina);
+        // Инициализация менеджера пассивок
+        if (window.game?.passiveAbilityService && window.game?.formulaParser) {
+            // Создаем PassiveManager
+            this.passiveManager = new PassiveManager(
+                this.id,
+                this.class,
+                this.gameState,
+                window.game.passiveAbilityService,
+                window.game.formulaParser,
+                window.game.contextManager 
+            );
+            
+            // Получаем данные класса для врожденных способностей
+            const classData = window.game.dataService?.getProfessionData(this.class);
+            if (classData?.innateAbilities) {
+                this.passiveManager.initInnate(classData.innateAbilities);
+            }
+        }
         
         this.finalBaseStats = { ...statManager.baseStats };
     }
-    
+    /**
+     * Изучить пассивную способность
+     * @param {string} passiveId - ID способности
+     * @returns {Object} результат операции
+     */
+    learnPassive(passiveId) {
+        if (!this.passiveManager) {
+            return { success: false, message: "Менеджер пассивок не инициализирован" };
+        }
+        
+        const result = this.passiveManager.tryLearnPassive(passiveId);
+        
+        if (result.success) {
+            this.gameState?.getEventBus()?.emit('player:statsChanged', this.getStats());
+            this.gameState?.getEventBus()?.emit('passive:learned', {
+                passiveId,
+                level: result.level
+            });
+        }
+        
+        return result;
+    }
+    /**
+     * Получить список доступных для изучения пассивок
+     * @returns {Array} массив с информацией о доступных пассивках
+     */
+    getAvailablePassives() {
+        if (!this.passiveManager) return [];
+        return this.passiveManager.getAvailableToLearn();
+    }
+
+    /**
+     * Получить информацию о слотах пассивок
+     * @returns {Object} информация о слотах
+     */
+    getPassiveSlotInfo() {
+        if (!this.passiveManager) return null;
+        return this.passiveManager.getSlotInfo();
+    }
     // ========== УПРАВЛЕНИЕ ЭФФЕКТАМИ ==========
     /**
      * Добавить эффект
@@ -830,7 +885,8 @@ class PlayerCharacter extends Character {
                     };
                 }
                 return effect;
-            })
+            }),
+        passiveManager: this.passiveManager ? this.passiveManager.toJSON() : null
         };
     }
     
@@ -846,6 +902,10 @@ class PlayerCharacter extends Character {
         this.race = data.race || null;
         this.finalBaseStats = data.finalBaseStats || null;
 
+        this.level = data.level || 1;
+        this.exp = data.exp || 0;
+        this.reincarnations = data.reincarnations || 0;
+        this.state = data.state || 'alive';
         // Если есть сохранённые финальные статы - применяем их
         if (this.finalBaseStats) {
             const statManager = this.getStatManager();
@@ -854,11 +914,7 @@ class PlayerCharacter extends Character {
                 statManager.needsRecalculation = true;
             }
         }
-        this.level = data.level || 1;
-        this.exp = data.exp || 0;
-        this.reincarnations = data.reincarnations || 0;
-        this.state = data.state || 'alive';
-        
+
         if (data.proficiencies) {
             this.proficiencies = new Set(data.proficiencies);
         }
@@ -866,9 +922,21 @@ class PlayerCharacter extends Character {
         if (data.activeEffects) {
             this.activeEffects = [];
         }
-        
+        // Восстанавливаем менеджер пассивок
+        if (data.passiveManager && window.game?.passiveAbilityService && window.game?.formulaParser) {
+            this.passiveManager = new PassiveManager(
+                this.id,
+                this.class,
+                gameState,
+                window.game.passiveAbilityService,
+                window.game.formulaParser
+            );
+            this.passiveManager.fromJSON(data.passiveManager);
+        }
+
         this.gameState = gameState;
         this.container = gameState?.getPlayerContainer() || this.container;
+        this.gameState?.getEventBus()?.emit('player:statsChanged', this.getStats());
     }
 }
 

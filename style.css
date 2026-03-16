@@ -1393,3 +1393,89 @@ body {
     background: rgba(50, 50, 70, 0.9);
     border-color: #4ecdc4;
 }
+
+/* Entity Action Modal */
+.entity-action-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2a2a2a;
+    border: 2px solid #4ecdc4;
+    border-radius: 8px;
+    padding: 15px;
+    z-index: 10000;
+    min-width: 250px;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.entity-action-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #444;
+}
+
+.entity-action-modal h3 {
+    margin: 0;
+    color: #4ecdc4;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.entity-action-modal .close-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.entity-action-modal .close-btn:hover {
+    color: #fff;
+}
+
+.entity-action-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.entity-action-modal .modal-btn {
+    width: 100%;
+    padding: 10px;
+    background: #3949ab;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.entity-action-modal .modal-btn:hover {
+    background: #5c6bc0;
+    transform: translateY(-1px);
+}
+
+.entity-action-modal .back-btn {
+    margin-top: 5px;
+    background: #333;
+}
+
+.entity-action-modal .back-btn:hover {
+    background: #444;
+}
+
+.entity-action-modal .no-abilities {
+    color: #aaa;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}

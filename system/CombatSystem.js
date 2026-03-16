@@ -1,33 +1,34 @@
 /**
- * CombatSystem - система мгновенных действий в бою
- * Получает выбранные действия игрока через combat:playerSelectedAction 
- * Управляет текущим боем и передачей хода
+ * CombatSystem - система управления боем
+ * Получает выбранные действия игрока через combat:playerSelectedAction
+ * Управляет текущим боем и последовательностью раундов
  */
+import { mechanics } from './mechanics.js';
+
 class CombatSystem {
     constructor(battleSystem, eventBus) {
         this.battleSystem = battleSystem;
         this.eventBus = eventBus;
-        this.currentBattle = null; 
-        this.playerAction = null; 
+        this.currentBattle = null;
+        this.playerAction = null;
+        
+        // Состояния активных механик
+        this.dodgeState = null;
+        
         this.setupEventListeners();
     }
 
     setupEventListeners() {
-        // Начало боя из BattleOrchestrator
         this.eventBus.on('battle:start', (data) => {
             this.startBattle(data.player, data.enemyId || data.enemy);
         });
         
         this.eventBus.on('time:tick', () => this.processRound());
         this.eventBus.on('combat:playerSelectedAction', (data) => {
-            console.log('CombatSystem: получено действие', data);
             this.playerAction = data.action;
         });
     }
     
-    /**
-     * Начать бой
-     */
     startBattle(player, enemyId) {
         let enemyInstance;
         
@@ -51,13 +52,10 @@ class CombatSystem {
             turn: 'player'
         };
         this.playerAction = null;
+        this.dodgeState = null;
     }
     
-    /**
-     * Закончить бой - ВЫЗЫВАЕТ BattleOrchestrator
-     */
     endBattle(victory = true, defeatedEnemy = null) {
-        // СБРОСИТЬ КУЛДАУНЫ
         if (window.game?.abilityService) {
             const abilityService = window.game.abilityService;
             for (const ability of abilityService.abilities.values()) {
@@ -67,7 +65,6 @@ class CombatSystem {
             }
         }
         
-        // 1. ВЫЗВАТЬ BattleOrchestrator для бизнес-логики
         if (window.game?.battleOrchestrator) {
             if (victory) {
                 window.game.battleOrchestrator.endBattleVictory(defeatedEnemy);
@@ -76,23 +73,17 @@ class CombatSystem {
             }
         }
         
-        // 2. ОЧИСТИТЬ СОСТОЯНИЕ БОЯ
-        this.currentBattle = null; 
-        this.playerAction = null;       
-        // 3. ЭМИТИТЬ СОБЫТИЕ ДЛЯ UI
+        this.currentBattle = null;
+        this.playerAction = null;
+        this.dodgeState = null;
+        
         this.eventBus.emit(victory ? 'battle:victory' : 'battle:defeat');
         this.eventBus.emit('battle:end');
     }
-    /**
-     * Враг побежден
-     * @param {NonPlayerCharacter} enemy - побежденный враг
-     */
+    
     onEnemyDefeated(enemy) {
-        console.log(`CombatSystem: враг ${enemy.id} побежден`);
-        
-        // ===== ПРЕВРАЩАЕМ ВРАГА В ТРУП =====
         if (enemy && typeof enemy.die === 'function') {
-            enemy.die();  // меняет state на 'corpse' и эмитит событие
+            enemy.die();
         }
         
         const index = this.currentBattle.enemies.indexOf(enemy);
@@ -101,43 +92,23 @@ class CombatSystem {
         }
         
         if (this.currentBattle.enemies.length === 0) {
-            // ===== ИСПРАВЛЕНО: передаем врага в endBattle =====
             this.endBattle(true, enemy);
         }
     }
-    /**
-     * Игрок побежден
-     */
+    
     onPlayerDefeated(player) {
-        console.log('CombatSystem: игрок побежден');
         this.endBattle(false);
     }
-    /**
-     * Обработать один раунд боя (вызывается по тику времени)
-     */
+    
     processRound() {
-        if (!this.currentBattle) {
-            return;
-        }
-        // 1. ПРОВЕРКА: бой активен?
-        if (!this.currentBattle || !this.currentBattle.enemies) {
-            return;
-        }
-        
-        // 2. ПРОВЕРКА: враги есть?
-        if (this.currentBattle.enemies.length === 0) {
-            console.warn('CombatSystem: нет врагов для атаки');
-            return;
-        }
-        
-        // 3. ПРОВЕРКА: игрок жив?
-        if (!this.currentBattle.player) {
-            console.warn('CombatSystem: игрок не найден в текущем бою');
-            return;
-        }
+        if (!this.currentBattle) return;
         
         const player = this.currentBattle.player;
-        const enemies = this.currentBattle.enemies.filter(e => e.getStats().health > 0);
+        let enemies = this.currentBattle.enemies.filter(e => e.getStats().health > 0);
+        
+        if (enemies.length === 0 || player.getStats().health <= 0) return;
+        
+        const logMessages = [];
         const results = {
             playerAttacks: [],
             enemyAttacks: [],
@@ -145,167 +116,230 @@ class CombatSystem {
             deaths: []
         };
         
-        const logMessages = [];
+        // 1. Сначала действие игрока (умения и заклинания)
+        this._processPlayerAction(player, enemies, results, logMessages);
         
-        // 4. Базовая атака игрока (оружие/кулаки)
-        if (player.getStats().health > 0) {
-            for (const enemy of enemies) {
-                const attackResult = this.battleSystem.playerAttack(player, enemy);
-                if (attackResult.damage > 0) {
-                    results.playerAttacks.push({
-                        target: enemy.id,
-                        result: attackResult
-                    });
-                } else {
-                    // Промах игрока
-                    results.playerAttacks.push({
-                        target: enemy.id,
-                        result: { damage: 0, log: attackResult.log || [] }
+        // 2. Потом автоатаки игрока (оружие/кулаки)
+        this._processPlayerAttacks(player, enemies, results, logMessages);
+        
+        // 3. Потом атаки врагов
+        this._processEnemyAttacks(enemies, player, results, logMessages);
+        
+        // 4. Обработка смертей
+        this._processDeaths(results.deaths, player, enemies);
+        
+        // 5. Завершение раунда
+        this._endRound(player, enemies, results, logMessages);
+    }
+    
+    _processPlayerAction(player, enemies, results, logMessages) {
+        if (!this.playerAction || player.getStats().health <= 0) return;
+        
+        const target = enemies[0];
+        if (!target || target.getStats().health <= 0) return;
+        
+        if (this.playerAction.type === 'ability') {
+            const ability = this.playerAction.data;
+            
+            if (ability.mechanic && mechanics[ability.mechanic]) {
+                mechanics[ability.mechanic].activate(this, ability, player);
+                this._applyMasteryGain(player, ability);
+                results.playerAction = {
+                    type: 'ability',
+                    name: ability.name,
+                    mechanic: ability.mechanic
+                };
+                this.playerAction = null;
+                return;
+            }
+            
+            const abilityResult = ability.use(player, target);
+            
+            if (abilityResult.success) {
+                this._applyMasteryGain(player, ability);
+               if (abilityResult.appliedEffects && abilityResult.appliedEffects.length > 0) {
+                    abilityResult.appliedEffects.forEach(effect => {
+                        logMessages.push({
+                            message: `✨ ${effect.name} наложен на ${target.name}!`,
+                            type: 'success'
+                        });
                     });
                 }
-                // Добавляем лог от playerAttack
-                if (attackResult.log && attackResult.log.length > 0) {
-                    attackResult.log.forEach(msg => {
-                        logMessages.push({ message: msg, type: 'battle' });
+                if (abilityResult.damage > 0) {
+                    target.takeDamage(abilityResult.damage, {
+                        damageType: 'magical',
+                        isCritical: false
+                    });
+                    
+                    // Добавляем сообщение о уроне в лог
+                    logMessages.push({ 
+                        message: `${ability.name} наносит ${abilityResult.damage} урона ${target.name}`, 
+                        type: 'battle' 
                     });
                 }
                 
-                if (attackResult.enemyDead) {
-                    results.deaths.push(enemy.id);
+                results.playerAction = {
+                    type: 'ability',
+                    name: ability.name,
+                    target: target.id,
+                    result: abilityResult
+                };
+                
+                if (abilityResult.message) {
+                    logMessages.push({ message: abilityResult.message, type: 'battle' });
+                }
+                
+                if (target.getStats().health <= 0) {
+                    results.deaths.push(target.id);
                     logMessages.push({ 
-                        message: `🎊 ${enemy.name} побежден!`, 
+                        message: `🎊 ${target.name} побежден!`, 
                         type: 'victory' 
                     });
                 }
+            } else if (abilityResult.message) {
+                logMessages.push({ message: abilityResult.message, type: 'error' });
             }
+            
+            this.playerAction = null;
+            
+        } else if (this.playerAction.type === 'item') {
+            const item = this.playerAction.data;
+            const useResult = item.use(player);
+            
+            if (useResult.success) {
+                results.playerAction = {
+                    type: 'item',
+                    name: item.name,
+                    result: useResult
+                };
+                
+                if (useResult.effects) {
+                    useResult.effects.forEach(effect => {
+                        logMessages.push({ message: effect, type: 'success' });
+                    });
+                }
+            } else if (useResult.message) {
+                logMessages.push({ message: useResult.message, type: 'error' });
+            }
+            
+            this.playerAction = null;
         }
+    }
+
+    _processPlayerAttacks(player, enemies, results, logMessages) {
+        if (player.getStats().health <= 0) return;
         
-        // 5. Базовые атаки всех живых врагов
         for (const enemy of enemies) {
-            if (enemy.getStats().health > 0 && player.getStats().health > 0) {
-                const attackResult = enemy.attackPlayer(player.getStats());
-                if (attackResult && attackResult.damage > 0) {
-                    const damageResult = player.takeDamage(attackResult.damage, {
-                        isCritical: attackResult.isCritical
-                    });
-                    
-                    results.enemyAttacks.push({
-                        attacker: enemy.id,
-                        attackerName: enemy.name,
-                        damage: attackResult.damage,
-                        isCritical: attackResult.isCritical
-                    });
-                    
-                    // Лог атаки врага
-                    const critText = attackResult.isCritical ? ' (КРИТ!)' : '';
-                    logMessages.push({ 
-                        message: `${enemy.name} наносит вам ${attackResult.damage} урона${critText}!`, 
-                        type: 'battle' 
-                    });
-                    
-                    if (damageResult.isDead) {
-                        results.deaths.push(player.id);
-                        logMessages.push({ 
-                            message: '💀 Вы погибли...', 
-                            type: 'defeat' 
-                        });
+            if (enemy.getStats().health <= 0) continue;
+            
+            const attackResult = this.battleSystem.playerAttack(player, enemy);
+            
+            if (attackResult.damage > 0) {
+                const equipment = player.getEquipment();
+                const rightHand = equipment?.right_hand;
+                
+                if (rightHand?.weaponType) {
+                    const weaponSkillId = this._getWeaponSkillId(rightHand.weaponType);
+                    if (weaponSkillId && window.game?.abilityService) {
+                        window.game.abilityService.addMastery(
+                            player.id,
+                            weaponSkillId,
+                            0.02
+                        );
                     }
                 } else {
-                    // Промах врага
-                    logMessages.push({ 
-                        message: `${enemy.name} промахнулся по вам!`, 
-                        type: 'battle' 
-                    });
-                    results.enemyAttacks.push({
-                        attacker: enemy.id,
-                        attackerName: enemy.name,
-                        damage: 0,
-                        isCritical: false
-                    });
-                }
-            }
-        }
-        
-        // 6. Применить выбранное действие игрока (способность или предмет)
-        if (this.playerAction && player.getStats().health > 0) {
-            if (this.playerAction.type === 'ability') {
-                const ability = this.playerAction.data;
-                const target = enemies[0]; // цель всегда первый враг
-                
-                if (target && target.getStats().health > 0) {
-                    const abilityResult = ability.use(player, target);
-                    
-                    if (abilityResult.success) {
-                        // ===== ПРИМЕНИТЬ УРОН К ЦЕЛИ =====
-                        if (abilityResult.damage > 0) {
-                            target.takeDamage(abilityResult.damage, {
-                                damageType: 'magical', // или physical, зависит от типа способности
-                                isCritical: false
-                            });
-                        }
-                        
-                        results.playerAction = {
-                            type: 'ability',
-                            name: ability.name,
-                            target: target.id,
-                            result: abilityResult
-                        };
-                        
-                        // Лог использования способности
-                        if (abilityResult.message) {
-                            logMessages.push({ message: abilityResult.message, type: 'battle' });
-                        }
-                        if (abilityResult.damage > 0) {
-                            logMessages.push({ 
-                                message: `${ability.name} наносит ${abilityResult.damage} урона ${target.name}`, 
-                                type: 'battle' 
-                            });
-                        }
-                        
-                        if (target.getStats().health <= 0) {
-                            results.deaths.push(target.id);
-                            logMessages.push({ 
-                                message: `🎊 ${target.name} побежден!`, 
-                                type: 'victory' 
-                            });
-                        }
-                    } else {
-                        // Если способность не сработала
-                        if (abilityResult.message) {
-                            logMessages.push({ message: abilityResult.message, type: 'error' });
-                        }
-                    }
-                }
-            } else if (this.playerAction.type === 'item') {
-                // Использование предмета из пояса
-                const item = this.playerAction.data;
-                const useResult = item.use(player);
-                
-                if (useResult.success) {
-                    results.playerAction = {
-                        type: 'item',
-                        name: item.name,
-                        result: useResult
-                    };
-                    
-                    if (useResult.effects) {
-                        useResult.effects.forEach(effect => {
-                            logMessages.push({ message: effect, type: 'success' });
-                        });
-                    }
-                } else {
-                    if (useResult.message) {
-                        logMessages.push({ message: useResult.message, type: 'error' });
+                    if (window.game?.abilityService) {
+                        window.game.abilityService.addMastery(
+                            player.id,
+                            'кулачный_бой',
+                            0.02
+                        );
                     }
                 }
             }
             
-            // Сбрасываем выбранное действие после применения
-            this.playerAction = null;
+            results.playerAttacks.push({
+                target: enemy.id,
+                result: attackResult
+            });
+            
+            if (attackResult.log && attackResult.log.length > 0) {
+                attackResult.log.forEach(msg => {
+                    logMessages.push({ message: msg, type: 'battle' });
+                });
+            }
+            
+            if (attackResult.enemyDead) {
+                results.deaths.push(enemy.id);
+                logMessages.push({ 
+                    message: `🎊 ${enemy.name} побежден!`, 
+                    type: 'victory' 
+                });
+            }
         }
+    }
+    
+    _processEnemyAttacks(enemies, player, results, logMessages) {
+        if (player.getStats().health <= 0) return;
         
-        // 7. Обработка смертей
-        for (const deadId of results.deaths) {
+        for (const enemy of enemies) {
+            if (enemy.getStats().health <= 0) continue;
+            
+            const dodged = mechanics.dodge.processAttack(this, enemy, player);
+            if (dodged) {
+                results.enemyAttacks.push({
+                    attacker: enemy.id,
+                    attackerName: enemy.name,
+                    damage: 0,
+                    evaded: true
+                });
+                continue;
+            }
+            
+            const attackResult = enemy.attackPlayer(player.getStats());
+            
+            if (attackResult && attackResult.damage > 0) {
+                const damageResult = player.takeDamage(attackResult.damage, {
+                    isCritical: attackResult.isCritical
+                });
+                
+                results.enemyAttacks.push({
+                    attacker: enemy.id,
+                    attackerName: enemy.name,
+                    damage: attackResult.damage,
+                    isCritical: attackResult.isCritical
+                });
+                
+                const critText = attackResult.isCritical ? ' (КРИТ!)' : '';
+                logMessages.push({ 
+                    message: `${enemy.name} наносит вам ${attackResult.damage} урона${critText}!`, 
+                    type: 'battle' 
+                });
+                
+                if (damageResult.isDead) {
+                    results.deaths.push(player.id);
+                    logMessages.push({ 
+                        message: '💀 Вы погибли...', 
+                        type: 'defeat' 
+                    });
+                }
+            } else {
+                logMessages.push({ 
+                    message: `${enemy.name} промахнулся по вам!`, 
+                    type: 'battle' 
+                });
+                results.enemyAttacks.push({
+                    attacker: enemy.id,
+                    attackerName: enemy.name,
+                    damage: 0,
+                    isCritical: false
+                });
+            }
+        }
+    }
+    
+    _processDeaths(deathIds, player, enemies) {
+        for (const deadId of deathIds) {
             if (deadId === player.id) {
                 this.onPlayerDefeated(player);
                 return;
@@ -316,25 +350,54 @@ class CombatSystem {
                 }
             }
         }
-        this.lastResults = results; // для отладки
-        // 8. Обновление кулдаунов
+    }
+    
+    _endRound(player, enemies, results, logMessages) {
+        // Сначала обновляем кулдауны (уменьшаем старые)
         if (window.game?.abilityService) {
             window.game.abilityService.updateCooldowns();
-        }      
-        // 10. Отправляем лог
+        }
+        
+        // Потом вызываем endRound для ВСЕХ механик, у которых есть такой метод
+        for (const mechanicName in mechanics) {
+            if (mechanics[mechanicName].endRound) {
+                mechanics[mechanicName].endRound(this);
+            }
+        }
+        
         if (logMessages.length > 0) {
             this.eventBus.emit('log:batch', logMessages);
         }
+        
         this.eventBus.emit('battle:update', {
             player: player.getStats(),
             enemies: enemies.map(e => e.getInfo())
         });
-        // 11. Эмитим результаты для анимаций
+        
         this.eventBus.emit('battle:roundComplete', results);
     }
-    /**
-     * Получить информацию о текущем бое
-     */
+
+    _applyMasteryGain(player, ability) {
+        if (!window.game?.abilityService) return;
+        
+        window.game.abilityService.addMastery(
+            player.id,
+            ability.id,
+            ability.masteryGain || 0.03
+        );
+        
+        if (ability.type === 'spell' && ability.school) {
+            const schoolSkillId = this._getSchoolSkillId(ability.school);
+            if (schoolSkillId) {
+                window.game.abilityService.addMastery(
+                    player.id,
+                    schoolSkillId,
+                    0.02
+                );
+            }
+        }
+    }
+    
     getBattleInfo() {
         if (!this.currentBattle) return null;
         
@@ -348,11 +411,27 @@ class CombatSystem {
             }))
         };
     }
-    /**
-     * Проверить идет ли бой
-     */
+    
     isInCombat() {
         return !!this.currentBattle;
     }
+    
+    _getSchoolSkillId(school) {
+        const mapping = {
+            'fire': 'магия_огня',
+            'water': 'магия_воды',
+            'air': 'магия_воздуха',
+            'earth': 'магия_земли',
+            'life': 'магия_жизни',
+            'mind': 'магия_разума',
+            'dark': 'магия_тьмы'
+        };
+        return mapping[school] || null;
+    }
+
+    _getWeaponSkillId(weaponType) {
+        return weaponType || null;
+    }
 }
+
 export { CombatSystem };

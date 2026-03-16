@@ -1,7 +1,7 @@
 {
   "name": "Зачарованный Лес",
   "rooms": {
-    "х1у2z0": {
+    "forest.х1у2z0": {
       "name": "Опушка леса",
       "description": "Граница между цивилизацией и диким лесом.",
       "background": "assets/backgrounds/forest/forest_edge1.jpg",
@@ -17,18 +17,19 @@
         { "id": "mushroom", "count": 2 }
       ],
       "directions": {
-        "east": "х2у2z0",
-        "west": "village:х3у2z0"
+        "east": "forest.х2у2z0",
+        "west": "village:village.х3у2z0"
       }
     },
-    "х2у2z0": {
+    "forest.х2у2z0": {
       "name": "Древнее дерево",
       "description": "Огромное дерево, возраст которого исчисляется веками.",
       "background": "assets/backgrounds/forest/ancient_tree1.jpg",
       "terrain": "plain",
       "enemies": [
         { "type": "Лесной паук", "level": 2, "gridX": 6, "gridY": 2 },
-        { "type": "Лесной паук", "level": 1 , "gridX": 8, "gridY": 3}
+        { "type": "Лесной паук", "level": 1 , "gridX": 8, "gridY": 3},
+        { "type": "Хорёк", "level": 2 , "gridX": 3, "gridY": 4}
       ],
       "npcs": [],
       "objects": [],
@@ -36,12 +37,12 @@
         { "id": "spider_silk", "count": 1 }
       ],
       "directions": {
-        "west": "х1у2z0",
-        "north": "х2у1z0",
-        "south": "х2у3z0"
+        "west": "forest.х1у2z0",
+        "north": "forest.х2у1z0",
+        "south": "forest.х2у3z0"
       }
     },
-    "х2у1z0": {
+    "forest.х2у1z0": {
       "name": "Берег реки",
       "description": "Берег чистой лесной реки.",
       "background": "assets/backgrounds/forest/riverbank.jpg",
@@ -54,10 +55,10 @@
       "objects": [],
       "items": [],
       "directions": {
-        "south": "х2у2z0"
+        "south": "forest.х2у2z0"
       }
     },
-    "х2у3z0": {
+    "forest.х2у3z0": {
       "name": "Избушка",
       "description": "Кривая избушка.",
       "background": "assets/backgrounds/forest/witch_hut.jpg",
@@ -70,11 +71,11 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х2у2z0",
-        "west": "х1у3z0"
+        "north": "forest.х2у2z0",
+        "west": "forest.х1у3z0"
       }
     },
-    "х1у3z0": {
+    "forest.х1у3z0": {
       "name": "Поляна",
       "description": "Небольшая поляна, где пасутся дикие волки.",
       "background": "assets/backgrounds/forest/forest_clearing1.jpg",
@@ -87,11 +88,11 @@
       "objects": [],
       "items": [],
       "directions": {
-        "east": "х2у3z0",
-        "south": "х1у4z0"
+        "east": "forest.х2у3z0",
+        "south": "forest.х1у4z0"
       }
     },
-    "х1у4z0": {
+    "forest.х1у4z0": {
       "name": "Волчье логово",
       "description": "Темная, зловонная пещера. Здесь обитает стая волков.",
       "background": "assets/backgrounds/forest/wolf_cave.jpg",
@@ -107,11 +108,11 @@
         { "id": "wolf_pelt", "count": 1 }
       ],
       "directions": {
-        "north": "х1у3z0",
-        "east": "х2у4z0"
+        "north": "forest.х1у3z0",
+        "east": "forest.х2у4z0"
       }
     },
-    "х2у4z0": {
+    "forest.х2у4z0": {
       "name": "Сад трав",
       "description": "Маленький ухоженный сад с редкими лекарственными растениями.",
       "background": "assets/backgrounds/forest/herb_garden.jpg",
@@ -123,7 +124,7 @@
         { "id": "herb", "count": 4 }
       ],
       "directions": {
-        "west": "х1у4z0"
+        "west": "forest.х1у4z0"
       }
     }
   }

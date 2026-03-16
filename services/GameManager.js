@@ -63,12 +63,18 @@ class GameManager {
 
         // 2. Определяем стоимость перемещения
         const terrainType = currentRoomInfo.terrain || 'road';
-        const staminaCost = GameManager.TERRAIN_COSTS[terrainType] || 3;
+        let staminaCost = GameManager.TERRAIN_COSTS[terrainType] || 3; // ← let
+
+        const player = this.game.player; // ← объявляем player здесь
+
+        // Проверяем эффект полета
+        if (player.hasEffect && player.hasEffect('полет')) {
+            staminaCost = 2; // Устанавливаем фиксированную стоимость для полета
+        }
 
         // 3. Проверяем, хватает ли выносливости
-        const player = this.game.player;
         const currentStamina = player.getStats().stamina;
-        
+
         if (currentStamina < staminaCost) {
             this.eventBus.emit('log:add', { 
                 message: `Нужно ${staminaCost} выносливости для перемещения по ${terrainType} (имеется: ${currentStamina})`, 
@@ -201,6 +207,78 @@ class GameManager {
                 type: 'error' 
             });
         }
+    }
+    /**
+     * Применить способность к сущности
+     * @param {string} abilityId - ID способности
+     * @param {string} targetId - ID целевой сущности
+     */
+    useAbilityOnEntity(abilityId, targetId) {
+        const ability = this.game.abilityService.getAbility(abilityId);
+        const caster = this.game.player;
+        const target = this.game.zoneManager.getEntityById(targetId);
+        
+        if (!ability || !caster || !target) {
+            this.eventBus.emit('log:add', { 
+                message: 'Не удалось применить способность', 
+                type: 'error' 
+            });
+            return;
+        }
+        
+        // Применяем способность
+        const result = ability.use(caster, target);
+        
+        if (result.success) {
+            // Логируем результат
+            this.eventBus.emit('log:add', { 
+                message: result.message, 
+                type: 'success' 
+            });
+            
+            // Увеличиваем мастерство способности
+            if (window.game?.abilityService) {
+                window.game.abilityService.addMastery(
+                    caster.id,
+                    ability.id,
+                    ability.masteryGain || 0.03
+                );
+                
+                // Для заклинаний - увеличиваем мастерство школы
+                if (ability.type === 'spell' && ability.school) {
+                    const schoolSkillId = this._getSchoolSkillId(ability.school);
+                    if (schoolSkillId) {
+                        window.game.abilityService.addMastery(
+                            caster.id,
+                            schoolSkillId,
+                            0.04
+                        );
+                    }
+                }
+            }
+            
+            // Если способность начинает бой
+            if (ability.startsCombat && target.state === 'alive') {
+                this.game.battleOrchestrator.startBattle(target);
+            }
+        }
+    }
+
+    /**
+     * Получить ID умения школы магии
+     * @private
+     */
+    _getSchoolSkillId(school) {
+        const mapping = {
+            'fire': 'магия_огня',
+            'water': 'магия_воды',
+            'air': 'магия_воздуха',
+            'earth': 'магия_земли',
+            'life': 'магия_жизни',
+            'mind': 'магия_разума',
+            'dark': 'магия_тьмы'
+        };
+        return mapping[school] || null;
     }
 }
 

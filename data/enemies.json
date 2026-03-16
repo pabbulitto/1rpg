@@ -51,13 +51,20 @@
         "gold": { "min": 5, "max": 10 }
       },
       "chance": {
+        "potion_of_life_sense": 1,
+        "speed_boots": 1,
+        "rat_eye_amulet": 1,
+        "bookdodge": 1,
+        "booklefthand": 1,
+        "bookpiercing": 1,
+        "bookunarmed": 1,
         "rusty_sword": 0.2,
         "leather_belt": 0.3,
         "health_potion": 0.2
       }
     },
-    "corpseDecay": 40,
-    "respawnTime": 40,
+    "corpseDecay": 20,
+    "respawnTime": 25,
     "experienceReward": 35
   },
 
@@ -526,7 +533,16 @@
     "inventory": {
       "guaranteed": {
       },
-      "chance": {}
+      "chance": {
+        "potion_of_life_sense": 1,
+        "bookstaff": 1,
+        "rat_eye_amulet": 1,
+        "speed_boots": 1,
+        "scrollfly": 1,
+        "scrollflash": 1,
+        "bookfire": 1,
+        "bookair": 1
+      }
     },
     "corpseDecay": 30,
     "respawnTime": 33,
@@ -821,5 +837,58 @@
     "corpseDecay": 30,
     "respawnTime": 30,
     "experienceReward": 30
+  },
+  "Хорёк": {
+      "name": "Хорёк",
+      "description": "Маленький хищник, затаившийся в засаде. Если бы вы чувствовали жизнь, то заметили бы его раньше.",
+      "sprite": "assets/sprites/creatures/ferret.png",
+      "class": "beast",
+      "race": "mustelid",
+      "profession": null,
+      "faction": "beast",
+      "baseStats": {
+          "strength": 8,
+          "dexterity": 18,
+          "constitution": 10,
+          "intelligence": 4,
+          "wisdom": 12,
+          "charisma": 6,
+          "baseHealth": 35,
+          "maxMana": 0,
+          "maxStamina": 20,
+          "healthRegen": 3,
+          "manaRegen": 0,
+          "staminaRegen": 2,
+          "armor": 1,
+          "defense": 3,
+          "spellPower": 1.0,
+          "initiative": 14
+      },
+      "baseLevel": 2,
+      "healthPerLevel": 3,
+      "manaPerLevel": 0,
+      "staminaPerLevel": 3,
+      "armorPerLevel": 0.3,
+      "damageModPerLevel": 0.2,
+      "hitrollPerLevel": 0.2,
+      "naturalWeapon": {
+          "name": "Укус",
+          "damage": "1d5",
+          "damageType": "piercing"
+      },
+      "abilities": [],
+      "spells": [],
+      "skills": [],
+      "inventory": {
+          "guaranteed": {
+              "gold": { "min": 1, "max": 2 }
+          },
+          "chance": {}
+      },
+      "startingEffects": ["спрятался"],
+      "corpseDecay": 30,
+      "respawnTime": 30,
+      "experienceReward": 25
   }
+
 }

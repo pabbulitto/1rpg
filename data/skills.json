@@ -1,20 +1,244 @@
 
 {
-  "kick": {
-    "name": "Пнуть",
-    "type": "skill",
-    "isBattle": true,
-    "description": "Мощный пинок, урон зависит от силы и веса обуви.",
-    "icon": "assets/sprites/abilities/kick.jpg",
-    "staminaCost": 7,
-    "damageFormula": "1d4 + floor(strengthMod-4) + floor(bootWeight/2)",
-    "requirements": { 
-      "strength": 16,
-      "level": 1
+    "двуручники": {
+        "name": "Двуручники",
+        "type": "skill",
+        "description": "Владение двуручным оружием.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'two_handed'"
     },
-    "target": "enemy",
-    "cooldown": 2,
-    "animation": "kick"
-  }
+    "длинные_лезвия": {
+        "name": "Длинные лезвия",
+        "type": "skill",
+        "description": "Владение длинными лезвиями.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'long_blade'"
+    },
+    "иное_оружие": {
+        "name": "Иное оружие",
+        "type": "skill",
+        "description": "Владение необычным оружием.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'unusual'"
+    },
+    "копья": {
+        "name": "Копья",
+        "type": "skill",
+        "description": "Владение копьями и древковым оружием.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'spear'"
+    },
+    "короткие_лезвия": {
+        "name": "Короткие лезвия",
+        "type": "skill",
+        "description": "Владение короткими лезвиями.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'short_blade'"
+    },
+    "луки": {
+        "name": "Луки",
+        "type": "skill",
+        "description": "Владение луками.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'bow'"
+    },
+    "посохи_и_дубины": {
+        "name": "Посохи и дубины",
+        "type": "skill",
+        "description": "Владение посохами и дубинами.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'staff'"
+    },
+    "проникающее_оружие": {
+        "name": "Проникающее оружие",
+        "type": "skill",
+        "description": "Владение проникающим оружием.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'piercing'"
+    },
+    "топоры": {
+        "name": "Топоры",
+        "type": "skill",
+        "description": "Владение топорами и секирами.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'axe'"
+    },
+    "кулачный_бой": {
+        "name": "Кулачный бой",
+        "type": "skill",
+        "description": "Владение кулачным боем.",
+        "isBattle": false,
+        "masteryGain": 0.02,
+        "scaling": {
+            "damroll": "floor(mastery/20)",
+            "hitroll": "floor(mastery/30)"
+        },
+        "conditionFormula": "weaponType == 'unarmed'"
+    },
+
+    "магия_огня": {
+        "name": "Магия огня",
+        "type": "skill",
+        "description": "Владение магией огня. Влияет на успешность заклинаний школы огня.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'fire'"
+    },
+    "магия_воды": {
+        "name": "Магия воды",
+        "type": "skill",
+        "description": "Владение магией воды. Влияет на успешность заклинаний школы воды.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'water'"
+    },
+    "магия_воздуха": {
+        "name": "Магия воздуха",
+        "type": "skill",
+        "description": "Владение магией воздуха. Влияет на успешность заклинаний школы воздуха.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'air'"
+    },
+    "магия_земли": {
+        "name": "Магия земли",
+        "type": "skill",
+        "description": "Владение магией земли. Влияет на успешность заклинаний школы земли.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'earth'"
+    },
+    "магия_жизни": {
+        "name": "Магия жизни",
+        "type": "skill",
+        "description": "Владение магией жизни. Влияет на успешность заклинаний школы жизни.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'life'"
+    },
+    "магия_разума": {
+        "name": "Магия разума",
+        "type": "skill",
+        "description": "Владение магией разума. Влияет на успешность заклинаний школы разума.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'mind'"
+    },
+    "магия_тьмы": {
+        "name": "Магия тьмы",
+        "type": "skill",
+        "description": "Владение магией тьмы. Влияет на успешность заклинаний школы тьмы.",
+        "isBattle": false,
+        "masteryGain": 0.04,
+        "scaling": {},
+        "conditionFormula": "school == 'dark'"
+    },
+
+  "kick": {
+      "name": "Пнуть",
+      "type": "skill",
+      "isBattle": true,
+      "startsCombat": true,
+      "description": "Мощный пинок, урон зависит от силы и веса обуви.",
+      "icon": "assets/sprites/abilities/kick.jpg",
+      "staminaCost": 6,
+      "damageFormula": "1d5 + floor(strengthMod-4) + floor(bootWeight/2)",
+      "requirements": { 
+          "strength": 16,
+          "level": 1
+      },
+      "targetMain": "living",
+      "targetScope": "single",
+      "cooldown": 2,
+      "animation": "kick",
+      "masteryGain": 0.03,
+      "scaling": {
+          "damroll": "floor(mastery/10)",
+          "hitroll": "floor(mastery/20)"
+      }
+  },
+  "удар_левой_рукой": {
+      "name": "Удар левой рукой",
+      "type": "skill",
+      "description": "Позволяет наносить дополнительные удары в кулачном бою. При 0% мастерства даёт 30% шанс на второй удар. Каждый процент мастерства увеличивает шанс второй атаки на 1% (до 100%). После 100% мастерства появляется шанс на третий удар: +1% за каждые 3% сверх 100.",
+      "isBattle": false,
+      "masteryGain": 0.03,
+      "scaling": {},
+      "conditionFormula": "weaponType == 'unarmed'"
+  },
+
+    "dodge": {
+        "name": "Уклониться",
+        "type": "skill",
+        "isBattle": true,
+        "startsCombat": false,
+        "description": "Позволяет уклониться от нескольких атак в текущем раунде.",
+        "icon": "assets/sprites/abilities/dodge.jpg",
+        "staminaCost": 5,
+        "cooldown": 1,
+        "targetMain": "self",
+        "targetScope": "single",
+        "mechanic": "dodge",
+        "mechanicParams": {
+            "charges": "1 + floor(mastery/25)",
+            "chance": "min(95, (dexterity-18)*5 + floor(mastery/3))"
+        },
+        "masteryGain": 0.03,
+        "scaling": {},
+        "requirements": {
+            "level": 1
+        }
+    }
 
 }

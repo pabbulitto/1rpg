@@ -1,7 +1,7 @@
 {
   "name": "Заброшенный дом",
   "rooms": {
-    "х1у1z0": {
+    "abandoned_house.х1у1z0": {
       "name": "Заброшенный дом",
       "description": "Заброшенный дом",
       "background": "assets/backgrounds/abandoned_house/х1у1z0.jpg",
@@ -10,11 +10,11 @@
       "objects": [],
       "items": [],
       "directions": {
-        "east": "х2у1z0",
-        "west": "southwest_village:х7у12z0"
+        "east": "abandoned_house.х2у1z0",
+        "west": "southwest_village:southwest_village.х7у12z0"
       }
     },
-    "х2у1z0": {
+    "abandoned_house.х2у1z0": {
       "name": "На крыльце",
       "description": "На крыльце",
       "background": "assets/backgrounds/abandoned_house/х2у1z0.jpg",
@@ -23,15 +23,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х1у1z0",
-        "east": "х3у1z0"
+        "west": "abandoned_house.х1у1z0",
+        "east": "abandoned_house.х3у1z0"
       },
       "enemies": [
         { "type": "Крылохлоп", "level": 1, "gridX": 6, "gridY": 3 },
         { "type": "Тараканище", "level": 1, "gridX": 7, "gridY": 4 }
       ]
     },
-    "х3у1z0": {
+    "abandoned_house.х3у1z0": {
       "name": "В сенях",
       "description": "В сенях",
       "background": "assets/backgrounds/abandoned_house/х3у1z0.jpg",
@@ -40,15 +40,16 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х2у1z0",
-        "east": "х4у1z0"
+        "west": "abandoned_house.х2у1z0",
+        "east": "abandoned_house.х4у1z0"
       },
       "enemies": [
         { "type": "Прыгун", "level": 1, "gridX": 6, "gridY": 1 },
-        { "type": "Мышь", "level": 1, "gridX": 3, "gridY": 3 }
+        { "type": "Мышь", "level": 1, "gridX": 3, "gridY": 3 },
+        { "type": "Хорёк", "level": 2 , "gridX": 2, "gridY": 4}
       ]
     },
-    "х4у1z0": {
+    "abandoned_house.х4у1z0": {
       "name": "В сенях",
       "description": "В сенях",
       "background": "assets/backgrounds/abandoned_house/х4у1z0.jpg",
@@ -57,15 +58,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х3у1z0",
-        "south": "х4у2z0"
+        "west": "abandoned_house.х3у1z0",
+        "south": "abandoned_house.х4у2z0"
       },
       "enemies": [
         { "type": "Крылохлоп", "level": 1, "gridX": 5, "gridY": 4 },
         { "type": "Крылохлоп", "level": 1, "gridX": 6, "gridY": 1 }
       ]
     },
-    "х4у2z0": {
+    "abandoned_house.х4у2z0": {
       "name": "В избе",
       "description": "В избе",
       "background": "assets/backgrounds/abandoned_house/х4у2z0.jpg",
@@ -74,8 +75,8 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х4у1z0",
-        "south": "х4у3z0"
+        "north": "abandoned_house.х4у1z0",
+        "south": "abandoned_house.х4у3z0"
       },
       "enemies": [
         { "type": "Большой Комар", "level": 1, "gridX": 5, "gridY": 1 },
@@ -83,7 +84,7 @@
         { "type": "Тараканище", "level": 1, "gridX": 6, "gridY": 4 }
       ]
     },
-    "х4у3z0": {
+    "abandoned_house.х4у3z0": {
       "name": "У печи",
       "description": "У печи",
       "background": "assets/backgrounds/abandoned_house/х4у3z0.jpg",
@@ -92,16 +93,16 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х4у2z0",
-        "east": "х5у3z0",
-        "west": "х3у3z0" 
+        "north": "abandoned_house.х4у2z0",
+        "east": "abandoned_house.х5у3z0",
+        "west": "abandoned_house.х3у3z0"
       },
       "enemies": [
         { "type": "Пылекрыл", "level": 1, "gridX": 5, "gridY": 1 },
         { "type": "Плоскоспин", "level": 1, "gridX": 6, "gridY": 3 }
       ]
     },
-    "х5у3z0": {
+    "abandoned_house.х5у3z0": {
       "name": "На кухне",
       "description": "На кухне",
       "background": "assets/backgrounds/abandoned_house/х5у3z0.jpg",
@@ -110,15 +111,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х4у3z0",
-        "down": "х1у1z-1"
+        "west": "abandoned_house.х4у3z0",
+        "down": "abandoned_house.х1у1z-1"
       },
       "enemies": [
         { "type": "Большой Комар", "level": 1, "gridX": 7, "gridY": 1 },
         { "type": "Крылохлоп", "level": 1, "gridX": 4, "gridY": 3 }
       ]
     },
-    "х3у3z0": {
+    "abandoned_house.х3у3z0": {
       "name": "В избе",
       "description": "В избе",
       "background": "assets/backgrounds/abandoned_house/х3у3z0.jpg",
@@ -127,15 +128,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "east": "х4у3z0",
-        "south": "х3у4z0"
+        "east": "abandoned_house.х4у3z0",
+        "south": "abandoned_house.х3у4z0"
       },
       "enemies": [
         { "type": "Ночной огонек", "level": 1, "gridX": 6, "gridY": 2 },
         { "type": "Тараканище", "level": 1, "gridX": 4, "gridY": 4 }
       ]
     },
-    "х2у3z0": {
+    "abandoned_house.х2у3z0": {
       "name": "В кладовке",
       "description": "В избе",
       "background": "assets/backgrounds/abandoned_house/х2у3z0.jpg",
@@ -144,13 +145,13 @@
       "objects": [],
       "items": [],
       "directions": {
-        "south": "х2у4z0"
+        "south": "abandoned_house.х2у4z0"
       },
       "enemies": [
         { "type": "Плоскоспин", "level": 1, "gridX": 6, "gridY": 2 }
       ]
     },
-    "х2у4z0": {
+    "abandoned_house.х2у4z0": {
       "name": "На сеновале",
       "description": "На сеновале",
       "background": "assets/backgrounds/abandoned_house/х2у4z0.jpg",
@@ -159,15 +160,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х2у3z0",
-        "east": "х3у4z0",
-        "south": "х2у5z0"
+        "north": "abandoned_house.х2у3z0",
+        "east": "abandoned_house.х3у4z0",
+        "south": "abandoned_house.х2у5z0"
       },
       "enemies": [
         { "type": "Мышь", "level": 3, "gridX": 4, "gridY": 3 }
       ]
     },
-    "х2у5z0": {
+    "abandoned_house.х2у5z0": {
       "name": "На сеновале",
       "description": "На сеновале",
       "background": "assets/backgrounds/abandoned_house/х2у5z0.jpg",
@@ -176,15 +177,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х2у4z0",
-        "east": "х3у5z0"
+        "north": "abandoned_house.х2у4z0",
+        "east": "abandoned_house.х3у5z0"
       },
       "enemies": [
         { "type": "Мышь", "level": 1, "gridX": 6, "gridY": 2 },
         { "type": "Прыгун", "level": 3, "gridX": 2, "gridY": 4 }
       ]
     },
-    "х3у5z0": {
+    "abandoned_house.х3у5z0": {
       "name": "На сеновале",
       "description": "На сеновале",
       "background": "assets/backgrounds/abandoned_house/х3у5z0.jpg",
@@ -193,15 +194,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х3у4z0",
-        "west": "х2у5z0"
+        "north": "abandoned_house.х3у4z0",
+        "west": "abandoned_house.х2у5z0"
       },
       "enemies": [
         { "type": "Мышь", "level": 2, "gridX": 7, "gridY": 3 },
         { "type": "Тараканище", "level": 1, "gridX": 5, "gridY": 2 }
       ]
     },
-    "х3у4z0": {
+    "abandoned_house.х3у4z0": {
       "name": "На сеновале",
       "description": "На сеновале",
       "background": "assets/backgrounds/abandoned_house/х3у4z0.jpg",
@@ -210,15 +211,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х2у4z0",
-        "south": "х3у5z0",
-        "north": "х3у3z0"
+        "west": "abandoned_house.х2у4z0",
+        "south": "abandoned_house.х3у5z0",
+        "north": "abandoned_house.х3у3z0"
       },
       "enemies": [
         { "type": "Мышь", "level": 2, "gridX": 5, "gridY": 2 }
       ]
     },
-    "х1у1z-1": {
+    "abandoned_house.х1у1z-1": {
       "name": "В подвале",
       "description": "В подвале",
       "background": "assets/backgrounds/abandoned_house/х1у1z-1.jpg",
@@ -227,9 +228,9 @@
       "objects": [],
       "items": [],
       "directions": {
-        "up": "х5у3z0",
-        "east": "х2у1z-1",
-        "south": "х1у2z-1"
+        "up": "abandoned_house.х5у3z0",
+        "east": "abandoned_house.х2у1z-1",
+        "south": "abandoned_house.х1у2z-1"
       },
       "enemies": [
         { "type": "Прыгун", "level": 3, "gridX": 2, "gridY": 4 },
@@ -237,7 +238,7 @@
         { "type": "Плоскоспин", "level": 3, "gridX": 7, "gridY": 3 }
       ]
     },
-    "х2у1z-1": {
+    "abandoned_house.х2у1z-1": {
       "name": "В подвале",
       "description": "В подвале",
       "background": "assets/backgrounds/abandoned_house/х2у1z-1.jpg",
@@ -246,15 +247,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "west": "х1у1z-1",
-        "south": "х2у2z-1"
+        "west": "abandoned_house.х1у1z-1",
+        "south": "abandoned_house.х2у2z-1"
       },
       "enemies": [
         { "type": "Большой Комар", "level": 3, "gridX": 3, "gridY": 4 },
         { "type": "Пылекрыл", "level": 4, "gridX": 5, "gridY": 2 }
       ]
     },
-    "х2у2z-1": {
+    "abandoned_house.х2у2z-1": {
       "name": "В подвале",
       "description": "В подвале",
       "background": "assets/backgrounds/abandoned_house/х2у2z-1.jpg",
@@ -263,15 +264,15 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х2у1z-1",
-        "west": "х1у2z-1"
+        "north": "abandoned_house.х2у1z-1",
+        "west": "abandoned_house.х1у2z-1"
       },
       "enemies": [
         { "type": "Тараканище", "level": 3, "gridX": 5, "gridY": 2 },
         { "type": "Плоскоспин", "level": 4, "gridX": 4, "gridY": 3 }
       ]
     },
-    "х1у2z-1": {
+    "abandoned_house.х1у2z-1": {
       "name": "В подвале",
       "description": "В подвале",
       "background": "assets/backgrounds/abandoned_house/х1у2z-1.jpg",
@@ -280,16 +281,16 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х1у1z-1",
-        "east": "х2у2z-1",
-        "south": "х1у3z-1"
+        "north": "abandoned_house.х1у1z-1",
+        "east": "abandoned_house.х2у2z-1",
+        "south": "abandoned_house.х1у3z-1"
       },
       "enemies": [
         { "type": "Мышь", "level": 3, "gridX": 6, "gridY": 3 },
         { "type": "Прыгун", "level": 2, "gridX": 4, "gridY": 1 }
       ]
     },
-    "х1у3z-1": {
+    "abandoned_house.х1у3z-1": {
       "name": "Глухой угол",
       "description": "Глухой угол",
       "background": "assets/backgrounds/abandoned_house/х1у3z-1.jpg",
@@ -298,7 +299,7 @@
       "objects": [],
       "items": [],
       "directions": {
-        "north": "х1у2z-1"
+        "north": "abandoned_house.х1у2z-1"
       },
       "enemies": [
         { "type": "Старая крыса", "level": 2, "gridX": 5, "gridY": 2}

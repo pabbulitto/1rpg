@@ -217,7 +217,55 @@ class GraphicsEngine {
         // Пропускаем мертвых (кроме трупов)
         if (entity.state === 'removed') return;
         
-        // Вычисляем позицию на canvas
+        // Получаем оригинальную сущность по ID для проверки эффектов
+        const originalEntity = window.game?.zoneManager?.getEntityById(entity.id);
+        
+        // Проверяем, есть ли у оригинальной сущности эффект "спрятался"
+        const hasHidden = originalEntity?.hasEffect && originalEntity.hasEffect('спрятался');
+        
+        if (hasHidden) {
+            const player = window.game?.player;
+            const hasLifeSense = player?.hasEffect && player.hasEffect('чувствовать_жизнь');
+            
+            // Если у игрока нет детекта - не рисуем вообще
+            if (!hasLifeSense) {
+                return;
+            }
+            
+            // Если есть детект - рисуем с затемнением
+            const x = entity.gridX * this.cellSize;
+            const y = entity.gridY * this.cellSize;
+            const offsetX = (this.cellSize - entity.width) / 2;
+            const offsetY = (this.cellSize - entity.height) / 2;
+            
+            this.ctx.save();
+            this.ctx.globalAlpha = 0.5;
+            
+            // Рисуем спрайт
+            if (entity.sprite) {
+                const img = await this._loadImage(entity.sprite);
+                if (img) {
+                    this.ctx.drawImage(img, x + offsetX, y + offsetY, entity.width, entity.height);
+                } else {
+                    this._drawPlaceholder(entity, x, y);
+                }
+            } else {
+                this._drawPlaceholder(entity, x, y);
+            }
+            
+            this.ctx.restore();
+            
+            // Рисуем желтый пунктирный контур
+            this.ctx.strokeStyle = '#ffff00';
+            this.ctx.lineWidth = 2;
+            this.ctx.setLineDash([5, 3]);
+            this.ctx.strokeRect(x, y, this.cellSize, this.cellSize);
+            this.ctx.setLineDash([]);
+            
+            return; // ВАЖНО: выходим, чтобы не рисовать нормально
+        }
+        
+        // Вычисляем позицию на canvas для обычных существ
         const x = entity.gridX * this.cellSize;
         const y = entity.gridY * this.cellSize;
         
@@ -238,7 +286,7 @@ class GraphicsEngine {
             this._drawPlaceholder(entity, x, y);
         }
     }
-    
+        
     /**
      * Нарисовать заглушку для отладки
      * @private
@@ -253,14 +301,22 @@ class GraphicsEngine {
         this.ctx.font = '10px monospace';
         this.ctx.fillText(entity.type.substring(0, 3), x + 20, y + 40);
     }
+    
     getRoomName(roomId, currentZoneId) {
         // Если roomId содержит ":", значит это переход в другую зону
         if (roomId.includes(':')) {
             const [zoneId, targetRoom] = roomId.split(':');
             const zoneData = this.zoneManager?.loadedZones.get(zoneId);
             return zoneData?.rooms?.[targetRoom]?.name || targetRoom;
-        } else {
-            // Внутри текущей зоны
+        } 
+        // Если roomId содержит ".", значит это внутренняя комната с префиксом зоны
+        else if (roomId.includes('.')) {
+            const [zoneId, targetRoom] = roomId.split('.');
+            const zoneData = this.zoneManager?.loadedZones.get(zoneId);
+            return zoneData?.rooms?.[roomId]?.name || targetRoom;
+        }
+        else {
+            // Внутри текущей зоны (старый формат)
             const zoneData = this.zoneManager?.loadedZones.get(currentZoneId);
             return zoneData?.rooms?.[roomId]?.name || roomId;
         }

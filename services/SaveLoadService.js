@@ -7,6 +7,7 @@ class SaveLoadService {
     saveGame() {
         const saveData = {
             gameState: this.gameState.toJSON(),
+            abilityService: window.game?.abilityService?.getSaveData(),
             timestamp: new Date().toISOString(),
             version: '1.0'
         };
@@ -31,6 +32,9 @@ class SaveLoadService {
             
             if (data.gameState) {
                 this.gameState.fromJSON(data.gameState);
+                if (data.abilityService && window.game?.abilityService) {
+                    window.game.abilityService.loadSaveData(data.abilityService);
+                }
                 return { 
                     success: true, 
                     timestamp: data.timestamp,

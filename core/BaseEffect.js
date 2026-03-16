@@ -11,6 +11,7 @@ class BaseEffect {
         
         this.statsModifiers = config.stats || {};
         this.source = config.source || 'unknown';
+        this.sourceId = config.sourceId || `${this.source}_${this.id}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
         this.isDebuff = config.isDebuff || false;
         
         this.onApply = config.onApply || null;
@@ -18,9 +19,14 @@ class BaseEffect {
         this.onRemove = config.onRemove || null;
     }
     
-    apply(target, source = null) {
+    apply(target, source = null, formulaParser = null) {
         this.target = target;
         this.applicationTick = 0;
+        
+        if (source && source !== this.source) {
+            this.source = source;
+            this.sourceId = `${this.source}_${this.id}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        }
         
         if (Object.keys(this.statsModifiers).length > 0) {
             const modifierId = `effect_${this.id}_${Date.now()}`;
@@ -30,6 +36,10 @@ class BaseEffect {
         
         if (this.onApply && typeof this.onApply === 'function') {
             this.onApply(this.target, source);
+        }
+        
+        if (target && typeof target.addEffect === 'function') {
+            target.addEffect(this);
         }
         
         return true;
@@ -105,7 +115,15 @@ class BaseEffect {
         }
         return 1;
     }
-    
+    refresh(newDuration) {
+        if (newDuration !== undefined) {
+            this.duration = newDuration;
+            this.remainingTicks = this.duration;
+        } else {
+            this.remainingTicks = this.duration;
+        }
+        return this;
+    }
     getInfo() {
         return {
             id: this.id,
@@ -116,7 +134,8 @@ class BaseEffect {
             currentStacks: this.currentStacks,
             maxStacks: this.maxStacks,
             isDebuff: this.isDebuff,
-            source: this.source
+            source: this.source,
+            sourceId: this.sourceId 
         };
     }
     

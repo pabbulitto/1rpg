@@ -1,28 +1,28 @@
 {
   "village": {
     "name": "Тихая деревня",
-    "startRoom": "х3у2z-1",
+    "startRoom": "village.х3у2z-1",
     "theme": "village",
     "unlockedByDefault": true,
     "depthRange": [0, 0]
   },
   "forest": {
     "name": "Зачарованный Лес",
-    "startRoom": "forest_entrance",
+    "startRoom": "forest.х1у2z0",
     "theme": "forest",
     "unlockedByDefault": true,
     "depthRange": [0, 1]
   },
-    "southwest_village": {
+  "southwest_village": {
     "name": "Деревушка на юго-западе",
-    "startRoom": "х4у3z0",
+    "startRoom": "southwest_village.х4у10z0",
     "theme": "village",
     "unlockedByDefault": false,
     "depthRange": [0, 0]
   },
-    "abandoned_house": {
+  "abandoned_house": {
     "name": "Заброшенный дом",
-    "startRoom": "old_house",
+    "startRoom": "abandoned_house.х1у1z0",
     "theme": "dungeon",
     "unlockedByDefault": false,
     "depthRange": [0, 1]

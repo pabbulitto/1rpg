@@ -62,7 +62,34 @@ class FormulaParser {
             return 0;
         }
     }
-    
+    /**
+     * Вычислить условие (логическое выражение) с контекстом переменных
+     * @param {string} condition - строка условия
+     * @param {Object} context - объект с переменными
+     * @returns {boolean} результат вычисления
+     */
+    evaluateCondition(condition, context = {}) {
+        if (!condition || typeof condition !== 'string') {
+            console.warn('FormulaParser: пустое условие');
+            return false;
+        }
+        
+        try {
+            // Нормализуем формулу
+            const normalized = this._normalizeFormula(condition);
+            
+            // Заменяем переменные на значения
+            const withValues = this._replaceVariables(normalized, context);
+            
+            // Безопасное вычисление
+            const result = this._safeEval(withValues);
+            
+            return Boolean(result);
+        } catch (error) {
+            console.error(`FormulaParser: ошибка вычисления условия "${condition}":`, error);
+            return false;
+        }
+    }    
     /**
      * Нормализовать формулу: удалить пробелы, привести к нижнему регистру
      */
@@ -85,7 +112,19 @@ class FormulaParser {
         
         // Затем заменяем переменные на значения
         for (const [varName, value] of Object.entries(context)) {
-            if (typeof value === 'number') {
+            if (value === null || value === undefined) {
+                const regex = new RegExp(`\\b${varName}\\b`, 'g');
+                result = result.replace(regex, 'null');
+            }
+            else if (typeof value === 'number') {
+                const regex = new RegExp(`\\b${varName}\\b`, 'g');
+                result = result.replace(regex, value.toString());
+            }
+            else if (typeof value === 'string') {
+                const regex = new RegExp(`\\b${varName}\\b`, 'g');
+                result = result.replace(regex, `'${value}'`);
+            }
+            else if (typeof value === 'boolean') {
                 const regex = new RegExp(`\\b${varName}\\b`, 'g');
                 result = result.replace(regex, value.toString());
             }
@@ -93,7 +132,6 @@ class FormulaParser {
         
         return result;
     }
-    
     /**
      * Безопасное вычисление выражения
      */
@@ -105,6 +143,16 @@ class FormulaParser {
             
             // Используем Function constructor как более безопасную альтернативу eval
             try {
+                // Если выражение содержит операторы сравнения, возвращаем результат как есть
+                if (expression.includes('==') || expression.includes('!=') || 
+                    expression.includes('>') || expression.includes('<') ||
+                    expression.includes('>=') || expression.includes('<=')) {
+                    // eslint-disable-next-line no-new-func
+                    const result = new Function(`return ${withFunctions}`)();
+                    return result;
+                }
+                
+                // Для математических выражений возвращаем число
                 // eslint-disable-next-line no-new-func
                 return new Function(`return ${withFunctions}`)();
             } catch (error) {

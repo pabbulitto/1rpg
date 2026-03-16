@@ -22,8 +22,9 @@ class MapUI {
         Object.entries(zoneData.rooms).forEach(([roomId, roomData]) => {
             const roomZ = parseInt(roomId.split('z')[1]) || 0;
             if (roomZ === currentZ) {
-                // Парсим x и y из формата "х3у2z-1"
-                const matches = roomId.match(/х(\-?\d+)у(\-?\d+)/);
+                // Парсим x и y из формата "зона.х3у2z-1"
+                const shortId = roomId.includes('.') ? roomId.split('.')[1] : roomId;
+                const matches = shortId.match(/х(\-?\d+)у(\-?\d+)/);
                 if (matches) {
                     rooms.push({
                         id: roomId,

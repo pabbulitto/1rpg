@@ -48,16 +48,32 @@ class FormulaCalculator {
         return baseHealth + (constitution - 10) + healthBonus;
     }
     //Регенерация здоровья за тик    
-    calculateHealthRegen(constitution) {
-        return 5 + Math.max(0, Math.floor((constitution - 14) / 2));
+    calculateHealthRegen(constitution, playerLevel) {
+        const baseRegen = 4;
+        const conBonus = Math.max(0, Math.floor((constitution - 14) / 2));
+        const levelBonus = Math.floor(playerLevel / 5); // +1 за каждые 5 уровней
+        
+        return baseRegen + conBonus + levelBonus;
     }
     /**
      * Прирост здоровья за уровень
      * @param {number} constitution - телосложение
      * @returns {number} HP за уровень
      */
-    calculateHealthPerLevel(constitution) {
-        return 4 + Math.floor((constitution - 10) / 4);
+    calculateHealthPerLevel(constitution, playerLevel) {
+        const baseGain = 5;
+        
+        if (constitution <= 14) return baseGain;
+        
+        const pointsAbove14 = constitution - 14;
+        let totalBonus = 0;
+        // Для каждого очка выше 14 свой случайный множитель
+        for (let i = 0; i < pointsAbove14; i++) {
+            const randomMultiplier = 0.8 + (Math.random() * 0.4); // 0.8-1.2
+            totalBonus += randomMultiplier;
+        }
+        
+        return baseGain + totalBonus;
     }
     
     /**
@@ -69,18 +85,41 @@ class FormulaCalculator {
      * @returns {number} максимальная мана
      */
     calculateMaxMana(baseMana, intelligence, wisdom, manaBonus = 0) {
-        return baseMana + (intelligence - 10) * 2 + (wisdom - 10) + manaBonus;
+        const intBonus = Math.max(0, Math.floor((intelligence - 10) / 2));
+        const wisBonus = Math.max(0, Math.floor((wisdom - 10) / 2));
+        return baseMana + intBonus + wisBonus + manaBonus;
     }
-    
     /**
      * Регенерация маны
      * @param {number} wisdom - мудрость
      * @returns {number} мана за тик
      */
-    calculateManaRegen(wisdom) {
-        return 2 + Math.max(0, Math.floor((wisdom - 14) / 2));
+    calculateManaRegen(wisdom, playerLevel) {
+        const baseRegen = 4;
+        const wisBonus = Math.max(0, Math.floor((wisdom - 14) / 2));
+        const levelBonus = Math.floor(playerLevel / 5);
+        return baseRegen + wisBonus + levelBonus;
     }
-    
+    /**
+     * Прирост маны за уровень
+    * @param {number} wisdom - мудрость
+    * @returns {number} мана за уровень
+    */
+    calculateManaPerLevel(wisdom) {
+        const baseGain = 3;
+        
+        if (wisdom <= 14) return baseGain;
+        
+        const pointsAbove14 = wisdom - 14;
+        let totalBonus = 0;
+        
+        for (let i = 0; i < pointsAbove14; i++) {
+            const randomMultiplier = 0.8 + (Math.random() * 0.4);
+            totalBonus += randomMultiplier;
+        }
+        
+        return baseGain + totalBonus;
+    }    
     /**
      * Сила заклинаний (с 23 мудрости)
      * @param {number} wisdom - мудрость
@@ -123,24 +162,45 @@ class FormulaCalculator {
     }
     /**
      * Максимальная выносливость
-     * @param {number} baseStamina - базовая выносливость (из пресета класса)
+     * @param {number} baseStamina - базовая выносливость а)
      * @param {number} dexterityMod - модификатор ловкости
      * @param {number} staminaBonus - бонус выносливости
      * @returns {number} максимальная выносливость
      */
-    calculateMaxStamina(baseStamina, dexterityMod, staminaBonus = 0) {
-        return baseStamina + dexterityMod * 5 + staminaBonus;
+    calculateMaxStamina(baseStamina, dexterity, staminaBonus = 0) {
+        return baseStamina + Math.max(0, dexterity - 10) + staminaBonus;
     }
-    
     /**
      * Регенерация выносливости
      * @param {number} dexterity - ловкость
      * @returns {number} выносливость за тик
      */
-    calculateStaminaRegen(dexterity) {
-        return 4 + Math.max(0, Math.floor((dexterity - 14) / 2));
+    calculateStaminaRegen(dexterity, playerLevel) {
+        const baseRegen = 4;
+        const dexBonus = Math.max(0, Math.floor((dexterity - 14) / 2));
+        const levelBonus = Math.floor(playerLevel / 5);
+        return baseRegen + dexBonus + levelBonus;
     }
-    
+    /**
+     * Прирост выносливости за уровень
+     * @param {number} dexterity - ловкость
+     * @returns {number} выносливость за уровень
+     */
+    calculateStaminaPerLevel(dexterity) {
+        const baseGain = 5;
+        
+        if (dexterity <= 14) return baseGain;
+        
+        const pointsAbove14 = dexterity - 14;
+        let totalBonus = 0;
+        
+        for (let i = 0; i < pointsAbove14; i++) {
+            const randomMultiplier = 0.8 + (Math.random() * 0.4);
+            totalBonus += randomMultiplier;
+        }
+        
+        return baseGain + totalBonus;
+    }       
     /**
      * Бонус удачи
      * @param {number} charisma - харизма
