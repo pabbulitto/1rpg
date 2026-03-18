@@ -23,6 +23,7 @@ import { GroundBag } from './core/GroundBag.js';
 import { EffectService } from './services/EffectService.js';
 import { PassiveAbilityService } from './services/PassiveAbilityService.js';
 import { FormulaParser } from './system/FormulaParser.js';
+import { EscapeSystem } from './system/EscapeSystem.js';
 import { ContextManager } from './services/ContextManager.js';  
 // Импорт всех UI компонентов
 import { CharacterCreationUI } from './ui/components/CharacterCreationUI.js';
@@ -84,7 +85,8 @@ class Game {
         this.battleSystem,
         this.combatSystem
     );
-    
+
+    this.escapeSystem = new EscapeSystem(this);
     // 6. Остальные системы
     this.zoneManager = new ZoneManager(this.gameState);
     this.graphicsEngine = new GraphicsEngine('game-canvas', this);
