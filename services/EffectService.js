@@ -212,6 +212,7 @@ class EffectService {
         if (!effect) return false;
         
         const targetId = effect.target?.id;
+        const effectTarget = effect.target;  // ← сохраняем ДО удаления
         
         // Удаляем из реестра целей
         if (targetId && this.effectsByTarget.has(targetId)) {
@@ -224,6 +225,10 @@ class EffectService {
         // Удаляем сам эффект
         effect.remove();
         this.activeEffects.delete(sourceId);
+        
+        if (effectTarget && typeof effectTarget.removeEffect === 'function') {
+            effectTarget.removeEffect(effect.id);
+        }     
         
         this.eventBus?.emit('effect:removed', {
             targetId,
@@ -246,9 +251,9 @@ class EffectService {
         const toRemove = [];
         for (const sourceId of effectSourceIds) {
             const effect = this.activeEffects.get(sourceId);
-            if (effect && effect.source === source) {
-                toRemove.push(sourceId);
-            }
+            if (effect && effect.source.startsWith(source)) {
+            toRemove.push(sourceId);
+        }
         }
         
         toRemove.forEach(sourceId => this.removeEffect(sourceId));

@@ -48,11 +48,6 @@ class GameManager {
      * @param {string} direction - направление ('north', 'south', 'east', 'west', 'up', 'down')
      */
     async move(direction) {
-        const battle = this.game.gameState.getBattleState();
-        if (battle.inBattle) {
-            this.eventBus.emit('log:add', { message: "Нельзя перемещаться во время боя!", type: "warning" });
-            return;
-        }
 
         // 1. Получаем данные текущей комнаты
         const currentRoomInfo = this.game.zoneManager.getCurrentRoomInfo();

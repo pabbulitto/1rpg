@@ -534,7 +534,18 @@ class Character {
     hasEffect(effectId) {
         return this.activeEffects.some(e => e.id === effectId);
     }
-
+    /**
+     * Проверить, есть ли у персонажа эффект, блокирующий побег
+     * @returns {boolean} true если есть блокирующий эффект
+     */
+    hasBlockingEffect() {
+        for (const effect of this.activeEffects) {
+            if (effect.flags && effect.flags.blocksEscape === true) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Получить все активные эффекты
      * @returns {Array} массив эффектов

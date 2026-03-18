@@ -790,7 +790,31 @@ class BattleCanvas {
                 this.ctx.strokeRect(x, cellY, this.abilityCellSize, this.abilityCellSize);
                 
                 const abilityIndex = row * abilityCols + col;
-                if (this.abilities[abilityIndex]) {
+                const isLastCell = (row === this.abilityRows - 1 && col === abilityCols - 1);
+
+                if (isLastCell) {
+                    // Рисуем кнопку "Бежать"
+                    this.ctx.save();
+                    this.ctx.fillStyle = '#8b0000';
+                    this.ctx.fillRect(x, cellY, this.abilityCellSize, this.abilityCellSize);
+                    
+                    // Иконка и текст с правильным центрированием
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = 'bold 24px monospace';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    
+                    // Иконка в верхней половине
+                    this.ctx.fillText('🏃', x + this.abilityCellSize/2, cellY + this.abilityCellSize/3);
+                    
+                    // Текст в нижней половине
+                    this.ctx.font = 'bold 12px monospace';
+                    this.ctx.fillText('Бежать', x + this.abilityCellSize/2, cellY + this.abilityCellSize*2/3);
+                    
+                    // Восстанавливаем настройки
+                    this.ctx.restore();
+    
+                    } else if (this.abilities[abilityIndex]) {
                     const ability = this.abilities[abilityIndex];
                     if (ability.icon) {
                      const img = await this.loadSprite(ability.icon);
@@ -937,6 +961,12 @@ class BattleCanvas {
         const row = Math.floor(offsetY / this.abilityCellSize);
         
         if (col < 0 || col >= 12 || row < 0 || row >= this.abilityRows) return;
+
+        const isLastCell = (row === this.abilityRows - 1 && col === 11);
+        if (isLastCell) {
+            this._handleEscapeClick();
+            return;
+        }
             
         const index = row * 12 + col;
         if (this.abilities[index]) {
@@ -960,7 +990,25 @@ class BattleCanvas {
         
         this.render();
     }
-    
+
+    _handleEscapeClick() {
+        // Проверяем, что бой активен
+        if (!this.combatSystem?.isInCombat()) {
+            console.log('Не в бою');
+            return;
+        }
+        
+        console.log('Попытка побега');
+        
+        // Эмитим событие для BattleOrchestrator
+        this.eventBus?.emit('battle:escape');
+        
+        // Можно добавить сообщение в лог
+        this.eventBus?.emit('log:add', {
+            message: '🏃 Попытка побега...',
+            type: 'info'
+        });
+    }
     handleTopBarClick(x, y) {
         // TODO: опционально
     }

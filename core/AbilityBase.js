@@ -36,6 +36,8 @@ class AbilityBase {
         
         // Для модификаторов эффектов (расширение в будущем)
         this.effects = data.effects || [];
+        this.baseEffectChance = data.baseEffectChance || 0;  
+        this.effectDuration = data.effectDuration || 0;  
         // Масштабирование от мастерства
         this.scaling = data.scaling || {};
         this.baseProjectiles = data.baseProjectiles || 1; // для магической стрелы
@@ -343,7 +345,6 @@ class AbilityBase {
                     stacksOverride: this.effectStacks || 1
                 }
             );
-            
             if (effect) {
                 appliedEffects.push(effect);
                 

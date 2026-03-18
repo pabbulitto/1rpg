@@ -255,27 +255,6 @@ class BattleSystem {
         log
         };
     }
-    
-    tryEscape(player, enemy) {
-        const escapeChance = 0.5;
-        const success = Math.random() < escapeChance;
-        
-        let log = [];
-        
-        if (success) {
-        log.push("Вы успешно сбежали!");
-        return { success: true, log };
-        } else {
-        log.push("Не удалось сбежать!");
-        
-        return {
-            success: false,
-            enemyDamage: 0,
-            playerDead: false,
-            log
-        };
-        }
-    }
 
     endBattleVictory(player, enemy) {
         const expReward = enemy.expReward;

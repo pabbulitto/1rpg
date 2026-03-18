@@ -11,6 +11,9 @@ class BattleOrchestrator {
     constructor(game, battleSystem = null, combatSystem = null) {
         
         this.game = game;
+        this.game.gameState.eventBus.on('battle:escape', async () => {
+        await this.tryEscape();
+        });
         this.battleSystem = battleSystem || new BattleSystem();
         this.battleSystem.game = game;
         
@@ -222,7 +225,7 @@ class BattleOrchestrator {
     /**
      * Попытка побега 
      */
-    tryEscape() {
+    async tryEscape() {
         const battle = this.game.gameState.getBattleState();
         const enemy = this.game.gameState.getCurrentEnemy();
         
@@ -230,7 +233,7 @@ class BattleOrchestrator {
             console.warn('tryEscape: бой не активен или враг не найден');
             return;
         }
-        // Проверяем здоровье через getStats()
+        
         const enemyStats = enemy.getStats ? enemy.getStats() : enemy;
         if (enemyStats.health <= 0) {
             console.warn('tryEscape: враг уже мертв');
@@ -239,43 +242,90 @@ class BattleOrchestrator {
         
         console.log('tryEscape: пытаемся сбежать от', enemy.name);
         
-        // 1. Используем BattleSystem для расчета побега
-        const result = this.battleSystem.tryEscape(this.game.player, enemy);
-        
-        // 2. Логируем результат попытки побега
-        if (result.log && result.log.length > 0) {
-            this.game.gameState.eventBus.emit('log:batch', 
-                result.log.map(msg => ({ message: msg, type: 'battle' }))
-            );
+        // Получаем систему побега
+        const escapeSystem = this.game.escapeSystem;
+        if (!escapeSystem) {
+            console.error('tryEscape: EscapeSystem не найдена');
+            return;
         }
         
-        // 3. Обрабатываем результат
-        if (result.success) {
-            // Успешный побег - заканчиваем бой
+        // Проверяем возможность побега
+        const canEscape = escapeSystem.canEscape(this.game.player);
+        if (!canEscape.success) {
             this.game.gameState.eventBus.emit('log:add', {
-                message: '🏃 Вы успешно сбежали!',
-                type: 'success'
-            });
-            this._endBattleCleanup();
-        } else {
-            // Провал побега - игрок пропускает ход, враг атакует
-            this.game.gameState.eventBus.emit('log:add', {
-                message: '❌ Не удалось сбежать! Вы теряете ход.',
+                message: canEscape.reason,
                 type: 'warning'
             });
             
+            // Провал проверки - враг атакует
             if (this.combatSystem && this.combatSystem.currentBattle) {
-                // Передаём ход врагу
                 this.combatSystem.isPlayerTurn = false;
-                
-                // Враг атакует в свой ход
                 setTimeout(() => {
                     if (this.combatSystem.currentBattle) {
                         this.combatSystem.processEnemyTurn();
                     }
                 }, 300);
             }
+            return;
         }
+        
+        // Получаем информацию о побеге
+        const escapeInfo = escapeSystem.getEscapeInfo(this.game.player);
+        
+        // Проверяем пассивку на выбор направления
+        const canChoose = this.game.player.passiveManager?.hasFlag('canChooseEscapeDestination');
+        
+        if (canChoose && escapeInfo.destinations.length > 0) {
+            // Есть пассивка - показываем UI выбора
+            this.game.gameState.eventBus.emit('escape:showChoices', {
+                destinations: escapeInfo.destinations,
+                staminaCost: escapeInfo.staminaCost,
+                expPenalty: escapeInfo.expPenalty
+            });
+        } else {
+            // Нет пассивки - случайный побег (ждём завершения)
+            const result = await escapeSystem.escapeRandom(this.game.player);
+            await this._processEscapeResult(result, enemy);
+        }
+    }
+    async _performRandomEscape(escapeSystem, enemy) {
+        const result = await escapeSystem.escapeRandom(this.game.player);
+        this._processEscapeResult(result, enemy);
+    }
+    async _processEscapeResult(result, enemy) {
+        if (!result.success) {
+            // Побег не удался
+            this.game.gameState.eventBus.emit('log:add', {
+                message: result.reason || 'Не удалось сбежать!',
+                type: 'warning'
+            });
+            
+            if (this.combatSystem && this.combatSystem.currentBattle) {
+                this.combatSystem.isPlayerTurn = false;
+                setTimeout(() => {
+                    if (this.combatSystem.currentBattle) {
+                        this.combatSystem.processEnemyTurn();
+                    }
+                }, 300);
+            }
+            return;
+        }
+        
+        // Успешный побег
+        if (result.expPenalty > 0) {
+            this.game.gameState.eventBus.emit('log:add', {
+                message: `Вы потеряли ${result.expPenalty} опыта при побеге`,
+                type: 'warning'
+            });
+        }
+        
+        this.game.gameState.eventBus.emit('log:add', {
+            message: `🏃 Вы сбежали в ${result.destination.roomName}!`,
+            type: 'success'
+        });
+        
+        // Завершаем бой
+        this._endBattleCleanup();
     }
 }
 

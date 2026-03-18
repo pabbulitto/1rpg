@@ -423,7 +423,7 @@ class EquipmentService {
                 .map(m => m.source);
             toRemove.forEach(source => this.statManager.removeModifier(source));
         }
-        
+        this._applyItemEffects(slot, item);
         if (item) {
             const itemStats = { ...item.stats };
             // Конвертируем health/maxHealth
@@ -451,8 +451,7 @@ class EquipmentService {
             this.statManager.setResource('health', Math.min(currentHealth, finalStats.maxHealth));
             this.statManager.setResource('mana', Math.min(currentMana, finalStats.maxMana));
             this.statManager.setResource('stamina', Math.min(currentStamina, finalStats.maxStamina));
-            // Применяем эффекты от предмета
-            this._applyItemEffects(slot, item);
+            
         }
         
         // Обновляем UI
