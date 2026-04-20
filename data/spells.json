@@ -38,6 +38,7 @@
         "duration": "floor(mastery/20)"
       },
       "effects": ["полет"],
+      "baseEffectChance": 100,
       "requirements": {
         "intelligence": 14,
         "level": 1

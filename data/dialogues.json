@@ -1,0 +1,110 @@
+{
+  "test_healer_dialogue": {
+    "startNode": "greeting",
+    "nodes": {
+      "greeting": {
+        "npcText": "Твои раны говорят о тяжелом пути. Я могу исцелить тебя.",
+        "options": [
+          {
+            "text": "Да, исцели меня",
+            "action": { "type": "heal" },
+            "nextNode": "after_heal"
+          },
+          {
+            "text": "Спасибо, я в порядке",
+            "nextNode": "goodbye"
+          }
+        ]
+      },
+      "after_heal": {
+        "npcText": "Будь осторожен в своих странствиях.",
+        "options": [
+          { "text": "Прощай", "nextNode": null }
+        ]
+      },
+      "goodbye": {
+        "npcText": "Да хранят тебя духи леса.",
+        "options": [
+          { "text": "Прощай", "nextNode": null }
+        ]
+      }
+    }
+  },
+  
+  "test_trainer_dialogue": {
+    "startNode": "greeting",
+    "nodes": {
+      "greeting": {
+        "npcText": "Я вижу в тебе потенциал. Чему хочешь научиться?",
+        "options": [
+          { 
+            "text": "Заклинаниям", 
+            "action": { 
+              "type": "showTrainList", 
+              "abilityType": "spell", 
+              "abilities": ["magic_missile", "полет", "вспышка"], 
+              "cost": 0,
+              "returnNode": "greeting"
+            } 
+          },
+          { 
+            "text": "Умениям", 
+            "action": { 
+              "type": "showTrainList", 
+              "abilityType": "skill", 
+              "abilities": ["kick", "dodge", "удар_левой_рукой",  "двуручники", "длинные_лезвия", "иное_оружие", "копья",
+                 "короткие_лезвия", "луки", "посохи_и_дубины", "проникающее_оружие", "топоры", "кулачный_бой"], 
+              "cost": 0,
+              "returnNode": "greeting"
+            } 
+          },
+          { 
+            "text": "Способностям", 
+            "action": { 
+              "type": "showTrainList", 
+              "abilityType": "passive", 
+              "abilities": ["огромные_кулаки", "ускоренное_заживление", "ночное_зрение", "мощь_колдовства", "обостренное_чутье"], 
+              "cost": 0,
+              "returnNode": "greeting"
+            } 
+          },
+          { "text": "Ничему, я пойду", "nextNode": "goodbye" }
+        ]
+      },
+      "goodbye": {
+        "npcText": "Удачи в твоих странствиях, путник.",
+        "options": [
+          { "text": "Прощай", "nextNode": null }
+        ]
+      }
+    }
+  },
+  
+  "test_teleporter_dialogue": {
+    "startNode": "greeting",
+    "nodes": {
+      "greeting": {
+        "npcText": "Я чувствую, что ты ищешь новые горизонты. Куда желаешь отправиться?",
+        "options": [
+          { 
+            "text": "В Зачарованный лес", 
+            "action": { 
+              "type": "teleport", 
+              "destination": { "name": "Зачарованный лес", "zone": "forest", "room": "forest.х1у2z0" } 
+            },
+            "nextNode": null
+          },
+          { 
+            "text": "В Южную деревню", 
+            "action": { 
+              "type": "teleport", 
+              "destination": { "name": "Южная деревня", "zone": "southwest_village", "room": "southwest_village.х4у10z0" } 
+            },
+            "nextNode": null
+          },
+          { "text": "Никуда, я передумал", "nextNode": null }
+        ]
+      }
+    }
+  }
+}

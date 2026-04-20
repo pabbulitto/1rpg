@@ -2,6 +2,7 @@
 import { GroundBag } from '../core/GroundBag.js';
 import { NonPlayerCharacter } from '../core/NonPlayerCharacter.js';
 import { EntityContainer } from '../core/EntityContainer.js';
+import { NPCService } from '../services/NPCService.js';
 class ZoneManager {
   constructor(gameState) {
     this.gameState = gameState;
@@ -10,6 +11,8 @@ class ZoneManager {
     // ===== НОВАЯ СТРУКТУРА: ЕДИНОЕ ХРАНЕНИЕ ВСЕХ СУЩНОСТЕЙ =====
     /** @type {Map<string, {entities: Map<string, Entity>}>} */
     this.rooms = new Map();
+    // Сервис для создания NPC
+    this.npcService = new NPCService(window.game);
 
     if (this.gameState.timeSystem) {
         // Регенерация (постоянная)
@@ -121,7 +124,42 @@ class ZoneManager {
           }
       }
   }
-    
+
+  /**
+     * Загрузить NPC для комнаты из конфига
+     * @private
+     */
+    _loadNPCsForRoom(roomId) {
+        const position = this.gameState.getPosition();
+        const zoneData = this.loadedZones.get(position.zone);
+        const roomData = zoneData?.rooms?.[roomId];
+        
+        if (!roomData || !roomData.npcs || roomData.npcs.length === 0) {
+            return;
+        }
+        
+        // Проверяем, не загружены ли уже NPC в комнату
+        const room = this.rooms.get(roomId);
+        if (room) {
+            const existingNPCs = Array.from(room.entities.values())
+                .filter(e => e.isNPC && e.isNPC());
+            if (existingNPCs.length > 0) {
+                return;
+            }
+        }
+        
+        for (const npcConfig of roomData.npcs) {
+            const npc = this.npcService.createNPC(npcConfig.npcId, {
+                gridX: npcConfig.gridX,
+                gridY: npcConfig.gridY
+            });
+            
+            if (npc) {
+                npc.zoneId = position.zone;
+                this.addEntity(roomId, npc);
+            }
+        }
+    }
   // ===== НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С ENTITIES =====
   /**
    * Добавить сущность в комнату
@@ -590,7 +628,10 @@ class ZoneManager {
         
         // Загружаем врагов для новой комнаты
         this._loadEnemiesForRoom(targetRoom);
-        
+
+        // Загружаем NPC для новой комнаты
+        this._loadNPCsForRoom(targetRoom);
+
         // Отправляем событие обновления комнаты
         const roomInfo = this.getCurrentRoomInfo();
         if (roomInfo) {
@@ -662,6 +703,9 @@ class ZoneManager {
             
             // Загружаем врагов для новой комнаты
             this._loadEnemiesForRoom(targetRoom);
+
+            // Загружаем NPC для новой комнаты
+            this._loadNPCsForRoom(targetRoom);
 
             // Отправляем событие обновления комнаты
             const roomInfo = this.getCurrentRoomInfo();

@@ -1,0 +1,93 @@
+{
+  "test_healer": {
+    "name": "Целитель-отшельник",
+    "sprite": "assets/sprites/npcs/healer.png",
+    "aiType": "passive",
+    "faction": "neutral",
+    "dialogueTree": "test_healer_dialogue",
+    "services": {
+      "dialogue": {
+        "greeting": "Твои раны говорят о тяжелом пути. Я могу исцелить тебя."
+      },
+      "heal": {
+        "icon": "💚",
+        "label": "Исцеление",
+        "cost": 0
+      }
+    }
+  },
+  
+"test_trainer": {
+    "name": "Мастер обучения",
+    "sprite": "assets/sprites/npcs/trainer.png",
+    "aiType": "passive",
+    "faction": "neutral",
+    "dialogueTree": "test_trainer_dialogue",
+    "services": {
+        "dialogue": {
+            "greeting": "Я вижу в тебе потенциал. Чему хочешь научиться?"
+        },
+        "trainSpells": {
+            "icon": "📚",
+            "label": "Заклинания",
+            "abilities": ["magic_missile", "полет", "вспышка"],
+            "cost": 0
+        },
+        "trainSkills": {
+            "icon": "⚔️",
+            "label": "Умения",
+            "abilities": [
+                "kick",
+                "dodge",
+                "удар_левой_рукой",
+                "двуручники",
+                "длинные_лезвия",
+                "иное_оружие",
+                "копья",
+                "короткие_лезвия",
+                "луки",
+                "посохи_и_дубины",
+                "проникающее_оружие",
+                "топоры",
+                "кулачный_бой"
+            ],
+            "cost": 0
+        },
+        "trainPassives": {
+            "icon": "🌟",
+            "label": "Способности",
+            "abilities": ["огромные_кулаки", "ускоренное_заживление", "ночное_зрение", "мощь_колдовства", "обостренное_чутье"],
+            "cost": 0
+        }
+    }
+  },
+  
+  "test_teleporter": {
+    "name": "Хранитель портала",
+    "sprite": "assets/sprites/npcs/portal_keeper.png",
+    "aiType": "passive",
+    "faction": "neutral",
+    "dialogueTree": "test_teleporter_dialogue",
+    "services": {
+      "dialogue": {
+        "greeting": "Я чувствую, что ты ищешь новые горизонты. Куда желаешь отправиться?"
+      },
+      "teleport": {
+        "icon": "🌀",
+        "label": "Переместиться",
+        "destinations": [
+          {
+            "name": "Зачарованный лес",
+            "zone": "forest",
+            "room": "forest.х1у2z0"
+          },
+          {
+            "name": "Южная деревня",
+            "zone": "southwest_village",
+            "room": "southwest_village.х4у10z0"
+          }
+        ]
+      }
+    }
+  }
+}

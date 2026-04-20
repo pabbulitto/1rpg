@@ -108,16 +108,6 @@
         "requiredLevel": 1,
         "exclusive": false
     },
-    "тихое_бегство": {
-        "name": "Тихое бегство",
-        "description": "Вы исчезаете так быстро, что никто не успевает заметить, в какую сторону вы направились.",
-        "modifiers": {
-            "hideEscapeDirection": true
-        },
-        "conditionFormula": "true",
-        "requiredLevel": 1,
-        "exclusive": false
-    },
     "твердая_рука": {
         "name": "Твердая рука",
         "description": "Ваши движения точны и выверены, будь то боевой клинок или обычная кружка. Увеличивает попадание.",

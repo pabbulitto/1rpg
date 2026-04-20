@@ -46,7 +46,13 @@
       "background": "assets/backgrounds/village/healer_hut.jpg",
       "description": "Небольшой домик на окраине, утопающий в зарослях лечебных трав. Внутри пахнет сушеными растениями и благовониями. Полки заставлены склянками и сушеными корешками. Пожилая женщина в платке перебирает травы.",
       "terrain": "road",
-      "npcs": [],
+      "npcs": [
+        {
+          "npcId": "test_healer",
+          "gridX": 6,
+          "gridY": 2
+        }
+      ],
       "objects": [],
       "items": [],
       "directions": {
@@ -71,7 +77,18 @@
       "description": "На обветренной вершине холма пересекаются несколько троп.",
       "background": "assets/backgrounds/village/market.jpg",
       "terrain": "road",
-      "npcs": [],
+      "npcs": [
+        {
+          "npcId": "test_trainer",
+          "gridX": 3,
+          "gridY": 2
+        },
+        {
+          "npcId": "test_teleporter",
+          "gridX": 6,
+          "gridY": 2
+        }
+      ],
       "objects": [],
       "items": [],
       "directions": {

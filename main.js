@@ -24,6 +24,7 @@ import { EffectService } from './services/EffectService.js';
 import { PassiveAbilityService } from './services/PassiveAbilityService.js';
 import { FormulaParser } from './system/FormulaParser.js';
 import { EscapeSystem } from './system/EscapeSystem.js';
+import { DialogueSystem } from './services/DialogueSystem.js';
 import { ContextManager } from './services/ContextManager.js';  
 // Импорт всех UI компонентов
 import { CharacterCreationUI } from './ui/components/CharacterCreationUI.js';
@@ -87,6 +88,9 @@ class Game {
     );
 
     this.escapeSystem = new EscapeSystem(this);
+
+    this.dialogueSystem = new DialogueSystem(this);
+    this.dialogueSystem.EntityActionModal = EntityActionModal;
     // 6. Остальные системы
     this.zoneManager = new ZoneManager(this.gameState);
     this.graphicsEngine = new GraphicsEngine('game-canvas', this);

@@ -26,14 +26,23 @@ class EntityActionModal {
         this.eventBus = eventBus;
         this.onClose = onClose;
         this.globalListenersAttached = false;
-        this.justOpened = false; 
+        this.justOpened = false;
+        this.dialogueSystem = game.dialogueSystem;
         
-        this.mode = 'main'; // 'main' или 'ability'
-        this.abilityType = null; // 'spell' или 'skill'
+        // Получаем саму сущность по ID
+        const entity = game.zoneManager?.getEntityById(entityId);
+        
+        // Определяем, является ли сущность NPC
+        this.isNPC = entity && typeof entity.isNPC === 'function' ? entity.isNPC() : false;
+        this.services = this.isNPC && entity ? entity.services : {};
+        
+        this.mode = 'main';
+        this.abilityType = null;
         this.abilities = [];
         
         this.modal = null;
     }
+
     _attachGlobalListeners() {
         // Если уже привязаны - выходим
         if (this.globalListenersAttached) return;
@@ -379,10 +388,31 @@ class EntityActionModal {
     }
 
     talk() {
-        console.log('Разговор с:', this.entityId);
-        this.eventBus.emit('log:add', { message: 'Разговор пока не реализован', type: 'info' });
+        // Получаем сущность
+        const entity = this.game.zoneManager?.getEntityById(this.entityId);
+        
+        // Если это NPC с диалогом - запускаем DialogueSystem
+        if (this.isNPC && entity && entity.dialogueTree) {
+            this.close();
+            this.dialogueSystem.startDialogue(entity, entity.dialogueTree);
+        } else if (this.isNPC && entity) {
+            // NPC без диалога - показываем простое сообщение
+            console.log('Разговор с:', this.entityId);
+            this.eventBus.emit('log:add', { 
+                message: `${entity.name} молча смотрит на вас.`, 
+                type: 'info' 
+            });
+            this.close();
+        } else {
+            // Для обычных существ - заглушка
+            console.log('Разговор с:', this.entityId);
+            this.eventBus.emit('log:add', { 
+                message: `${this.entityData?.name || 'Существо'} не хочет говорить`, 
+                type: 'info' 
+            });
+        }
     }
-
+      
     attack() {
         const entity = this.game.zoneManager.getEntityById(this.entityId);
         if (entity && entity.state === 'alive') {

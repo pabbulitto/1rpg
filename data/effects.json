@@ -56,7 +56,8 @@
       "staminaRegen": 5
     },
     "flags": {
-      "isSitting": true
+      "isSitting": true,
+      "blocksEscape": true
     }
   },
   "спрятался": {

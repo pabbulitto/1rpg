@@ -45,6 +45,10 @@ class NonPlayerCharacter extends Character {
         this.respawnTime = 600;
         this.zoneId = null;
         this.roomId = null;
+        // Данные для NPC (если это мирный NPC, а не враг)
+        this.npcType = null;              // 'npc' для мирных, null для врагов
+        this.services = {};               // объект с конфигурациями услуг
+        this.dialogueTree = null;         // ID диалога из dialogues.json
 
     }
     
@@ -247,7 +251,11 @@ class NonPlayerCharacter extends Character {
             roomId: this.roomId,
             inventory: containerInfo.items,
             equipment: containerInfo.equipment,
-            inventoryCount: containerInfo.itemCount || 0
+            inventoryCount: containerInfo.itemCount || 0,
+            npcType: this.npcType,
+            services: this.services,
+            dialogueTree: this.dialogueTree,
+            isNPC: this.isNPC()
         };
     }
     /**
@@ -265,8 +273,8 @@ class NonPlayerCharacter extends Character {
         this.sprite = config.sprite || null;
         this.gridX = config.gridX || 0;
         this.gridY = config.gridY || 0;
-        this.width = config.width || 68;
-        this.height = config.height || 68;
+        this.width = config.width || 85;
+        this.height = config.height || 85;
         
     // Загружаем базовые статы как есть (без умножения)
     if (config.baseStats) {
@@ -410,6 +418,58 @@ class NonPlayerCharacter extends Character {
         const finalStats = this.statManager.getFinalStats();
         
         return this;
+    }
+    /**
+     * Загрузить конфигурацию мирного NPC
+     * @param {Object} config - конфиг NPC из npcs.json
+     * @returns {NonPlayerCharacter}
+     */
+    loadNPCFromConfig(config) {
+        this.name = config.name || 'NPC';
+        this.type = config.type || 'humanoid';
+        this.npcType = 'npc';
+        this.sprite = config.sprite || null;
+        this.gridX = config.gridX || 0;
+        this.gridY = config.gridY || 0;
+        this.width = config.width || 85;
+        this.height = config.height || 85;
+        this.aiType = config.aiType || 'passive';
+        this.faction = config.faction || 'neutral';
+        this.services = config.services || {};
+        this.dialogueTree = config.dialogueTree || null;
+        
+        // Для NPC не нужны боевые статы, но StatManager требует инициализации
+        const finalStats = this.statManager.getFinalStats();
+        this.statManager.setResource('health', finalStats.maxHealth || 20);
+        this.statManager.setResource('mana', finalStats.maxMana || 20);
+        this.statManager.setResource('stamina', finalStats.maxStamina || 25);
+        
+        return this;
+    }
+    /**
+     * Проверить, есть ли у NPC указанная услуга
+     * @param {string} serviceName - имя услуги
+     * @returns {boolean}
+     */
+    hasService(serviceName) {
+        return this.services && !!this.services[serviceName];
+    }
+
+    /**
+     * Получить конфигурацию услуги
+     * @param {string} serviceName - имя услуги
+     * @returns {Object|null}
+     */
+    getServiceConfig(serviceName) {
+        return this.services?.[serviceName] || null;
+    }
+
+    /**
+     * Проверить, является ли персонаж мирным NPC
+     * @returns {boolean}
+     */
+    isNPC() {
+        return this.npcType === 'npc';
     }
     /**
      * Добавить предмет в инвентарь
