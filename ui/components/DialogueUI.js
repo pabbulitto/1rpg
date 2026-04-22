@@ -13,6 +13,7 @@ class DialogueUI {
         this.onBack = null;
         this.mode = 'dialogue'; // 'dialogue' или 'abilityList'
         this.isVisible = false;
+        this.overlay = null;
         
         this.injectStyles();
     }
@@ -182,6 +183,16 @@ class DialogueUI {
                 border-color: #888;
                 color: #fff;
             }
+
+            .dialogue-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -202,7 +213,8 @@ class DialogueUI {
         this.createModal();
         this.renderDialogue();
         this.bindDialogueEvents();
-        
+        this._createOverlay();
+
         this.isVisible = true;
     }
     
@@ -222,7 +234,8 @@ class DialogueUI {
         this.createModal();
         this.renderAbilityList();
         this.bindAbilityListEvents();
-        
+        this._createOverlay();
+
         this.isVisible = true;
     }
     
@@ -234,7 +247,27 @@ class DialogueUI {
         this.modal.className = 'dialogue-modal';
         document.body.appendChild(this.modal);
     }
-    
+    /**
+     * Создать оверлей, блокирующий взаимодействие с интерфейсом
+     * @private
+     */
+    _createOverlay() {
+        this._removeOverlay(); // на всякий случай
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'dialogue-overlay';
+        this.overlay.addEventListener('click', () => this.hide());
+        document.body.appendChild(this.overlay);
+    }
+    /**
+     * Удалить оверлей
+     * @private
+     */
+    _removeOverlay() {
+        if (this.overlay) {
+            this.overlay.remove();
+            this.overlay = null;
+        }
+    }
     /**
      * Отрисовать диалог
      */
@@ -356,6 +389,8 @@ class DialogueUI {
      * Скрыть диалоговое окно
      */
     hide() {
+        this._removeOverlay();
+        
         if (this.modal) {
             this.modal.remove();
             this.modal = null;

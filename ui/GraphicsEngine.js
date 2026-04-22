@@ -9,6 +9,8 @@
  * - Эмитит события для открытия модалок (BattleUI, InventoryUI)
  * - Не изменяет существующую логику боя/инвентаря
  */
+import { BubbleManager } from './BubbleManager.js';
+
 class GraphicsEngine {
     /**
      * @param {string} canvasId - ID canvas элемента
@@ -47,6 +49,8 @@ class GraphicsEngine {
         this.isInitialized = false;
         this.currentRoomInfo = null; 
         this.buttonAreas = [];         
+        this.bubbleManager = new BubbleManager(this);
+        this.bubbleTimer = null;
         
         // Привязка обработчиков
         this.handleRoomUpdate = this.handleRoomUpdate.bind(this);
@@ -82,7 +86,11 @@ class GraphicsEngine {
                 this.render(); 
             });
         }
-        
+        window.addEventListener('resize', () => {
+            if (this.bubbleManager) {
+                this.bubbleManager.updatePositions();
+            }
+        });
         // Вешаем обработчик клика
         this.canvas.addEventListener('click', this.handleClick);
         
@@ -103,32 +111,48 @@ class GraphicsEngine {
     handleRoomUpdate(roomInfo) {
         if (!roomInfo) return;
         
+        // Скрываем старые облачка
+        if (this.bubbleManager) {
+            this.bubbleManager.hideAllBubbles();
+        }
+        
+        // Отменяем старый таймер, если он есть
+        if (this.bubbleTimer) {
+            clearTimeout(this.bubbleTimer);
+            this.bubbleTimer = null;
+        }
+        
         this.currentZoneId = roomInfo.zoneId;
         this.currentRoomId = roomInfo.roomId;
         this.currentRoomInfo = roomInfo;
-        // Получаем все сущности в комнате
+        
         const allEntities = this.zoneManager?.getRoomEntities(roomInfo.roomId) || [];
         
-        // Фильтруем только живые и не удаленные, преобразуем в нужный формат
         this.entities = allEntities
             .filter(entity => entity && entity.state !== 'removed')
             .map(entity => ({
                 id: entity.id,
                 type: entity.type,
                 sprite: entity.sprite,
-                gridX: entity.gridX,        // придут из JSON через Entity
+                gridX: entity.gridX,
                 gridY: entity.gridY,
-                width: entity.width || 68,
-                height: entity.height || 68,
+                width: entity.width || 85,
+                height: entity.height || 85,
                 state: entity.state,
                 data: entity.getInfo ? entity.getInfo() : entity
             }))
             .filter(entity => entity.gridX !== undefined && entity.gridY !== undefined);
         
-        // Запускаем рендер
+        if (this.bubbleManager && this.entities.length > 0) {
+            this.bubbleTimer = setTimeout(() => {
+                const originalEntities = allEntities.filter(e => e && e.state !== 'removed');
+                this.bubbleManager.showGreetingsForRoom(originalEntities);
+                this.bubbleTimer = null;
+            }, 100);
+        }
+        
         this.render();
     }
-    
     /**
      * Загрузить изображение с кэшированием
      * @param {string} src - путь к изображению
@@ -301,7 +325,34 @@ class GraphicsEngine {
         this.ctx.font = '10px monospace';
         this.ctx.fillText(entity.type.substring(0, 3), x + 20, y + 40);
     }
-    
+    /**
+     * Получить экранные координаты сущности для позиционирования облачка
+     * @param {Object} entity - сущность с gridX, gridY, width, height
+     * @returns {Object} { x, y } - координаты центра верхней границы спрайта
+     */
+    getEntityScreenPosition(entity) {
+        if (!this.canvas) return { x: 0, y: 0 };
+        
+        const cellSize = this.cellSize;
+        const gridX = entity.gridX ?? 0;
+        const gridY = entity.gridY ?? 0;
+        const width = entity.width || 85;
+        
+        // Координаты внутри canvas
+        const offsetX = (cellSize - width) / 2;
+        const canvasX = gridX * cellSize + offsetX + width / 2;
+        const canvasY = gridY * cellSize;
+        
+        // Конвертируем в экранные координаты
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = rect.width / this.canvas.width;
+        const scaleY = rect.height / this.canvas.height;
+        
+        const screenX = rect.left + canvasX * scaleX;
+        const screenY = rect.top + canvasY * scaleY;
+        
+        return { x: screenX, y: screenY };
+    }
     getRoomName(roomId, currentZoneId) {
         // Если roomId содержит ":", значит это переход в другую зону
         if (roomId.includes(':')) {
@@ -652,6 +703,14 @@ class GraphicsEngine {
      * Очистить ресурсы
      */
     destroy() {
+        if (this.bubbleManager) {
+            this.bubbleManager.destroy();
+            this.bubbleManager = null;
+        }
+        if (this.bubbleTimer) {
+            clearTimeout(this.bubbleTimer);
+            this.bubbleTimer = null;
+        }
         if (this.eventBus) {
             // Отписываемся от событий
         }

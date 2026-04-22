@@ -49,7 +49,7 @@ class NonPlayerCharacter extends Character {
         this.npcType = null;              // 'npc' для мирных, null для врагов
         this.services = {};               // объект с конфигурациями услуг
         this.dialogueTree = null;         // ID диалога из dialogues.json
-
+        this.greetings = null;  // массив строк с приветствиями
     }
     
     /**
@@ -255,6 +255,7 @@ class NonPlayerCharacter extends Character {
             npcType: this.npcType,
             services: this.services,
             dialogueTree: this.dialogueTree,
+            greetings: this.greetings,
             isNPC: this.isNPC()
         };
     }
@@ -402,6 +403,8 @@ class NonPlayerCharacter extends Character {
         // Боевые формулы
         this.attackFormula = config.attackFormula || this.attackFormula;
         this.damageFormula = config.damageFormula || this.damageFormula;
+        // Приветствия для всплывающих облачков
+        this.greetings = config.greetings || null;
         
         // Награды (опыт и золото теперь только для информации, золото в инвентаре)
         this.goldReward = 0; // золото теперь в инвентаре
@@ -437,6 +440,7 @@ class NonPlayerCharacter extends Character {
         this.faction = config.faction || 'neutral';
         this.services = config.services || {};
         this.dialogueTree = config.dialogueTree || null;
+        this.greetings = config.greetings || null;
         
         // Для NPC не нужны боевые статы, но StatManager требует инициализации
         const finalStats = this.statManager.getFinalStats();
