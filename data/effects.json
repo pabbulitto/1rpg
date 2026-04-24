@@ -68,6 +68,24 @@
     "flags": {
         "hidden": true
     }
+  },
+    "аура_боевого_духа": {
+      "name": "Аура боевого духа",
+      "description": "В начале боя накладывает 'подавление' на всех врагов.",
+      "duration": 0,
+      "isDebuff": false,
+      "onCombatStart": {
+          "applyToEnemies": "подавление"
+      }
+  },
+  "подавление": {
+      "name": "Подавление",
+      "description": "Мастерство всех умений снижено на 10%.",
+      "duration": 0,
+      "isDebuff": true,
+      "stats": {
+          "masteryModifier": -10
+      }
   }
 
 

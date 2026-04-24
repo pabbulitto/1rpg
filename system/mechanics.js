@@ -18,8 +18,10 @@ export const mechanics = {
             const context = { mastery, dexterity: stats.dexterity };
             
             const maxDodges = Math.floor(formulaParser.evaluate(params.charges, context));
-            const dodgeChance = Math.min(95, formulaParser.evaluate(params.chance, context));
-            
+            let dodgeChance = Math.min(95, formulaParser.evaluate(params.chance, context));
+            // Добавляем бонус от удачи (+1% за каждое очко удачи, максимум +15%)
+            const luckBonus = Math.min(stats.luckBonus || 0, 15);
+            dodgeChance = Math.min(95, dodgeChance + luckBonus);
             combatSystem.dodgeState = {
                 active: true,
                 remaining: maxDodges,
@@ -73,8 +75,10 @@ export const mechanics = {
             if (!hasSkill) return;
             
             const mastery = abilityService.getMastery(character.id, 'удар_левой_рукой') || 0;
+            const stats = character.getStats();
+            const luckBonus = Math.min(stats.luckBonus || 0, 15);
             
-            const secondChance = 30 + mastery;
+            const secondChance = 30 + mastery+ luckBonus;
             let thirdChance = 0;
             if (mastery > 100) {
                 thirdChance = Math.floor((mastery - 100) / 3);

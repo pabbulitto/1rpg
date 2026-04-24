@@ -145,7 +145,7 @@ class GraphicsEngine {
         
         if (this.bubbleManager && this.entities.length > 0) {
             this.bubbleTimer = setTimeout(() => {
-                const originalEntities = allEntities.filter(e => e && e.state !== 'removed');
+                const originalEntities = allEntities.filter(e => e && e.state  === 'alive');
                 this.bubbleManager.showGreetingsForRoom(originalEntities);
                 this.bubbleTimer = null;
             }, 100);

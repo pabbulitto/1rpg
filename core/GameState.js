@@ -213,7 +213,14 @@ class GameState {
       diseaseResistance: finalStats.diseaseResistance || 0,
       spellResistance: finalStats.spellResistance || 0,
       mentalResistance: finalStats.mentalResistance || 0,
-      
+      critResistance: finalStats.critResistance || 0,
+      // === МАГИЧЕСКИЕ СОПРОТИВЛЕНИЯ ===
+      fireResist: finalStats.fireResist || 0,
+      waterResist: finalStats.waterResist || 0,
+      earthResist: finalStats.earthResist || 0,
+      airResist: finalStats.airResist || 0,
+      darkResist: finalStats.darkResist || 0,
+      mindResist: finalStats.mindResist || 0,
       // === СОЦИАЛЬНЫЕ ===
       charmChance: finalStats.charmChance || 0,
       persuasionDC: finalStats.persuasionDC || 10,

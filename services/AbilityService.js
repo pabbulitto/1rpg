@@ -118,9 +118,44 @@ class AbilityService {
      * @returns {number}
      */
     getMastery(characterId, abilityId) {
-        return this.characterMastery.get(characterId)?.get(abilityId) || 0;
+        const baseMastery = this.characterMastery.get(characterId)?.get(abilityId) || 0;
+        
+        // Получаем персонажа
+        const character = this.findCharacterById(characterId);
+        if (!character) return baseMastery;
+        
+        // Проверяем эффекты с модификатором мастерства
+        const effectService = window.game?.effectService;
+        if (!effectService) return baseMastery;
+        
+        const effects = effectService.getEffectsOnTarget(characterId);
+        let masteryModifier = 0;
+        
+        for (const effect of effects) {
+            const stats = effect.statsModifiers || {};
+            if (stats.masteryModifier !== undefined) {
+                masteryModifier += stats.masteryModifier;
+            }
+        }
+        
+        // Применяем модификатор (в процентах)
+        const modifiedMastery = baseMastery * (1 + masteryModifier / 100);
+        return Math.max(0, Math.min(200, modifiedMastery));
     }
-
+    /**
+     * Найти персонажа по ID
+     * @param {string} characterId
+     * @returns {Object|null}
+     */
+    findCharacterById(characterId) {
+        if (window.game?.player?.id === characterId) {
+            return window.game.player;
+        }
+        if (window.game?.zoneManager) {
+            return window.game.zoneManager.getEntityById(characterId);
+        }
+        return null;
+    }
     /**
      * Установить мастерство способности для персонажа
      * @param {string} characterId

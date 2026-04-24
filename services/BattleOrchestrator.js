@@ -38,6 +38,8 @@ class BattleOrchestrator {
         // Эмитим событие с данными для UI
         this.game.gameState.eventBus.emit('battle:start', {
             player: this.game.player,
+            enemy: enemy,  
+            enemies: [enemy],
             playerStats: battleStart.player,
             enemyId: battleStart.enemyId,
             enemyData: battleStart.enemyData,

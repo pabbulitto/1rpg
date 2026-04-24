@@ -178,9 +178,14 @@ class StatManager {
       result.staminaRegen = baseStaminaRegen + (modifierValues.staminaRegen || 0);
 
       // 9. ПРИРОСТ ЗА УРОВЕНЬ
-      result.healthPerLevel = this.formulaCalculator.calculateHealthPerLevel(result.constitution);
-      result.manaPerLevel = this.formulaCalculator.calculateManaPerLevel(result.wisdom);
-      result.staminaPerLevel = this.formulaCalculator.calculateStaminaPerLevel(result.dexterity);
+      const baseHealthPerLevel = this.formulaCalculator.calculateHealthPerLevel(result.constitution);
+      result.healthPerLevel = baseHealthPerLevel + (modifierValues.healthPerLevel || 0);
+
+      const baseManaPerLevel = this.formulaCalculator.calculateManaPerLevel(result.wisdom);
+      result.manaPerLevel = baseManaPerLevel + (modifierValues.manaPerLevel || 0);
+
+      const baseStaminaPerLevel = this.formulaCalculator.calculateStaminaPerLevel(result.dexterity);
+      result.staminaPerLevel = baseStaminaPerLevel + (modifierValues.staminaPerLevel || 0);
 
       // 10. МАГИЯ
       const baseSpellPower = this.formulaCalculator.calculateSpellPower(result.wisdom);
@@ -230,14 +235,14 @@ class StatManager {
       result.fortitude = 0;
       result.reflex = 0;
       
-      // Магические сопротивления
-      result.fireResist = 0;
-      result.waterResist = 0;
-      result.earthResist = 0;
-      result.airResist = 0;
-      result.darkResist = 0;
-      result.mindResist = 0;
-      
+      // Магические сопротивления (базовые + модификаторы)
+      result.fireResist = (modifierValues.fireResist || 0) + (modifierValues.allMagicResist || 0);
+      result.waterResist = (modifierValues.waterResist || 0) + (modifierValues.allMagicResist || 0);
+      result.earthResist = (modifierValues.earthResist || 0) + (modifierValues.allMagicResist || 0);
+      result.airResist = (modifierValues.airResist || 0) + (modifierValues.allMagicResist || 0);
+      result.darkResist = (modifierValues.darkResist || 0) + (modifierValues.allMagicResist || 0);
+      result.mindResist = (modifierValues.mindResist || 0) + (modifierValues.allMagicResist || 0);
+        
       // Тяжёлые раны
       result.heavyWounds = 0;
 
@@ -408,7 +413,13 @@ class StatManager {
         poisonResistance: stats.poisonResistance,
         diseaseResistance: stats.diseaseResistance,
         spellResistance: stats.spellResistance,
-        mentalResistance: stats.mentalResistance
+        mentalResistance: stats.mentalResistance,
+        fireResist: stats.fireResist || 0,
+        waterResist: stats.waterResist || 0,
+        earthResist: stats.earthResist || 0,
+        airResist: stats.airResist || 0,
+        darkResist: stats.darkResist || 0,
+        mindResist: stats.mindResist || 0
       },
       
       utility: {

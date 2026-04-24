@@ -70,7 +70,13 @@ class BattleSystem {
                 const attackFormula = `1d20+${hitroll}`;
                 attackRoll = this.diceRoller.roll(attackFormula, {});
                 naturalRoll = attackRoll.rolls[0] || 0;
-                isCritical = naturalRoll === 20;
+                // Шанс крита: базово 20 (5%), при удаче 9+ порог 19 (10%)
+                const luckBonus = playerStats.luckBonus || 0;
+                let critThreshold = 20;
+                if (luckBonus >= 9) {
+                    critThreshold = 19;
+                }
+                isCritical = naturalRoll >= critThreshold;
                 isFumble = naturalRoll === 1;
             }
             

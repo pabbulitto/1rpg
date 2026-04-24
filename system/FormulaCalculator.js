@@ -148,7 +148,7 @@ class FormulaCalculator {
     calculateHitroll(strength) {
         if (strength <= 18) return 0;
         const above18 = strength - 18;
-        return Math.floor(above18 / 2); // +1 за каждые 2 силы после 18
+        return Math.floor(above18 / 4); // +1 за каждые 4 силы после 18
     }
     /**
      * Рассчитать бонус повреждений (damroll) от силы
@@ -207,7 +207,7 @@ class FormulaCalculator {
      * @returns {number} бонус удачи
      */
     calculateLuckBonus(charisma) {
-        return Math.floor((charisma - 10) / 5);
+        return Math.floor((charisma - 10) / 4);
     }
     
     /**

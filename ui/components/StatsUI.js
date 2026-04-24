@@ -161,13 +161,13 @@ class StatsUI {
         const heavyWounds = 0;
         const mental = resistances.mentalResistance || s.mentalResistance || 0;
         
-        // Маг сопротивления (заглушки)
-        const fireResist = 0;
-        const waterResist = 0;
-        const earthResist = 0;
-        const airResist = 0;
-        const darkResist = 0;
-        const mindResist = 0;
+        // Маг сопротивления (из характеристик)
+        const fireResist = s.fireResist || 0;
+        const waterResist = s.waterResist || 0;
+        const earthResist = s.earthResist || 0;
+        const airResist = s.airResist || 0;
+        const darkResist = s.darkResist || 0;
+        const mindResist = s.mindResist || 0;
         
         // Группа
         const groupInfo = 'не состоит';

@@ -28,6 +28,14 @@ class EffectService {
         this.effectsByTarget = new Map();
         
         this.initialized = false;
+        // Подписка на начало боя для аур
+        if (this.eventBus) {
+            this.eventBus.on('battle:start', (data) => {
+                const player = data.player;
+                const enemies = data.enemies || (data.enemy ? [data.enemy] : []);
+                this.triggerCombatStartEffects(player, enemies);
+            });
+        }
     }
     
     /**
@@ -309,7 +317,50 @@ class EffectService {
         const effects = this.getEffectsOnTarget(targetId);
         return effects.some(e => e.id === effectId);
     }
-    
+    /**
+     * Активировать эффекты, срабатывающие при начале боя
+     * @param {Object} player - игрок
+     * @param {Array} enemies - массив врагов
+     */
+    triggerCombatStartEffects(player, enemies) {
+        if (!player || !enemies || enemies.length === 0) return;
+        
+        const playerEffects = this.getEffectsOnTarget(player.id);
+        
+        for (const effect of playerEffects) {
+            const template = this.templates.get(effect.id);
+            if (!template || !template.onCombatStart) continue;
+            
+            const combatStart = template.onCombatStart;
+            
+            // Применяем эффект ко всем врагам
+            if (combatStart.applyToEnemies) {
+                const enemyEffectId = combatStart.applyToEnemies;
+                for (const enemy of enemies) {
+                    // Проверяем, жив ли враг
+                    if (!enemy.isAlive || !enemy.isAlive()) continue;
+                    
+                    this.applyEffect(
+                        enemy,
+                        enemyEffectId,
+                        `combat_aura_${effect.id}`,
+                        { durationOverride: 0 }
+                    );
+                }
+            }
+            
+            // Применяем эффект ко всем союзникам (для будущих аур)
+            if (combatStart.applyToAllies) {
+                const allyEffectId = combatStart.applyToAllies;
+                this.applyEffect(
+                    player,
+                    allyEffectId,
+                    `combat_aura_${effect.id}`,
+                    { durationOverride: 0 }
+                );
+            }
+        }
+    }
     /**
      * Получить эффект по sourceId
      * @param {string} sourceId

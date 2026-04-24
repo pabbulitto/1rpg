@@ -159,6 +159,7 @@ class PlayerCharacter extends Character {
                     const newBaseMana = Math.floor((baseStats.baseMana || 20) + manaPerLevel);
 
                     const staminaPerLevel = currentStats.staminaPerLevel || 5;
+                    
                     const newBaseStamina = Math.floor((baseStats.baseStamina || 25) + staminaPerLevel);
                     
                     statManager.baseStats.baseHealth = newBaseHealth;
@@ -238,7 +239,18 @@ class PlayerCharacter extends Character {
      * @returns {Object} характеристики игрока
      */
     getStats() {
-        return this.gameState?.getPlayer() || {};
+        const stats = this.gameState?.getPlayer() || {};
+        
+        // Ограничение AC по профессии
+        if (this.class && stats.armorClass !== undefined) {
+            const classData = window.game?.dataService?.getProfessionData(this.class);
+            const maxArmorClass = classData?.maxArmorClass;
+            if (maxArmorClass && stats.armorClass > maxArmorClass) {
+                stats.armorClass = maxArmorClass;
+            }
+        }
+        
+        return stats;
     }
     
     /**

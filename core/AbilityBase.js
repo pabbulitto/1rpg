@@ -306,7 +306,7 @@ class AbilityBase {
             console.warn('EffectService не найден');
             return appliedEffects;
         }
-        
+        const casterStats = caster.getStats ? caster.getStats() : caster;
         // Применяем каждый эффект из списка
         this.effects.forEach(effectId => {
             // Базовая длительность (из заклинания или 0)
@@ -322,7 +322,9 @@ class AbilityBase {
             
             // ПОЛУЧАЕМ ШАНС СРАБАТЫВАНИЯ ЭФФЕКТА
             let chance = this.baseEffectChance !== undefined ? this.baseEffectChance : 100;
-            
+            // Добавляем бонус от удачи (+1% за каждое очко удачи, максимум +15%)
+            const luckBonus = Math.min(casterStats.luckBonus || 0, 15);
+            chance += luckBonus;
             // Если есть масштабирование шанса от мастерства
             if (this.scaling && this.scaling.effectChance) {
                 const mastery = window.game.abilityService.getMastery(caster.id, this.id) || 0;

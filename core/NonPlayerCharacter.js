@@ -156,7 +156,14 @@ class NonPlayerCharacter extends Character {
             const attackResult = this.battleSystem.diceRoller.roll(attackFormula, context);
             const playerAC = playerStats.armorClass ?? 0;
             const naturalRoll = attackResult.rolls[0] || 0;
-            const isCritical = naturalRoll === 20;
+            // Шанс крита для врагов: базово 20 (5%), при удаче 9+ порог 19 (10%)
+            const luckBonus = stats.luckBonus || 0;
+            let critThreshold = 20;
+            if (luckBonus >= 9) {
+                critThreshold = 19;
+            }
+
+            const isCritical = naturalRoll >= critThreshold;
             const isFumble = naturalRoll === 1;
             
             let hits = false;
@@ -312,16 +319,27 @@ class NonPlayerCharacter extends Character {
         if (config.inventory) {
             // 1. Гарантированный лут
             if (config.inventory.guaranteed) {
+                // Получаем удачу игрока для бонуса к золоту
+                const player = window.game?.player;
+                const playerStats = player?.getStats() || {};
+                const luckBonus = Math.min(playerStats.luckBonus || 0, 10);
+                const luckMultiplier = 1 + (luckBonus * 0.02); // +2% за очко удачи
+                
                 Object.entries(config.inventory.guaranteed).forEach(([itemId, value]) => {
                     let count = 1;
                     
                     // Если это объект с min/max (для золота и ресурсов)
                     if (typeof value === 'object' && value.min !== undefined) {
-                        count = Math.floor(Math.random() * (value.max - value.min + 1)) + value.min;
+                        const baseMin = value.min;
+                        const baseMax = value.max;
+                        // Применяем множитель удачи
+                        const luckyMin = Math.floor(baseMin * luckMultiplier);
+                        const luckyMax = Math.floor(baseMax * luckMultiplier);
+                        count = Math.floor(Math.random() * (luckyMax - luckyMin + 1)) + luckyMin;
                     } 
                     // Если это число (фиксированное количество)
                     else if (typeof value === 'number') {
-                        count = value;
+                        count = Math.floor(value * luckMultiplier);
                     }
                     
                     const item = itemFactory.create(itemId, count);
@@ -331,14 +349,21 @@ class NonPlayerCharacter extends Character {
             
             // 2. Шансовый лут (обычные предметы)
             if (config.inventory.chance) {
+                // Получаем удачу игрока (того, кто убил врага)
+                // Удача врага не влияет на лут, влияет удача игрока
+                const player = window.game?.player;
+                const playerStats = player?.getStats() || {};
+                const luckBonus = Math.min(playerStats.luckBonus || 0, 10); // макс +20% при удаче 10
+                const luckMultiplier = 1 + (luckBonus * 0.02); // +2% за очко удачи
+                
                 Object.entries(config.inventory.chance).forEach(([itemId, chance]) => {
-                    if (Math.random() <= chance) {
+                    const finalChance = Math.min(chance * luckMultiplier, 1.0); // не больше 100%
+                    if (Math.random() <= finalChance) {
                         const item = itemFactory.create(itemId, 1);
                         if (item) this.addItem(item);
                     }
                 });
             }
-            
             // 3. Лимитированные предметы (для будущего)
             if (config.inventory.limited && Array.isArray(config.inventory.limited)) {
                 config.inventory.limited.forEach(limited => {

@@ -362,6 +362,7 @@ class PassiveManager {
         }
 
         statManager.addModifier(sourceId, finalModifiers);
+
     }
 
     /**
